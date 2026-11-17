@@ -28,6 +28,9 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- m8: Zorfa discover (read-only) for the documented agents in data/supported_agents.json
+  (claude-code, gemini-cli), secret redaction, skill scanning, JSON + text report; shim fix
+  (src always first on sys.path).
 - cleanup: 16 third-party wheel files (~11 MB) that a network probe (`pip download`) had left in
   the project folder were committed by mistake in m1 (`dbe7e8b`). They are removed from the tree
   in this commit and `*.whl` is ignored. They remain in git history: rewriting history would change

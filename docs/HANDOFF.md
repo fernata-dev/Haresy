@@ -2,7 +2,15 @@
 
 _Updated at every milestone. Read this first if you are continuing the work (person or model)._
 
-## Status: m7 done — all milestones complete; real-model pilot NOT RUN
+## Status: m8 done (Zorfa discover) — m9/m10 in progress; real-model pilot NOT RUN
+
+### m8–m10 (Zorfa) summary
+- Product name: **Zorfa** (`zorfa` command, `src/zorfa/`). The research core keeps the package name
+  `hares` on purpose: renaming it would change every import line in the frozen scanner files.
+- Supported agents (official docs checked 2026-11-17, see docs/INTEGRATIONS.md): **claude-code**,
+  **gemini-cli**. Everything else is listed as not supported with the reason.
+- m8 `zorfa discover` (default command): read-only; tests in tests/test_zorfa_discover.py prove no
+  writes, no network, no reads of unsupported (.cursor) or secret (.ssh) files, secrets redacted.
 
 | milestone | state | tag |
 |---|---|---|
@@ -13,6 +21,9 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 | m5 real-LLM adapters + pilot | adapters DONE, **pilot NOT RUN** | `m5` |
 | m6 report generator + demo | DONE | `m6` |
 | m7 docs + self-audit + clean-checkout reproduction | DONE | `m7` |
+| m8 Zorfa discover (read-only) | DONE | `m8` |
+| m9 install (pip/pipx) | next | |
+| m10 protect / unprotect / MCP proxy / hook (opt-in) | pending | |
 
 ## What works (verified in the build environment)
 
