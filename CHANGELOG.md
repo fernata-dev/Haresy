@@ -28,6 +28,8 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- `pilot --authors student`: run the real-model pilot on the student's own texts only (empty set is
+  refused with instructions); install/run commands added to docs/STUDENT_GUIDE.md (checked in a fresh clone).
 - m14: new real recording under the name Bawwab (allowlist vs taint mode, D5-taint vs D6), docs updated.
 - m13: Bawwab policy hardening (Base64/percent-encoded and disguised destinations, numeric IP forms,
   destination-named arguments, punycode for look-alike hosts) and **taint mode** (MCP proxy: outputs

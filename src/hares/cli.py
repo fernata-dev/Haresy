@@ -296,6 +296,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--agent", default="ollama", choices=("ollama", "openai"))
     s.add_argument("--split", default="test", choices=("dev", "test"))
     s.add_argument("--langs", default="en,arz,arabizi")
+    s.add_argument("--authors", help="e.g. student (only your own texts); default: all authors")
     s.add_argument("--encodings", default="none,b64,zwsp")
     s.add_argument("--sources", default="email,webpage")
     s.add_argument("--defenses", default="D0,D1,D2,D5")

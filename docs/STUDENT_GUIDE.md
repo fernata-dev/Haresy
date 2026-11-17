@@ -47,3 +47,43 @@ python -m hares report
 
 متغيّرش عنوان المهاجم لعنوان حقيقي، ومتجرّبش أي حاجة على حسابات أو أنظمة حقيقية. المشروع كله وهمي،
 وده جزء من نزاهته.
+
+## 7. أوامر التنزيل والتشغيل (اتجرّبت في clone نضيف)
+
+المتطلبات: Python 3.11 أو أحدث، وgit. على ويندوز استخدم `python` وعلى ماك/لينكس ممكن تحتاج `python3`.
+
+```bash
+git clone -b ccr-bf26486f-ag5cn6 https://github.com/fernata-dev/Haresy.git
+cd Haresy
+python -m venv .venv
+# ويندوز (PowerShell):  .venv\Scripts\Activate.ps1
+# ماك/لينكس:            source .venv/bin/activate
+pip install -e ".[dev]"
+python -m hares restore-tags        # يرجّع الـ tags (ما اترفعتش على GitHub)
+python -m hares verify-freeze       # لازم "ok": true
+python -m pytest                    # كل الاختبارات لازم تنجح
+```
+
+البحث على المحاكي (من غير AI):
+```bash
+python -m hares eval --split test
+python -m hares report              # افتح report/index.html
+python -m hares demo                # http://127.0.0.1:8765
+```
+
+التجربة على AI حقيقي (Ollama على جهازك):
+```bash
+ollama pull qwen2.5:7b-instruct
+python -m hares llm-check --agent ollama --model qwen2.5:7b-instruct
+python -m hares pilot --agent ollama --model qwen2.5:7b-instruct --authors student --dry-run
+python -m hares pilot --agent ollama --model qwen2.5:7b-instruct --authors student --yes
+python -m hares report
+```
+
+أداة بوّاب على جهازك (جرّبها على حساب تجريبي الأول):
+```bash
+bawwab                      # اكتشاف، قراية بس
+bawwab protect --dry-run    # يوريك التغيير بالظبط
+bawwab protect --apply      # هيطلب منك تكتب APPLY
+bawwab unprotect            # يرجّع كل حاجة (هيطلب RESTORE)
+```

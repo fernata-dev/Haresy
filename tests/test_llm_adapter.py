@@ -92,3 +92,11 @@ def test_pilot_records_not_run_when_no_model(monkeypatch, tmp_path, capsys):
 
 def test_public_endpoint_strips_paths_and_secrets():
     assert _public_endpoint("https://user:key@api.example.test:8443/v1?key=abc") == "https://api.example.test:8443"
+
+
+def test_pilot_authors_filter_and_empty_student_set(fake_endpoint, monkeypatch, capsys):
+    monkeypatch.setenv("BASE_URL", fake_endpoint)
+    assert main(["pilot", "--agent", "openai", "--authors", "student", "--dry-run"]) == 2
+    assert "student_written" in capsys.readouterr().out
+    assert main(["pilot", "--agent", "openai", "--authors", "ai-draft", "--dry-run"]) == 0
+    assert "cases=" in capsys.readouterr().out

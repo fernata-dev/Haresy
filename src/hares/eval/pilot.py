@@ -29,8 +29,9 @@ def run_pilot(args) -> int:
     encs = tuple(x for x in args.encodings.split(",") if x)
     sources = tuple(x for x in args.sources.split(",") if x)
     defenses = tuple(x for x in args.defenses.split(",") if x)
+    authors = tuple(x for x in (getattr(args, "authors", None) or "").split(",") if x) or None
     plan = {"split": args.split, "langs": langs, "encodings": encs, "sources": sources,
-            "defenses": defenses, "repeats": args.repeats}
+            "defenses": defenses, "repeats": args.repeats, "authors": authors}
     if len(langs) < 3 or len(encs) < 3 or len(sources) < 2:
         print("pilot needs >= 3 languages, >= 3 encodings and >= 2 sources")
         return 2
@@ -49,7 +50,12 @@ def run_pilot(args) -> int:
     if args.split == "test" and not frz["ok"]:
         print("REFUSED: scanners differ from the freeze tag; see `python -m hares verify-freeze`.")
         return 2
-    cases = runner.build_cases(args.split, args.seed, langs=langs, encodings=encs, sources=sources)
+    cases = runner.build_cases(args.split, args.seed, langs=langs, encodings=encs, sources=sources,
+                               authors=authors)
+    if not cases:
+        print("no cases match (with --authors student: add your texts to data/attacks/student_written/ "
+              "and data/benign/student_written/, then run `python -m hares validate`)")
+        return 2
     agent = LLMAgent(client)
     n_ep = len(cases) * len(defenses) * args.repeats
     est = client.estimate(n_ep)
@@ -62,7 +68,7 @@ def run_pilot(args) -> int:
     rows, st = runner.run_matrix(cases, defenses, agent, repeats=args.repeats, llm_client=client,
                                  stop=client.exhausted)
     result = runner.package_results(rows, st, agent, split=args.split, seed=args.seed, repeats=args.repeats,
-                                    filters={"langs": langs, "encodings": encs, "sources": sources},
+                                    filters={"langs": langs, "encodings": encs, "sources": sources, "authors": authors},
                                     extra_meta={"freeze": frz, "llm_usage": client.usage(), "pilot": True})
     result["meta"]["agent"]["endpoint"] = _public_endpoint(client.endpoint())
     slug = "".join(c if c.isalnum() else "-" for c in str(client.model))
