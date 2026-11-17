@@ -2,7 +2,7 @@
 
 _Updated at every milestone. Read this first if you are continuing the work._
 
-## Status: m4 done (skill scanner)
+## Status: m5 done (LLM adapters; pilot NOT RUN - no model available in the build environment)
 
 | milestone | state |
 |---|---|
@@ -10,8 +10,8 @@ _Updated at every milestone. Read this first if you are continuing the work._
 | m2 D2 scanner + freeze | DONE (tag `freeze-scanner`) |
 | m3 D5 guard, residual risk, benign utility | DONE |
 | m4 skillscan | DONE |
-| m5 LLM adapters + pilot | next |
-| m6 report + demo | pending |
+| m5 LLM adapters + pilot | adapters DONE; pilot NOT RUN (see below) |
+| m6 report + demo | next |
 | m7 docs + self-audit | pending |
 
 ## What works
@@ -63,9 +63,40 @@ _Updated at every milestone. Read this first if you are continuing the work._
   addresses outside an allowlist, shell patterns (report only). Fixtures in `fixtures/`.
 - Not evaluated on a held-out corpus: only fixture tests. Do not report detection rates for it.
 
+## Real-LLM adapters and pilot (m5)
+
+- `src/hares/agents/llm_adapter.py`: `OllamaClient` (OLLAMA_HOST, MODEL) and
+  `OpenAICompatClient` (BASE_URL, API_KEY, MODEL; HARES_* variants win). stdlib urllib only.
+  Temperature 0, fixed seed, every request/response appended to `results/raw/*.jsonl`
+  (git-ignored). `--max-calls` is a hard cap; interrupted episodes are dropped, never scored.
+- `src/hares/agents/protocol.py`: one-JSON-tool-call protocol + robust parser (fences, <think>,
+  OpenAI tool_calls, string arguments, single quotes). One format-correction retry per turn.
+- `src/hares/agents/fake_llm_server.py`: scripted responder used ONLY by tests (NOT A MODEL).
+- **Pilot status: NOT RUN.** The build environment had no Ollama, and ollama.com /
+  huggingface.co were blocked, so no real model existed. The endpoint Claude Code itself uses
+  was deliberately NOT used (rule 2: only a user-configured endpoint). `results/pilot_status.json`
+  records this. Plan: test split, langs en,arz,arabizi x encodings none,b64,zwsp x sources
+  email,webpage; defenses D0,D1,D2,D5; N=3 -> 81 cases, 972 episodes, ~3.9k calls.
+
+### Student: how to run the pilot on your laptop
+
+```bash
+# 1. install Ollama from ollama.com, then pull a model that knows Arabic, e.g.
+ollama pull qwen2.5:7b-instruct
+# 2. check the connection (one request)
+python -m hares llm-check --agent ollama --model qwen2.5:7b-instruct
+# 3. see the plan and estimate, then run it (several hours on CPU; leave it overnight)
+python -m hares pilot --agent ollama --model qwen2.5:7b-instruct --dry-run
+python -m hares pilot --agent ollama --model qwen2.5:7b-instruct --yes
+# 4. rebuild the report and the go/no-go file
+python -m hares report
+```
+
+Record in your logbook: model name, the digest printed by llm-check, the date, your machine.
+
 ## What is not there yet
 
-LLM adapters + pilot, report, demo.
+report generator, demo, final docs.
 
 ## Conservative decisions taken (ambiguities in the brief)
 

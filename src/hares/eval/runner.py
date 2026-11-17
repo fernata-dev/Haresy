@@ -100,7 +100,16 @@ def run_matrix(cases: list[Case], defense_names: Iterable[str], agent, repeats: 
                     return rows, status
                 if hasattr(agent, "set_repeat"):
                     agent.set_repeat(rep)
-                _, res = run_episode(case, stack, agent, max_steps=max_steps)
+                try:
+                    _, res = run_episode(case, stack, agent, max_steps=max_steps)
+                except Exception as exc:  # real-model failures: the episode is dropped, never scored
+                    if agent.simulated:
+                        raise
+                    status["_llm_errors"] = status.get("_llm_errors", 0) + 1
+                    if stop and stop():
+                        status["_partial"] = f"stopped early after {done} of {total} episodes ({exc})"
+                        return rows, status
+                    continue
                 row = {
                     "case_id": case.case_id, "kind": case.kind, "base_id": v["base_id"],
                     "lang": v["lang"], "encoding": v.get("encoding", "none"),

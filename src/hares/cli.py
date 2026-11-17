@@ -64,7 +64,10 @@ def _make_agent(args):
         return ObedientMock(), None
     from hares.agents.llm_adapter import LLMAgent, make_client
     client = make_client(args.agent, raw_dir=project_root() / "results" / "raw",
-                         max_calls=args.max_calls)
+                         max_calls=args.max_calls, model=getattr(args, "model", None))
+    chk = client.check()
+    if not chk.get("ok"):
+        raise SystemExit(f"LLM endpoint not usable: {chk.get('reason')}")
     return LLMAgent(client), client
 
 
@@ -221,9 +224,10 @@ def cmd_pilot(args) -> int:
 def cmd_llm_check(args) -> int:
     from hares.agents.llm_adapter import make_client
 
-    client = make_client(args.agent)
-    print(json.dumps(client.check(), ensure_ascii=False, indent=2))
-    return 0
+    client = make_client(args.agent, model=args.model)
+    chk = client.check()
+    print(json.dumps(chk, ensure_ascii=False, indent=2))
+    return 0 if chk.get("ok") else 1
 
 
 # ------------------------------------------------------------------- main
@@ -244,6 +248,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--repeats", type=int, default=3, help="repeats per case for real models (N=3)")
     s.add_argument("--limit", type=int, default=0, help="only the first N cases (debugging)")
     s.add_argument("--max-calls", type=int, default=2000, help="hard cap on LLM requests")
+    s.add_argument("--model", help="model name (else env MODEL; Ollama: first installed model)")
     s.add_argument("--dry-run", action="store_true")
     s.add_argument("--yes", action="store_true", help="really call the model")
     s.add_argument("--allow-unfrozen", action="store_true")
@@ -286,13 +291,15 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--sources", default="email,webpage")
     s.add_argument("--defenses", default="D0,D1,D2,D5")
     s.add_argument("--repeats", type=int, default=3)
-    s.add_argument("--max-calls", type=int, default=3000)
+    s.add_argument("--max-calls", type=int, default=5000)
+    s.add_argument("--model")
     s.add_argument("--seed", type=int, default=DEFAULT_SEED)
     s.add_argument("--dry-run", action="store_true"); s.add_argument("--yes", action="store_true")
     s.set_defaults(fn=cmd_pilot)
 
     s = sub.add_parser("llm-check", help="test the configured LLM endpoint with one request")
     s.add_argument("--agent", default="ollama", choices=("ollama", "openai"))
+    s.add_argument("--model")
     s.set_defaults(fn=cmd_llm_check)
     return p
 

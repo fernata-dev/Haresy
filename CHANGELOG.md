@@ -10,6 +10,8 @@ _None._ (Checked by `python -m hares verify-freeze`.)
 
 ## History
 
+- m5: Ollama + OpenAI-compatible adapters, robust tool-call parser, raw logging, max-calls cap,
+  pilot command (recorded as NOT RUN: no model available), scripted test endpoint.
 - m4: skill scanner (front matter, hidden carriers, decoded blobs, bidi/tag/zero-width,
   homoglyphs, JSON tool manifests, allowlist, shell patterns report-only), SARIF output.
 - m3: D5 capability guard (tools / args / taint, ablation variants), path normalisation,

@@ -72,6 +72,7 @@ class Episode:
         self.taint = TaintTracker(trusted=[self.task.instruction, *self.task.manifest.trusted_values()])
         self.site_withheld = False
         self.injection_in_context = False
+        self.parse_failures = 0
 
         tools = dict(W.DEFAULT_TOOL_DESCRIPTIONS)
         if src == "tool_desc":
@@ -163,6 +164,7 @@ class Episode:
             "n_blocked": len(blocked),
             "blocked_rules": sorted({c["reason"].split(" ")[0] for c in blocked}),
             "error": self.error,
+            "parse_failures": self.parse_failures,
         }
         if self.case.kind == "attack":
             intended = gt["intended_call"]
