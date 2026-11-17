@@ -52,11 +52,13 @@ def _git(*args: str) -> str | None:
 
 def git_info() -> dict:
     commit = _git("rev-parse", "HEAD")
-    status = _git("status", "--porcelain")
+    # only uncommitted changes that can change results count (generated outputs do not)
+    status = _git("status", "--porcelain", "--", "src", "data", "pyproject.toml", "hares.py")
     tags = _git("tag", "--points-at", "HEAD")
     return {
         "commit": commit or "unknown",
         "dirty": bool(status) if status is not None else None,
+        "dirty_scope": "src/, data/, pyproject.toml, hares.py",
         "tags_at_head": tags.split("\n") if tags else [],
     }
 

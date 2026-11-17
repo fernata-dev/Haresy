@@ -60,3 +60,20 @@ DEFINITION OF DONE
 
 (The request was accompanied by the user's standing preference: challenge every
 assumption, stress-test every idea, be a strict guide.)
+
+---
+
+## Prompt 2 — 2026-11-17 — follow-up during m2
+
+Model/tool: Claude Code (Anthropic), same session. (Before this message the user switched the
+session's model with a `/model` command; that command is not a prompt and is not reproduced.)
+
+```text
+يبني انت بتعمل قاهدة من الصفر اعمل اشياء احترافية ومميزه اكتر واقوى
+```
+
+Response summary (for the student's logbook): the assistant argued that rigor matters more than
+feature count, then added features that strengthen the measurement: Arabic→Arabizi
+transliteration as a script control, Arabizi spelling noise, stacked encodings, cluster-bootstrap
+CIs by authored text, text-level McNemar, SARIF output and JSON-manifest scanning in the skill
+scanner, guard ablation variants, a sha256-pinned post-freeze change record.

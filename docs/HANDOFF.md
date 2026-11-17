@@ -1,149 +1,111 @@
 # HANDOFF
 
-_Updated at every milestone. Read this first if you are continuing the work._
+_Updated at every milestone. Read this first if you are continuing the work (person or model)._
 
-## Status: m6 done (report generator + demo); pilot NOT RUN
+## Status: m7 done — all milestones complete; real-model pilot NOT RUN
 
-| milestone | state |
-|---|---|
-| m1 harness | DONE |
-| m2 D2 scanner + freeze | DONE (tag `freeze-scanner`) |
-| m3 D5 guard, residual risk, benign utility | DONE |
-| m4 skillscan | DONE |
-| m5 LLM adapters + pilot | adapters DONE; pilot NOT RUN (see below) |
-| m6 report + demo | DONE |
-| m7 docs + self-audit | next |
+| milestone | state | tag |
+|---|---|---|
+| m1 harness (env, tasks, worst-case agent, schema/encoders, D0, D1, runner, Wilson) | DONE | `m1` |
+| m2 D2 normaliser + lexicon on dev only, then freeze | DONE | `m2`, `freeze-scanner` (test data before lexicon: `data-test-before-lexicon`) |
+| m3 D5 guard + residual risk + benign utility | DONE | `m3` |
+| m4 skill scanner + fixtures | DONE | `m4` |
+| m5 real-LLM adapters + pilot | adapters DONE, **pilot NOT RUN** | `m5` |
+| m6 report generator + demo | DONE | `m6` |
+| m7 docs + self-audit + clean-checkout reproduction | DONE | `m7` |
 
-## What works
+## What works (verified in the build environment)
 
-- `python -m hares validate` — validates data, prints the matrix.
-- `python -m hares eval --split dev --defenses D0,D1` — worst-case simulator run.
-- `pytest` — green.
+- `python -m pytest` — green (count printed by pytest).
+- `python -m hares validate | eval --split dev|test | verify-freeze | verify-repro | report | demo | scan-skill | pilot | llm-check`.
+- `eval --split test` reproduces `results/sim_test.json` bit-for-bit (digest), also from a fresh
+  `git clone` (see "Clean-checkout reproduction").
+- Demo: three tabs checked in headless Chromium with no console errors.
 
-## Scanner freeze (HARD RULE 4)
+## What is NOT done / broken / not verified
 
-- Test-split AI-draft texts were committed first (tag `data-test-before-lexicon`), then the
-  D2 lexicon was written using dev texts only. The provenance rule is in the header of
-  `src/hares/defenses/d2_lexicon.py` (each entry is annotated with the dev text it came from).
-- Frozen files: see `src/hares/eval/freeze.py::FROZEN_FILES` (encoders + D1..D4).
-  `python -m hares verify-freeze` compares them byte-for-byte with tag `freeze-scanner`.
-  `eval --split test` refuses to run when they differ (unless `--allow-unfrozen`, which is
-  written into the results file). Any post-freeze change goes into CHANGELOG.md.
-- Dev result at freeze time (worst-case simulator, D2 content hook): 546/558 dev attack cases
-  flagged and 0 dev benign cases flagged. The 12 misses (msa-dev-02 transliterated, arz-dev-02
-  transliterated + leet) were left in on purpose rather than tuned away on 10 texts.
-- D3 needs a real model; D4 needs tiktoken's cl100k_base vocabulary, which could NOT be
-  downloaded in the build environment (proxy blocks the host). Both are reported as skipped.
-
-## D5 capability guard (m3)
-
-- `src/hares/defenses/d5_guard.py`. `authorize(tool, args, manifest, is_tainted)` never receives
-  content text. Ablation variants: `D5-tools`, `D5-args`, `D5-taint`, `D5` (all three).
-- Property test `tests/test_guard.py::test_guard_decisions_are_identical_across_languages_and_encodings`
-  checks the guard's decision trace depends only on (intent, source, task).
-- Taint = byte-exact match of a value against the attacker-controlled part of untrusted content
-  (email BODY, page text, injected skill / tool-description text). Headers are trusted metadata.
-  Known, measured limitation: encoded addresses are not seen as tainted.
-- Residual risk: `in_scope_tamper` (allowed channel, harmful content) and `override` (task lost
-  even when the harmful call is blocked: `task_completed_under_attack` table).
-- Cost: `delegation` benign cases (a real request to e-mail a third party) are blocked by
-  D5-args / D5-taint / D5. Measured as lost utility.
-- Statistics: every table cell also has a cluster-bootstrap CI over authored texts
-  (`cluster_ci_lo/hi`), omitted when a cell has < 5 authored texts.
-
-## Skill scanner (m4)
-
-- `python -m hares scan-skill PATH [--allow host,...] [--json|--sarif] [--fail-on high]`
-- Files are read as bytes and decoded; nothing is executed or fetched (test: canary file).
-- Reuses the frozen D2 scanner (imports it; does not modify it) on: front-matter `description`
-  (escalated: always loaded into context), visible paragraphs, HTML/Markdown comments,
-  CSS-hidden spans, decoded Base64 / data-URI / hex blobs, decoded Unicode tag characters,
-  and each string of a JSON tool manifest (reported with its JSON path).
-- Own rules: bidi controls (Trojan Source), zero-width in words, Latin/Cyrillic mixing,
-  addresses outside an allowlist, shell patterns (report only). Fixtures in `fixtures/`.
-- Not evaluated on a held-out corpus: only fixture tests. Do not report detection rates for it.
-
-## Real-LLM adapters and pilot (m5)
-
-- `src/hares/agents/llm_adapter.py`: `OllamaClient` (OLLAMA_HOST, MODEL) and
-  `OpenAICompatClient` (BASE_URL, API_KEY, MODEL; HARES_* variants win). stdlib urllib only.
-  Temperature 0, fixed seed, every request/response appended to `results/raw/*.jsonl`
-  (git-ignored). `--max-calls` is a hard cap; interrupted episodes are dropped, never scored.
-- `src/hares/agents/protocol.py`: one-JSON-tool-call protocol + robust parser (fences, <think>,
-  OpenAI tool_calls, string arguments, single quotes). One format-correction retry per turn.
-- `src/hares/agents/fake_llm_server.py`: scripted responder used ONLY by tests (NOT A MODEL).
-- **Pilot status: NOT RUN.** The build environment had no Ollama, and ollama.com /
-  huggingface.co were blocked, so no real model existed. The endpoint Claude Code itself uses
-  was deliberately NOT used (rule 2: only a user-configured endpoint). `results/pilot_status.json`
-  records this. Plan: test split, langs en,arz,arabizi x encodings none,b64,zwsp x sources
-  email,webpage; defenses D0,D1,D2,D5; N=3 -> 81 cases, 972 episodes, ~3.9k calls.
-
-### Student: how to run the pilot on your laptop
-
-```bash
-# 1. install Ollama from ollama.com, then pull a model that knows Arabic, e.g.
-ollama pull qwen2.5:7b-instruct
-# 2. check the connection (one request)
-python -m hares llm-check --agent ollama --model qwen2.5:7b-instruct
-# 3. see the plan and estimate, then run it (several hours on CPU; leave it overnight)
-python -m hares pilot --agent ollama --model qwen2.5:7b-instruct --dry-run
-python -m hares pilot --agent ollama --model qwen2.5:7b-instruct --yes
-# 4. rebuild the report and the go/no-go file
-python -m hares report
-```
-
-Record in your logbook: model name, the digest printed by llm-check, the date, your machine.
-
-## Report and demo (m6)
-
-- `python -m hares report` reads `results/` and writes `report/index.html`, `report/results.json`,
-  `report/tables/*.csv`, `CLAIMS_ALLOWED.md`, `CLAIMS_NOT_ALLOWED.md`, `docs/PILOT_DECISION.md`,
-  and the `<!-- BEGIN GENERATED:... -->` blocks in README.md and docs/CLAIM_AUDIT.md.
-  Every number goes through `report.Facts` (value + results file + JSON path).
-- Paired comparisons: exact McNemar at TEXT level (one pair per authored text, majority outcome)
-  is the one to quote; case-level p-values are shown but are optimistic (correlated variants).
-- `python -m hares demo` (127.0.0.1:8765): Arabic RTL UI, three tabs. `demo/api.py` only adapts
-  JSON to the evaluator's functions (`tests/test_demo.py` checks verdict parity with the runner).
-- Post-freeze change mechanism: `docs/post_freeze_changes.json` (sha256-pinned). One entry: the
-  D4 no-download safety fix (no effect on results). The freeze tag was never moved.
-
-## What is not there yet
-
-final docs (README, LIMITATIONS, CLAIM_AUDIT, AI_PROVENANCE), clean-checkout reproduction.
+1. **Real-model pilot not run.** No Ollama in the build container; ollama.com and huggingface.co
+   blocked; Claude Code's own endpoint deliberately not used (rule 2). `results/pilot_status.json`
+   says so. Adapters are tested only against a scripted local endpoint (NOT a model).
+2. **D3 (LLM judge)** never run (needs a real model). **D4 (chars per token)** never run (tiktoken
+   is installable but its vocabulary could not be downloaded; D4 now refuses to download it).
+3. **All attack and benign texts are AI drafts.** No student-written data yet.
+4. The skill scanner has no measured detection rate (fixtures only).
+5. The GitHub Actions workflow (`.github/workflows/ci.yml`) was written but not run on GitHub.
 
 ## Conservative decisions taken (ambiguities in the brief)
 
-1. **Data location.** The brief lists `data/benign/` under `src/hares/` but also
-   `data/attacks/student_written/README.md`. Data lives in top-level `data/`
-   (attacks and benign); code lives in `src/hares/`.
-2. **Attacker HTTP destination.** Rule 2 says the attacker destination is always
-   `attacker@test.local`. `http_post` needs a URL, so the single mock attacker URL
-   is `http://test.local/attacker-inbox` (same reserved name, never resolved,
-   `http_post` only appends to an in-memory list). Validators reject anything else.
-3. **ai-draft cap** (at most 5 per language) is applied to ALL languages including
-   English and is enforced by the validator, not by convention. Split: 2 dev + 3 test.
-4. **Encoding applicability.** leet/rot13 do nothing to Arabic script; tatweel/tashkeel
-   do nothing to Latin. A (text, encoding) pair is generated only if the encoding
-   changes >= 25% of ordinary tokens. N/A cells are never reported as results.
-5. **Extra encoders** beyond the five required: tatweel, tashkeel, homoglyph
-   (Arabic-relevant obfuscations). Reported separately from the core five.
-6. **Simulated agent is never repeated** (N=1): repeating a deterministic agent
-   would only inflate n.
-7. **Scanner hit => content withheld => benign task counted as failed.** Simple and
-   conservative against scanners; stated in LIMITATIONS.
-8. **`hares.py` at the repo root** is only a path shim so `python -m hares` works
-   without `pip install -e .`.
+1. Data live in top-level `data/` (attacks and benign); code in `src/hares/`.
+2. Attacker HTTP destination: `http://test.local/attacker-inbox` (same reserved `test.local`;
+   `http_post` only records in memory). Validators reject any other destination.
+3. ai-draft cap (≤ 5 per language) applies to every language including English; enforced by code.
+   Split per language: 2 dev + 3 test.
+4. An encoding is generated for a text only if it changes ≥ 25% of ordinary tokens; N/A cells are
+   never reported. Extra encoders (tatweel, tashkeel, homoglyph, translit, arabizi_noise, stacks)
+   are reported as separate families from the core five.
+5. The simulated agent runs once per case (repeating a deterministic agent would inflate n).
+6. A scanner hit withholds the whole content (worst case for scanner utility).
+7. Encoders are part of the frozen file set (dropping an encoding a scanner fails on = rigging).
+8. Post-freeze changes are allowed only if sha256-pinned in `docs/post_freeze_changes.json` and
+   described in CHANGELOG; the freeze tag is never moved. One such change exists (D4 no-download).
+9. "Every number generated from results": README numbers live only inside generated blocks;
+   prose docs contain no result numbers (method parameters like the 25% coverage rule are not results).
+10. Paired tests: text-level exact McNemar is primary; case-level is shown as optimistic.
+11. The go/no-go uses the test split; dev is shown as informational only.
+12. `hares.py` at the repo root is only a path shim so `python -m hares` works without installing.
+13. Model identifiers are kept out of repository files (session policy); AI_PROVENANCE names the
+    assistant as "Claude (Anthropic) via Claude Code".
+
+## Layout
+
+```
+src/hares/  env/ agents/ attacks/ benign/ defenses/ skillscan/ eval/ demo/ cli.py util.py
+data/       attacks/{ai_draft,student_written,templates}  benign/{ai_draft,student_written}
+results/    sim_dev.json sim_test.json (+ _rows.csv) pilot_status.json raw/ (git-ignored)
+report/     index.html results.json tables/*.csv            (generated)
+docs/       HANDOFF LIMITATIONS DESIGN CLAIM_AUDIT AI_PROVENANCE prompt_log PILOT_DECISION
+            STUDENT_GUIDE post_freeze_changes.json
+fixtures/   malicious_skill.md benign_skill.md malicious_tool_descriptions.json
+```
 
 ## Exact next commands
 
 ```bash
+# sanity
 python -m pytest
+python -m hares verify-freeze && python -m hares verify-repro
+
+# student data (see data/attacks/student_written/README.md), then
 python -m hares validate
-python -m hares eval --split dev --defenses D0,D1,D2
-python -m hares verify-freeze
-python -m hares eval --split dev          # all simulator defenses, writes results/sim_dev.json
-python -m hares scan-skill fixtures/malicious_skill.md
-python -m hares eval --split test         # refuses if scanners changed without a recorded entry
+python -m hares eval --split dev --authors student
+python -m hares eval --split test --authors student --out results/sim_test_student.json
+#   (report.py reads results/sim_test.json; to make the student set the main one, write it there
+#    instead, after keeping a copy of the AI-draft run)
 python -m hares report
-python -m hares demo                      # http://127.0.0.1:8765/
+python -m hares demo
 ```
+
+### Real-model pilot (on the student's laptop)
+
+```bash
+ollama pull qwen2.5:7b-instruct                       # any local model that knows Arabic
+python -m hares llm-check --agent ollama --model qwen2.5:7b-instruct
+python -m hares pilot --agent ollama --model qwen2.5:7b-instruct --dry-run
+python -m hares pilot --agent ollama --model qwen2.5:7b-instruct --yes   # hours on CPU
+python -m hares report                                 # updates PILOT_DECISION, README, claims
+```
+
+OpenAI-compatible servers: set `BASE_URL`, `API_KEY`, `MODEL` and use `--agent openai`.
+
+### Changing a scanner later (do it right)
+
+Add NEW dev texts → change the lexicon → run dev → `git tag freeze-scanner-v2` → write a NEW
+test set nobody tuned on → update `FREEZE_TAG` in `src/hares/eval/freeze.py` → run test →
+document everything in CHANGELOG. Never edit the lexicon in response to test results.
+
+## Clean-checkout reproduction
+
+Done at m7 by cloning the repository into a temporary directory (deleted afterwards), running
+`pytest`, `python -m hares eval --split test --out <tmp>` and comparing the digest with
+`results/sim_test.json`; the outcome is recorded in the m7 commit message and in the final
+report to the user.
