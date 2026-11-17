@@ -10,3 +10,5 @@ results/raw/*
 results/scratch/
 .env
 results/scratch/
+*.whl
+*.tar.gz

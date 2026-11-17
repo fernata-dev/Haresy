@@ -28,6 +28,10 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- cleanup: 16 third-party wheel files (~11 MB) that a network probe (`pip download`) had left in
+  the project folder were committed by mistake in m1 (`dbe7e8b`). They are removed from the tree
+  in this commit and `*.whl` is ignored. They remain in git history: rewriting history would change
+  every commit hash that the freeze tag, `docs/tags.json` and the results files refer to.
 - post-m7: tags pinned in `docs/tags.json` (tag pushes refused by the session's remote);
   `restore-tags` command; freeze check falls back to the pinned commit and detects moved tags.
 - m6: report generator (HTML/CSV/JSON, claims, go/no-go, generated doc blocks, text-level McNemar),
