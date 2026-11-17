@@ -4,10 +4,17 @@ Idea: obfuscated text (Base64, leet, zero-width, spaced letters) splits into
 many short tokens, so its characters-per-token (CPT) ratio is low.  D4 flags
 content whose CPT is below a threshold.
 
-Requires a BPE tokenizer.  We use tiktoken's `cl100k_base` if it can be loaded
-(it needs its vocabulary file: downloaded once, or cached via
-TIKTOKEN_CACHE_DIR).  If it cannot be loaded, D4 is SKIPPED and every results
-file says so; no fallback "tokenizer" is invented.
+Requires a BPE tokenizer.  We use tiktoken's `cl100k_base` ONLY if its
+vocabulary file is already in tiktoken's local cache.  Hares never downloads it
+(HARD RULE 2: no network calls except a user-configured LLM endpoint).  To
+enable D4, fetch the file yourself once, e.g.
+    python -c "import tiktoken; tiktoken.get_encoding('cl100k_base')"
+If it is not cached, D4 is SKIPPED and every results file says so; no fallback
+"tokenizer" is invented.
+
+POST-FREEZE CHANGE (recorded in CHANGELOG.md and docs/post_freeze_changes.json):
+the cache check was added after the freeze because tiktoken otherwise tries to
+download the vocabulary.  D4 was skipped in every run before and after.
 
 Threshold: calibrated on the DEV benign split only (the 5th percentile of CPT
 over dev benign texts), per script group (Arabic script vs Latin script),
@@ -25,14 +32,32 @@ from hares.defenses.base import Defense, ScreenVerdict
 _AR = re.compile(r"[؀-ۿ]")
 
 
+_VOCAB_URL = "https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken"
+
+
+def _cache_file():
+    import hashlib
+    import os
+    import tempfile
+    from pathlib import Path
+
+    d = os.environ.get("TIKTOKEN_CACHE_DIR") or os.environ.get("DATA_GYM_CACHE_DIR") or \
+        os.path.join(tempfile.gettempdir(), "data-gym-cache")
+    return Path(d) / hashlib.sha1(_VOCAB_URL.encode()).hexdigest()
+
+
 @lru_cache(maxsize=1)
 def _encoding():
     try:
         import tiktoken  # optional dependency
-        return tiktoken.get_encoding("cl100k_base"), ""
     except ImportError:
         return None, "tiktoken is not installed (pip install tiktoken)"
-    except Exception as exc:  # vocabulary download blocked / offline
+    if not _cache_file().exists():
+        return None, ("cl100k_base vocabulary is not in the local tiktoken cache; Hares never downloads it "
+                      "(see the D4 docstring to enable it)")
+    try:
+        return tiktoken.get_encoding("cl100k_base"), ""
+    except Exception as exc:
         return None, f"tokenizer vocabulary could not be loaded ({type(exc).__name__})"
 
 

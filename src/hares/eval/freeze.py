@@ -5,9 +5,20 @@ any run on the test split.  This module makes that checkable by a machine.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import subprocess
 
 from hares.util import project_root
+
+RECORDED_CHANGES = "docs/post_freeze_changes.json"
+
+
+def recorded_changes() -> list[dict]:
+    p = project_root() / RECORDED_CHANGES
+    if not p.exists():
+        return []
+    return json.loads(p.read_text(encoding="utf-8"))
 
 FREEZE_TAG = "freeze-scanner"
 FROZEN_FILES = (
@@ -39,6 +50,8 @@ def freeze_status() -> dict:
         status["reason"] = "freeze tag not found"
         return status
     all_same = True
+    recorded = {(c["file"], c["sha256"]): c for c in recorded_changes()}
+    status["post_freeze_changes"] = []
     for rel in FROZEN_FILES:
         c, blob = _git("show", f"{FREEZE_TAG}:{rel}")
         path = root / rel
@@ -49,11 +62,21 @@ def freeze_status() -> dict:
             same = False
             note = "missing in working tree"
         else:
-            same = path.read_bytes() == blob
+            data = path.read_bytes()
+            same = data == blob
             note = "identical" if same else "CHANGED since freeze"
+            if not same:
+                rec = recorded.get((rel, hashlib.sha256(data).hexdigest()))
+                if rec:
+                    note = "changed after freeze (recorded: " + rec["reason"][:60] + "...)"
+                    status["post_freeze_changes"].append(rec)
+                    status["files"][rel] = {"same": False, "recorded": True, "note": note}
+                    continue
         status["files"][rel] = {"same": same, "note": note}
         all_same = all_same and same
     status["ok"] = all_same
+    status["identical_to_tag"] = all_same and not status["post_freeze_changes"]
     if not all_same:
-        status["reason"] = "frozen files differ from the freeze tag; see CHANGELOG.md"
+        status["reason"] = ("frozen files differ from the freeze tag and the change is not recorded in "
+                            f"{RECORDED_CHANGES}; see CHANGELOG.md")
     return status

@@ -74,3 +74,17 @@ def test_cluster_interval_is_wider_than_wilson_for_correlated_clusters():
     lo, hi = cluster_bootstrap(cl, seed=0)
     wlo, whi = wilson(30, 60)
     assert (hi - lo) > (whi - wlo)
+
+
+def test_paired_table_reports_text_level_mcnemar():
+    from hares.eval.runner import paired_table
+    rows = []
+    for b in range(6):
+        for v in range(10):
+            cid = f"t{b}__v{v}"
+            rows.append({"case_id": cid, "base_id": f"t{b}", "defense": "A", "success": True})
+            rows.append({"case_id": cid, "base_id": f"t{b}", "defense": "B", "success": b >= 3})
+    p = paired_table(rows, "success", ["A", "B"])[0]
+    assert (p["n_pairs"], p["only_a"], p["only_b"]) == (60, 30, 0)
+    assert (p["text_pairs"], p["text_only_a"], p["text_only_b"]) == (6, 3, 0)
+    assert p["text_mcnemar_exact_p"] == 0.25 and p["mcnemar_exact_p"] < 1e-8

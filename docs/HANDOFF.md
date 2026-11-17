@@ -2,7 +2,7 @@
 
 _Updated at every milestone. Read this first if you are continuing the work._
 
-## Status: m5 done (LLM adapters; pilot NOT RUN - no model available in the build environment)
+## Status: m6 done (report generator + demo); pilot NOT RUN
 
 | milestone | state |
 |---|---|
@@ -11,8 +11,8 @@ _Updated at every milestone. Read this first if you are continuing the work._
 | m3 D5 guard, residual risk, benign utility | DONE |
 | m4 skillscan | DONE |
 | m5 LLM adapters + pilot | adapters DONE; pilot NOT RUN (see below) |
-| m6 report + demo | next |
-| m7 docs + self-audit | pending |
+| m6 report + demo | DONE |
+| m7 docs + self-audit | next |
 
 ## What works
 
@@ -94,9 +94,22 @@ python -m hares report
 
 Record in your logbook: model name, the digest printed by llm-check, the date, your machine.
 
+## Report and demo (m6)
+
+- `python -m hares report` reads `results/` and writes `report/index.html`, `report/results.json`,
+  `report/tables/*.csv`, `CLAIMS_ALLOWED.md`, `CLAIMS_NOT_ALLOWED.md`, `docs/PILOT_DECISION.md`,
+  and the `<!-- BEGIN GENERATED:... -->` blocks in README.md and docs/CLAIM_AUDIT.md.
+  Every number goes through `report.Facts` (value + results file + JSON path).
+- Paired comparisons: exact McNemar at TEXT level (one pair per authored text, majority outcome)
+  is the one to quote; case-level p-values are shown but are optimistic (correlated variants).
+- `python -m hares demo` (127.0.0.1:8765): Arabic RTL UI, three tabs. `demo/api.py` only adapts
+  JSON to the evaluator's functions (`tests/test_demo.py` checks verdict parity with the runner).
+- Post-freeze change mechanism: `docs/post_freeze_changes.json` (sha256-pinned). One entry: the
+  D4 no-download safety fix (no effect on results). The freeze tag was never moved.
+
 ## What is not there yet
 
-report generator, demo, final docs.
+final docs (README, LIMITATIONS, CLAIM_AUDIT, AI_PROVENANCE), clean-checkout reproduction.
 
 ## Conservative decisions taken (ambiguities in the brief)
 
@@ -130,4 +143,7 @@ python -m hares eval --split dev --defenses D0,D1,D2
 python -m hares verify-freeze
 python -m hares eval --split dev          # all simulator defenses, writes results/sim_dev.json
 python -m hares scan-skill fixtures/malicious_skill.md
+python -m hares eval --split test         # refuses if scanners changed without a recorded entry
+python -m hares report
+python -m hares demo                      # http://127.0.0.1:8765/
 ```

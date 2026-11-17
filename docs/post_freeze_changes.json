@@ -1,0 +1,11 @@
+[
+  {
+    "file": "src/hares/defenses/d4_cpt.py",
+    "sha256": "f2aadf5c872cf3a0cff4f1a97a337d64af97141cb4270553be4958276bc376ca",
+    "date": "2026-11-17",
+    "reason": "Safety fix (HARD RULE 2): tiktoken.get_encoding() tried to download its vocabulary from the internet. D4 now only loads a vocabulary that is already cached locally and never downloads it.",
+    "affects_results": false,
+    "evidence_no_effect": "D4 was reported as skipped in results/sim_dev.json and results/sim_test.json both before and after this change (tokenizer unavailable in the build environment).",
+    "changelog": "CHANGELOG.md, section 'Post-freeze scanner changes'"
+  }
+]

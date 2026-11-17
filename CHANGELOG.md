@@ -6,10 +6,30 @@ All notable changes. **Any change to a frozen scanner file after git tag
 
 ## Post-freeze scanner changes
 
-_None._ (Checked by `python -m hares verify-freeze`.)
+Machine-readable list: `docs/post_freeze_changes.json` (file + sha256 of the new content).
+`python -m hares verify-freeze` accepts a frozen file that differs from tag `freeze-scanner`
+ONLY if its exact sha256 is recorded there, and every results file and the report list it.
+
+1. **2026-11-17 — `src/hares/defenses/d4_cpt.py` — safety fix, no effect on results.**
+   Found while screenshotting the demo: `tiktoken.get_encoding("cl100k_base")` tries to download
+   its vocabulary from the internet, which breaks HARD RULE 2 (no network calls except a
+   user-configured LLM endpoint). The attempt failed in the build environment (blocked by the
+   proxy), so D4 was skipped in every run. D4 now checks tiktoken's local cache first and never
+   downloads. D4 is skipped before and after the change, so no number changes. The freeze tag was
+   NOT moved.
+
+## Post-freeze inspections (no code changed)
+
+- 2026-11-17, after the first test-split run: D2's reasons on the 15 test base texts were
+  printed (read-only) to check whether any miss was caused by a code bug rather than by the
+  lexicon. None was found: the misses come from wording absent from dev. The scanner was NOT
+  changed. Anyone continuing this work must not add those test phrasings to the lexicon; new
+  lexicon entries must come from new dev texts, followed by a NEW freeze tag and a NEW test set.
 
 ## History
 
+- m6: report generator (HTML/CSV/JSON, claims, go/no-go, generated doc blocks, text-level McNemar),
+  Arabic RTL demo server sharing the evaluator's code paths, recorded post-freeze change mechanism.
 - m5: Ollama + OpenAI-compatible adapters, robust tool-call parser, raw logging, max-calls cap,
   pilot command (recorded as NOT RUN: no model available), scripted test endpoint.
 - m4: skill scanner (front matter, hidden carriers, decoded blobs, bidi/tag/zero-width,

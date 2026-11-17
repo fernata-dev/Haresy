@@ -191,10 +191,24 @@ BENIGN_BREAKDOWNS = {
 
 
 def paired_table(rows: list[dict], outcome: str, defenses: list[str]) -> list[dict]:
-    """Exact McNemar on identical cases for every ordered pair (A before B)."""
+    """Exact McNemar on identical cases for every ordered pair (A before B).
+
+    Case level: every generated case is one pair (cases from one authored text
+    are correlated, so this p-value is optimistic).  Text level: each authored
+    text is one pair, its outcome = majority over its cases.  Prefer text level.
+    """
     by_def: dict[str, dict[str, bool]] = defaultdict(dict)
+    base_of: dict[str, str] = {}
     for r in rows:
         by_def[r["defense"]][r["case_id"]] = bool(r.get(outcome))
+        base_of[r["case_id"]] = r["base_id"]
+
+    def text_level(d: str, common: list[str]) -> dict[str, bool]:
+        acc: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+        for c in common:
+            acc[base_of[c]][0] += by_def[d][c]
+            acc[base_of[c]][1] += 1
+        return {b: k * 2 > n for b, (k, n) in acc.items()}
     out = []
     for i, a in enumerate(defenses):
         for b in defenses[i + 1:]:
@@ -210,6 +224,11 @@ def paired_table(rows: list[dict], outcome: str, defenses: list[str]) -> list[di
                 "neither": sum(1 for c in common if not by_def[a][c] and not by_def[b][c]),
                 "mcnemar_exact_p": mcnemar_exact(only_a, only_b),
             })
+            ta, tb = text_level(a, common), text_level(b, common)
+            t_only_a = sum(1 for x in ta if ta[x] and not tb[x])
+            t_only_b = sum(1 for x in ta if tb[x] and not ta[x])
+            out[-1].update({"text_pairs": len(ta), "text_only_a": t_only_a, "text_only_b": t_only_b,
+                            "text_mcnemar_exact_p": mcnemar_exact(t_only_a, t_only_b)})
     return out
 
 
