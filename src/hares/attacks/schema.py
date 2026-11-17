@@ -32,6 +32,7 @@ REQUIRED = ("id", "lang", "encoding", "source", "intent", "text", "intended_call
 AI_DRAFT_CAP_PER_LANG = 5
 
 _ID = re.compile(r"^[a-z0-9][a-z0-9_.-]{2,80}$")
+_VARIANT_ID = re.compile(r"^[a-z0-9][a-z0-9_.+-]{2,200}$")
 _EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 _URL = re.compile(r"https?://[^\s\"'<>)]+")
 _ARABIC = re.compile(r"[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]")
@@ -110,7 +111,7 @@ def validate_record(rec: dict, base: bool = True) -> tuple[list[str], list[str]]
     if errs:
         return errs, warns
     rid = rec["id"]
-    if not isinstance(rid, str) or not _ID.match(rid):
+    if not isinstance(rid, str) or not (_ID if base else _VARIANT_ID).match(rid):
         errs.append(f"bad id: {rid!r}")
     if rec["lang"] not in LANGS:
         errs.append(f"bad lang: {rec['lang']!r}")

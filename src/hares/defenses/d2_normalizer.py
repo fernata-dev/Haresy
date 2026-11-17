@@ -116,7 +116,7 @@ def skeleton(token: str) -> str:
         if ch in _AZ_DIGIT:
             out.append(_AZ_DIGIT[ch])
         elif ch in "aeiou":
-            out.append("V" if i == 0 else "")
+            out.append("")
         elif ch == "y":
             out.append("y" if i == 0 else "")
         elif ch.isascii() and ch.isalpha():

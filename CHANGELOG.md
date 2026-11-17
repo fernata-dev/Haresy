@@ -10,5 +10,9 @@ _None._ (Checked by `python -m hares verify-freeze`.)
 
 ## History
 
+- m2: D2 normaliser + concept lexicon (en/msa/arz/arabizi, Arabizi skeletons, cross-script
+  matching), extended encoders (tatweel, tashkeel, homoglyph, translit, arabizi_noise, stacks),
+  optional D3 (LLM judge) and D4 (chars per token). Developed on dev only; tag `freeze-scanner`.
+- data: test split committed before the lexicon (tag `data-test-before-lexicon`).
 - m1: harness - mock world, tasks + manifests, worst-case simulated agent,
   attack schema/loader/encoders, D0, D1, runner, Wilson CI, exact McNemar, tests.

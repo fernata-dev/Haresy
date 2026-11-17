@@ -2,13 +2,13 @@
 
 _Updated at every milestone. Read this first if you are continuing the work._
 
-## Status: m1 done (harness)
+## Status: m2 done (D2 scanner developed on dev, frozen)
 
 | milestone | state |
 |---|---|
 | m1 harness | DONE |
-| m2 D2 scanner + freeze | next |
-| m3 D5 guard, residual risk, benign utility | pending |
+| m2 D2 scanner + freeze | DONE (tag `freeze-scanner`) |
+| m3 D5 guard, residual risk, benign utility | next |
 | m4 skillscan | pending |
 | m5 LLM adapters + pilot | pending |
 | m6 report + demo | pending |
@@ -20,9 +20,24 @@ _Updated at every milestone. Read this first if you are continuing the work._
 - `python -m hares eval --split dev --defenses D0,D1` — worst-case simulator run.
 - `pytest` — green.
 
+## Scanner freeze (HARD RULE 4)
+
+- Test-split AI-draft texts were committed first (tag `data-test-before-lexicon`), then the
+  D2 lexicon was written using dev texts only. The provenance rule is in the header of
+  `src/hares/defenses/d2_lexicon.py` (each entry is annotated with the dev text it came from).
+- Frozen files: see `src/hares/eval/freeze.py::FROZEN_FILES` (encoders + D1..D4).
+  `python -m hares verify-freeze` compares them byte-for-byte with tag `freeze-scanner`.
+  `eval --split test` refuses to run when they differ (unless `--allow-unfrozen`, which is
+  written into the results file). Any post-freeze change goes into CHANGELOG.md.
+- Dev result at freeze time (worst-case simulator, D2 content hook): 546/558 dev attack cases
+  flagged and 0 dev benign cases flagged. The 12 misses (msa-dev-02 transliterated, arz-dev-02
+  transliterated + leet) were left in on purpose rather than tuned away on 10 texts.
+- D3 needs a real model; D4 needs tiktoken's cl100k_base vocabulary, which could NOT be
+  downloaded in the build environment (proxy blocks the host). Both are reported as skipped.
+
 ## What is not there yet
 
-D2..D5, skillscan, LLM adapters, report, demo, test-split data (written only after the scanner freeze).
+D5 guard, skillscan, LLM adapters, report, demo.
 
 ## Conservative decisions taken (ambiguities in the brief)
 
@@ -52,5 +67,6 @@ D2..D5, skillscan, LLM adapters, report, demo, test-split data (written only aft
 ```bash
 python -m pytest
 python -m hares validate
-python -m hares eval --split dev --defenses D0,D1
+python -m hares eval --split dev --defenses D0,D1,D2
+python -m hares verify-freeze
 ```

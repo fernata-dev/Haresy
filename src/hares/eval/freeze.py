@@ -11,6 +11,7 @@ from hares.util import project_root
 
 FREEZE_TAG = "freeze-scanner"
 FROZEN_FILES = (
+    "src/hares/attacks/encoders.py",       # removing an encoding a scanner fails on would also be rigging
     "src/hares/defenses/d1_keyword.py",
     "src/hares/defenses/d2_normalizer.py",
     "src/hares/defenses/d2_lexicon.py",
