@@ -173,7 +173,10 @@ def cmd_scan_skill(args) -> int:
     from hares.skillscan.scanner import render_text, scan_path
 
     report = scan_path(Path(args.path), allow=_csv(args.allow) or ())
-    if args.json:
+    if args.sarif:
+        from hares.skillscan.scanner import to_sarif
+        print(json.dumps(to_sarif(report), ensure_ascii=False, indent=2))
+    elif args.json:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     else:
         print(render_text(report))
@@ -257,6 +260,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("path")
     s.add_argument("--allow", help="comma list of allowed hosts/domains")
     s.add_argument("--json", action="store_true")
+    s.add_argument("--sarif", action="store_true", help="SARIF 2.1.0 output for code-scanning tools")
     s.add_argument("--fail-on", choices=("low", "medium", "high"))
     s.set_defaults(fn=cmd_scan_skill)
 

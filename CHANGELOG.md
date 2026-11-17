@@ -10,6 +10,8 @@ _None._ (Checked by `python -m hares verify-freeze`.)
 
 ## History
 
+- m4: skill scanner (front matter, hidden carriers, decoded blobs, bidi/tag/zero-width,
+  homoglyphs, JSON tool manifests, allowlist, shell patterns report-only), SARIF output.
 - m3: D5 capability guard (tools / args / taint, ablation variants), path normalisation,
   body-only taint, residual-risk tables, cluster-bootstrap CI by authored text.
 - m2: D2 normaliser + concept lexicon (en/msa/arz/arabizi, Arabizi skeletons, cross-script

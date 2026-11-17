@@ -2,15 +2,15 @@
 
 _Updated at every milestone. Read this first if you are continuing the work._
 
-## Status: m3 done (D5 guard, residual risk, benign utility)
+## Status: m4 done (skill scanner)
 
 | milestone | state |
 |---|---|
 | m1 harness | DONE |
 | m2 D2 scanner + freeze | DONE (tag `freeze-scanner`) |
 | m3 D5 guard, residual risk, benign utility | DONE |
-| m4 skillscan | next |
-| m5 LLM adapters + pilot | pending |
+| m4 skillscan | DONE |
+| m5 LLM adapters + pilot | next |
 | m6 report + demo | pending |
 | m7 docs + self-audit | pending |
 
@@ -51,9 +51,21 @@ _Updated at every milestone. Read this first if you are continuing the work._
 - Statistics: every table cell also has a cluster-bootstrap CI over authored texts
   (`cluster_ci_lo/hi`), omitted when a cell has < 5 authored texts.
 
+## Skill scanner (m4)
+
+- `python -m hares scan-skill PATH [--allow host,...] [--json|--sarif] [--fail-on high]`
+- Files are read as bytes and decoded; nothing is executed or fetched (test: canary file).
+- Reuses the frozen D2 scanner (imports it; does not modify it) on: front-matter `description`
+  (escalated: always loaded into context), visible paragraphs, HTML/Markdown comments,
+  CSS-hidden spans, decoded Base64 / data-URI / hex blobs, decoded Unicode tag characters,
+  and each string of a JSON tool manifest (reported with its JSON path).
+- Own rules: bidi controls (Trojan Source), zero-width in words, Latin/Cyrillic mixing,
+  addresses outside an allowlist, shell patterns (report only). Fixtures in `fixtures/`.
+- Not evaluated on a held-out corpus: only fixture tests. Do not report detection rates for it.
+
 ## What is not there yet
 
-skillscan, LLM adapters, report, demo.
+LLM adapters + pilot, report, demo.
 
 ## Conservative decisions taken (ambiguities in the brief)
 
@@ -86,4 +98,5 @@ python -m hares validate
 python -m hares eval --split dev --defenses D0,D1,D2
 python -m hares verify-freeze
 python -m hares eval --split dev          # all simulator defenses, writes results/sim_dev.json
+python -m hares scan-skill fixtures/malicious_skill.md
 ```
