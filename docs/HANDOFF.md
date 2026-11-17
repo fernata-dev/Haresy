@@ -107,5 +107,6 @@ document everything in CHANGELOG. Never edit the lexicon in response to test res
 
 Done at m7 by cloning the repository into a temporary directory (deleted afterwards), running
 `pytest`, `python -m hares eval --split test --out <tmp>` and comparing the digest with
-`results/sim_test.json`; the outcome is recorded in the m7 commit message and in the final
-report to the user.
+`results/sim_test.json`. Outcome at m7: the fresh clone passed all tests, `verify-freeze` was OK,
+and the re-run test-split digest was IDENTICAL to the committed one (also recorded in the
+annotated tag `m7`: `git show m7`).
