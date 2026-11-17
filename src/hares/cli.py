@@ -197,6 +197,12 @@ def cmd_verify_freeze(args) -> int:
     return 0 if st["ok"] else 1
 
 
+def cmd_restore_tags(args) -> int:
+    from hares.eval.freeze import restore_tags
+
+    return restore_tags()
+
+
 def cmd_verify_repro(args) -> int:
     from hares.eval.repro import verify
 
@@ -271,6 +277,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     s = sub.add_parser("verify-freeze", help="check scanners against git tag freeze-scanner")
     s.set_defaults(fn=cmd_verify_freeze)
+
+    s = sub.add_parser("restore-tags", help="recreate milestone/freeze tags locally from docs/tags.json")
+    s.set_defaults(fn=cmd_restore_tags)
 
     s = sub.add_parser("verify-repro", help="re-run the simulator and compare digests with results/")
     s.add_argument("--splits"); s.add_argument("--seed", type=int, default=DEFAULT_SEED)

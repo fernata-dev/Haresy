@@ -32,6 +32,12 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 3. **All attack and benign texts are AI drafts.** No student-written data yet.
 4. The skill scanner has no measured detection rate (fixtures only).
 5. The GitHub Actions workflow (`.github/workflows/ci.yml`) was written but not run on GitHub.
+6. **Git tags were NOT pushed.** The build session may only push its branch; every tag push was
+   refused by the remote. All tags (`m1`..`m7`, `data-test-before-lexicon`, `freeze-scanner`) are
+   pinned to their commits in `docs/tags.json`. After cloning, run `python -m hares restore-tags`
+   (creates them locally, pushes nothing), then `git push origin --tags` yourself if you want them
+   on GitHub. `verify-freeze` falls back to the pinned commit when the tag is missing, and refuses
+   if a tag exists but points somewhere else (a moved tag).
 
 ## Conservative decisions taken (ambiguities in the brief)
 
@@ -71,6 +77,8 @@ fixtures/   malicious_skill.md benign_skill.md malicious_tool_descriptions.json
 ## Exact next commands
 
 ```bash
+# after cloning: recreate the tags (they could not be pushed from the build session)
+python -m hares restore-tags
 # sanity
 python -m pytest
 python -m hares verify-freeze && python -m hares verify-repro

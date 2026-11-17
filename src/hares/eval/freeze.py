@@ -40,20 +40,38 @@ def _git(*args: str) -> tuple[int, bytes]:
     return p.returncode, p.stdout
 
 
+PINNED_TAGS = "docs/tags.json"
+
+
+def pinned_tags() -> dict:
+    p = project_root() / PINNED_TAGS
+    if not p.exists():
+        return {}
+    return json.loads(p.read_text(encoding="utf-8")).get("tags", {})
+
+
 def freeze_status() -> dict:
     root = project_root()
     code, out = _git("rev-parse", "--verify", "--quiet", f"refs/tags/{FREEZE_TAG}^{{commit}}")
+    ref = FREEZE_TAG
+    pinned = pinned_tags().get(FREEZE_TAG, {}).get("commit")
     status: dict = {"tag": FREEZE_TAG, "tag_exists": code == 0,
                     "tag_commit": out.decode().strip() if code == 0 else None,
-                    "files": {}, "ok": False}
-    if code != 0:
-        status["reason"] = "freeze tag not found"
+                    "pinned_commit": pinned, "files": {}, "ok": False}
+    if code == 0 and pinned and status["tag_commit"] != pinned:
+        status["reason"] = f"tag {FREEZE_TAG} points to {status['tag_commit']} but {PINNED_TAGS} pins {pinned}: the tag was moved"
         return status
+    if code != 0:
+        if not pinned or _git("cat-file", "-e", f"{pinned}^{{commit}}")[0] != 0:
+            status["reason"] = "freeze tag not found and no pinned freeze commit available"
+            return status
+        ref = pinned
+        status["resolved_via"] = PINNED_TAGS
     all_same = True
     recorded = {(c["file"], c["sha256"]): c for c in recorded_changes()}
     status["post_freeze_changes"] = []
     for rel in FROZEN_FILES:
-        c, blob = _git("show", f"{FREEZE_TAG}:{rel}")
+        c, blob = _git("show", f"{ref}:{rel}")
         path = root / rel
         if c != 0:
             same = False
@@ -80,3 +98,20 @@ def freeze_status() -> dict:
         status["reason"] = ("frozen files differ from the freeze tag and the change is not recorded in "
                             f"{RECORDED_CHANGES}; see CHANGELOG.md")
     return status
+
+
+def restore_tags() -> int:
+    """Recreate missing tags locally from docs/tags.json (never pushes anything)."""
+    made = 0
+    for name, t in pinned_tags().items():
+        if _git("rev-parse", "--verify", "--quiet", f"refs/tags/{name}")[0] == 0:
+            print(f"{name}: exists")
+            continue
+        if _git("cat-file", "-e", f"{t['commit']}^{{commit}}")[0] != 0:
+            print(f"{name}: commit {t['commit'][:10]} not in this clone (fetch full history)")
+            continue
+        args = ["tag", "-a", name, "-m", t["message"] or name, t["commit"]] if t.get("annotated") else ["tag", name, t["commit"]]
+        code, _ = _git(*args)
+        print(f"{name}: {'created' if code == 0 else 'FAILED'} at {t['commit'][:10]}")
+        made += code == 0
+    return 0

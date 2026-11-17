@@ -13,6 +13,7 @@ jobs:
       - run: pip install pytest
       - run: python -m pytest
       - run: python -m hares validate
+      - run: python -m hares restore-tags
       - run: python -m hares verify-freeze
       - run: python -m hares verify-repro
       - run: python -m hares scan-skill fixtures/malicious_skill.md --fail-on high || test $? -eq 3

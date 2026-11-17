@@ -63,3 +63,25 @@ def test_default_pipeline_makes_no_network_connections(monkeypatch):
     monkeypatch.setattr(socket.socket, "connect", real_connect)
     assert attempts == []
     assert not ok and ("not in the local tiktoken cache" in why or "not installed" in why)
+
+
+def test_freeze_check_falls_back_to_pinned_commit_when_tag_is_missing(tmp_path, monkeypatch):
+    import subprocess
+    from hares.eval import freeze as F
+    if not freeze_status()["tag_exists"]:
+        return
+    repo = tmp_path / "r"
+    subprocess.run(["git", "clone", "-q", str(project_root()), str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repo), "checkout", "-q", "HEAD"], check=True)
+    for t in subprocess.run(["git", "-C", str(repo), "tag"], capture_output=True, text=True).stdout.split():
+        subprocess.run(["git", "-C", str(repo), "tag", "-d", t], capture_output=True, check=True)
+    import shutil
+    for rel in FROZEN_FILES + (F.RECORDED_CHANGES, F.PINNED_TAGS):
+        if (project_root() / rel).exists():
+            shutil.copy(project_root() / rel, repo / rel)
+    monkeypatch.setenv("HARES_ROOT", str(repo))
+    st = F.freeze_status()
+    assert not st["tag_exists"] and st["ok"] and st["resolved_via"] == F.PINNED_TAGS
+    assert F.restore_tags() == 0
+    st2 = F.freeze_status()
+    assert st2["tag_exists"] and st2["ok"]

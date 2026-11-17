@@ -1,0 +1,50 @@
+{
+  "_note": "Tags could not be pushed from the build session (the session may only push its branch). This file pins every tag to its commit. `python -m hares restore-tags` recreates them locally; verify-freeze falls back to the pinned freeze commit if the tag is missing.",
+  "tags": {
+    "data-test-before-lexicon": {
+      "commit": "e3094ae49a5f1990a466d116ba41ebadc5472663",
+      "annotated": false,
+      "message": ""
+    },
+    "freeze-scanner": {
+      "commit": "15e1f2db09bef943b6f6e4467bdde9c03ffa0bd2",
+      "annotated": false,
+      "message": ""
+    },
+    "m1": {
+      "commit": "dbe7e8baaf42a68ee875f8a7a05955431c48e3e0",
+      "annotated": false,
+      "message": ""
+    },
+    "m2": {
+      "commit": "15e1f2db09bef943b6f6e4467bdde9c03ffa0bd2",
+      "annotated": false,
+      "message": ""
+    },
+    "m3": {
+      "commit": "c94e1d5e324962aa5c45f84489f4dc1768ede145",
+      "annotated": false,
+      "message": ""
+    },
+    "m4": {
+      "commit": "f368df13f8737df1adaa1d3641a4559fa9c79939",
+      "annotated": false,
+      "message": ""
+    },
+    "m5": {
+      "commit": "42427c42c8e77765b73e0bf7636deecc8d011637",
+      "annotated": false,
+      "message": ""
+    },
+    "m6": {
+      "commit": "be926795e6750891d33e51f6b9dee4c9d5083236",
+      "annotated": false,
+      "message": ""
+    },
+    "m7": {
+      "commit": "6d89b45ef4616d698c733bd3b235c9edb2895d12",
+      "annotated": true,
+      "message": "m7: docs + self-audit complete.\nClean-checkout reproduction: fresh git clone -> pytest passed, verify-freeze OK,\neval --split test digest 9e1eaa7b43488798 IDENTICAL to results/sim_test.json (seed 1337).\nReal-model pilot: NOT RUN (no model reachable in the build environment)."
+    }
+  }
+}
