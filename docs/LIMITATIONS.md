@@ -106,10 +106,12 @@ Read this before quoting any number. Each point below can, on its own, make a co
 | Claude Code | user + project settings, `~/.claude.json` MCP servers (user and local scope), project `.mcp.json`, personal and project skills | PreToolUse command hook (user settings); MCP stdio proxy |
 | Gemini CLI | `mcpServers` in user and project `settings.json` | MCP stdio proxy |
 
-**Never verified end to end.** Neither Claude Code nor Gemini CLI was installed in the build
-environment. The hook output format and the config edits follow the official documentation and
-were tested only against a fake HOME, a fake MCP server and hand-written hook events. Run
-`bawwab protect --dry-run`, read the diff, and try it on a throwaway account first.
+**Verified with the real CLIs only for MCP wrapping** (`docs/VERIFICATION.md`): with Claude Code
+2.1.326 and Gemini CLI 0.68.0, servers wrapped by `bawwab protect` still start and complete the MCP
+handshake (`claude mcp list` / `gemini mcp list`), the clients' requests pass through the proxy, and
+`unprotect` restores working configs. **Not verified:** the PreToolUse hook inside a real Claude Code
+session, and any model actually calling a tool through the proxy (no model was run; no credentials
+were used). Run `bawwab protect --dry-run`, read the diff, and try it on a throwaway account first.
 
 **Not covered at all:** Claude Desktop, Cursor, VS Code / GitHub Copilot, OpenAI Codex CLI, Windsurf,
 Cline, Continue, Zed and every other agent (their docs were not reachable or not checked); remote

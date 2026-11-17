@@ -63,6 +63,11 @@ The proxy denies a call by answering it itself with `{"content": [{"type": "text
 
 You can still scan any file yourself: `bawwab scan PATH` (the skill scanner reads any text file).
 
+## Real-CLI checks
+
+See [`VERIFICATION.md`](VERIFICATION.md): MCP wrapping checked with Claude Code 2.1.326 and Gemini CLI
+0.68.0 (`mcp list` health checks) on 2026-11-17; the Claude Code hook was not exercised by a real session.
+
 ## How to add an agent
 
 1. Read its official documentation; quote the paths and the mechanism here with URL and date.

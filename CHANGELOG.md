@@ -28,6 +28,9 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- m12: MCP wrapping verified with the real Claude Code 2.1.326 and Gemini CLI 0.68.0 (`mcp list`
+  health checks, clean env without credentials): docs/VERIFICATION.md, tools/verify/verify_agents.sh.
+  Hook not verified (`claude mcp list` does not validate hooks: shown with a broken value).
 - m11: product renamed **Bawwab** (بوّاب, the Egyptian building doorman: decides by destination and
   what is carried out, not by language). Package `src/bawwab`, command `bawwab` (`zorfa` kept as an
   alias), config dir `~/.bawwab`; servers and hooks wrapped under the old name are still recognised.

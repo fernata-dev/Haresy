@@ -2,7 +2,7 @@
 
 _Updated at every milestone. Read this first if you are continuing the work (person or model)._
 
-## Status: m10 done (Bawwab protect, opt-in) — all milestones m1–m10 complete; real-model pilot NOT RUN
+## Status: m12 done (real-CLI verification of MCP wrapping); m13 next; real-model pilot NOT RUN
 
 ### m8–m10 (Bawwab) summary
 - Product name: **Bawwab** (بوّاب; `bawwab` command, `src/bawwab/`). m8–m10 were built under the name Zorfa;
@@ -53,8 +53,10 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 3. **All attack and benign texts are AI drafts.** No student-written data yet.
 4. The skill scanner has no measured detection rate (fixtures only).
 5. The GitHub Actions workflow (`.github/workflows/ci.yml`) was written but not run on GitHub.
-7. **Bawwab protect/hook/proxy never ran against a real Claude Code or Gemini CLI** (not installed in
-   the build container). Only fake HOME + fake MCP server + hand-written hook events. Only Linux.
+7. **Real CLIs (m12):** MCP wrapping verified with Claude Code 2.1.326 and Gemini CLI 0.68.0 via their
+   `mcp list` health checks (docs/VERIFICATION.md, script tools/verify/verify_agents.sh). The
+   PreToolUse hook was NOT exercised by a real Claude Code session (needs a model + credentials).
+   Only Linux.
 8. Claude Desktop, Cursor, VS Code, Codex CLI, Windsurf are NOT supported (official docs not
    reachable from the build session: modelcontextprotocol.io, cursor.com, code.visualstudio.com).
    To add one, follow "How to add an agent" in docs/INTEGRATIONS.md.
