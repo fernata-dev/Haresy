@@ -60,8 +60,22 @@ def is_wrapped(server: dict) -> bool:
     return ("zorfa" in args and "mcp-proxy" in args) or (cmd.startswith("zorfa") and args[:1] == ["mcp-proxy"])
 
 
+def unwrap(s: dict) -> dict:
+    """For a server behind the Zorfa proxy, the real server command is after '--'."""
+    if not is_wrapped(s):
+        return s
+    args = [str(a) for a in s.get("args", []) or []]
+    if "--" in args:
+        i = args.index("--")
+        if i + 1 < len(args):
+            return dict(s, command=args[i + 1], args=args[i + 2:])
+    return s
+
+
 def server_risks(name: str, s: dict) -> list[dict]:
     risks = []
+    wrapped = is_wrapped(s)
+    s = unwrap(s)
     if "url" in s or s.get("type") in ("http", "sse"):
         host = str(s.get("url", "")).split("://")[-1].split("/")[0].split(":")[0]
         if host and host not in ("localhost", "127.0.0.1", "::1"):
@@ -92,7 +106,7 @@ def server_risks(name: str, s: dict) -> list[dict]:
     if n:
         risks.append({"severity": "high", "rule": "secret_in_args",
                       "message": f"{n} argument(s) look like a literal secret (redacted); prefer env variables"})
-    if not is_wrapped(s):
+    if not wrapped:
         risks.append({"severity": "info", "rule": "not_protected",
                       "message": "stdio server is not behind the Zorfa policy proxy"})
     return risks
@@ -100,7 +114,8 @@ def server_risks(name: str, s: dict) -> list[dict]:
 
 def describe_server(name: str, s: dict, scope: str) -> dict:
     remote = "url" in s or s.get("type") in ("http", "sse")
-    args, _ = redact_args([str(a) for a in (s.get("args") or [])])
+    real = unwrap(s)
+    args, _ = redact_args([str(a) for a in (real.get("args") or [])])
     d = {"name": name, "scope": scope, "transport": (s.get("type") or "http") if remote else "stdio",
          "protected": is_wrapped(s) if not remote else False,
          "env_keys": sorted((s.get("env") or {}).keys()),
@@ -108,7 +123,8 @@ def describe_server(name: str, s: dict, scope: str) -> dict:
     if remote:
         d["url_host"] = str(s.get("url", "")).split("://")[-1].split("/")[0]
     else:
-        d["command"] = " ".join(shlex.quote(x) for x in [str(s.get("command", ""))] + args)
+        d["command"] = ("[zorfa proxy] " if d["protected"] else "") + \
+            " ".join(shlex.quote(x) for x in [str(real.get("command", ""))] + args)
     return d
 
 

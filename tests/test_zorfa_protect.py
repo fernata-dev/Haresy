@@ -145,3 +145,18 @@ def test_hook_only_when_agent_installed_and_not_duplicated(tmp_path):
     assert hook["matcher"] == "*" and hook["hooks"][0]["type"] == "command"
     assert "zorfa hook claude-code --policy" in hook["hooks"][0]["command"]
     assert P.make_plan(home, None, mechs=("pretooluse-hook",)).changes == []
+
+
+def test_discover_sees_through_the_proxy_after_protect(fake):
+    """Regression: wrapping must not hide the real server's risks or add false ones."""
+    root, home, project = fake
+    def risks():
+        res = discover(home, project)
+        return {s["name"]: ({r["rule"] for r in s["risks"]} - {"not_protected"}, s["command"] if "command" in s else "")
+                for a in res["agents"] for asset in a["assets"] for s in asset.get("mcp_servers", [])}
+    before = risks()
+    P.apply_plan(P.make_plan(home, project), P.APPLY_WORD)
+    after = risks()
+    assert {n: r for n, (r, _) in after.items()} == {n: r for n, (r, _) in before.items()}
+    assert "unpinned_package" in after["github"][0]
+    assert after["github"][1].startswith("[zorfa proxy] npx -y @modelcontextprotocol/server-github")
