@@ -28,6 +28,8 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- m9: distribution renamed `zorfa` (v0.2.0) with `zorfa` and `hares` commands; agent list shipped as
+  package data; README install section.
 - m8: Zorfa discover (read-only) for the documented agents in data/supported_agents.json
   (claude-code, gemini-cli), secret redaction, skill scanning, JSON + text report; shim fix
   (src always first on sys.path).

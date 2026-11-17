@@ -2,7 +2,7 @@
 
 _Updated at every milestone. Read this first if you are continuing the work (person or model)._
 
-## Status: m8 done (Zorfa discover) — m9/m10 in progress; real-model pilot NOT RUN
+## Status: m9 done (install) — m10 next; real-model pilot NOT RUN
 
 ### m8–m10 (Zorfa) summary
 - Product name: **Zorfa** (`zorfa` command, `src/zorfa/`). The research core keeps the package name
@@ -11,6 +11,9 @@ _Updated at every milestone. Read this first if you are continuing the work (per
   **gemini-cli**. Everything else is listed as not supported with the reason.
 - m8 `zorfa discover` (default command): read-only; tests in tests/test_zorfa_discover.py prove no
   writes, no network, no reads of unsupported (.cursor) or secret (.ssh) files, secrets redacted.
+- m9 install: `pipx install .` / `pip install .` (distribution `zorfa`, commands `zorfa` and `hares`,
+  agent list shipped as package data). Verified in the build container: fresh venv and pipx, run
+  from a directory outside the repo. `pipx install git+https://...` depends on repo access.
 
 | milestone | state | tag |
 |---|---|---|
@@ -22,8 +25,8 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 | m6 report generator + demo | DONE | `m6` |
 | m7 docs + self-audit + clean-checkout reproduction | DONE | `m7` |
 | m8 Zorfa discover (read-only) | DONE | `m8` |
-| m9 install (pip/pipx) | next | |
-| m10 protect / unprotect / MCP proxy / hook (opt-in) | pending | |
+| m9 install (pip/pipx) | DONE (verified: fresh venv + pipx, run outside the repo) | `m9` |
+| m10 protect / unprotect / MCP proxy / hook (opt-in) | next | |
 
 ## What works (verified in the build environment)
 

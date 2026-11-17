@@ -1,6 +1,15 @@
-# Hares (حارس)
+# Zorfa (formerly Hares, حارس)
 
 **Hares reduces the damage an injected instruction can cause; it does not stop a model from following it.**
+(Zorfa is the new name of Hares; the same sentence holds for Zorfa.)
+
+Zorfa has two parts:
+
+1. **Zorfa tool** (`zorfa`): finds the AI-agent setup on your machine (configs, skills, MCP servers)
+   for a short, documented list of agents, scans it, and — only if you ask — puts a policy proxy and
+   a hook in front of tool calls. Supported: **Claude Code** and **Gemini CLI** (official docs checked,
+   see [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)). Zorfa does **not** support "any AI".
+2. **Hares benchmark** (`zorfa bench …` / `python -m hares …`): the research measurement below.
 
 Hares is a mock-environment benchmark and toolkit for **indirect prompt injection** against
 tool-using LLM agents, built around one question:
@@ -71,7 +80,27 @@ Every number above is written by `python -m hares report` from a file in `result
 - No network calls, except to an LLM endpoint **you** configure for the optional real-model runs.
   D4 never downloads its tokenizer (a test blocks all sockets during a full simulator run).
 
-## Quick start
+## Install Zorfa (one command)
+
+```bash
+pipx install git+https://github.com/fernata-dev/Haresy.git     # or, from a checkout: pipx install .
+zorfa                     # = zorfa discover: READ-ONLY report of what is on this machine
+```
+
+`pip install .` works too. Then:
+
+```bash
+zorfa agents              # the supported list and the official doc behind each integration
+zorfa discover --json --out zorfa-report.json
+zorfa scan ~/.claude/skills            # scan skills / tool manifests (reads text only; --sarif for CI)
+zorfa protect --dry-run   # OPT-IN: exact diff of every file that would change (nothing is written)
+zorfa protect --apply     # asks you to type APPLY, writes a timestamped backup first
+zorfa unprotect           # restores that backup (asks you to type RESTORE)
+```
+
+Nothing runs automatically: installing Zorfa changes nothing, and `discover` never writes.
+
+## Quick start (research benchmark, from a checkout)
 
 Python 3.11+, standard library only. `pytest` for tests. Optional: `numpy` (faster bootstrap),
 `tiktoken` with a locally cached `cl100k_base` vocabulary (enables D4).
