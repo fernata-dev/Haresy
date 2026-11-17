@@ -28,6 +28,9 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- **Windows bug found by CI (fixed):** configs with CRLF line endings made `protect --apply` refuse
+  ("changed after the plan was made") because the plan compared raw text with newline-translated
+  text. Protect/restore now compare exact bytes and keep the file's line endings. Regression test.
 - **Reproducibility bug found by CI (fixed):** the cluster-bootstrap CI used numpy's random
   generator when numpy was installed and Python's `random` otherwise, so results digests depended
   on whether an optional package was present. GitHub CI (no numpy) got different digests than the

@@ -76,7 +76,15 @@ def _indent_of(text: str) -> int | str:
 
 def _dump(doc: dict, like: str | None) -> str:
     out = json.dumps(doc, ensure_ascii=False, indent=_indent_of(like) if like else 2)
-    return out + ("\n" if (like is None or like.endswith("\n")) else "")
+    out += "\n" if (like is None or like.endswith("\n")) else ""
+    if like and "\r\n" in like:                 # keep the file's line endings (Windows)
+        out = out.replace("\n", "\r\n")
+    return out
+
+
+def _read_exact(path: Path) -> str | None:
+    """File content exactly as stored (no newline translation): what plans and backups compare."""
+    return path.read_bytes().decode("utf-8") if path.exists() else None
 
 
 def wrap_server(name: str, s: dict, policy_path: Path) -> dict:
@@ -283,7 +291,7 @@ def apply_plan(plan: Plan, confirm: str | None) -> dict:
     manifest = {"created": stamp, "bawwab_version": __version__, "home": str(plan.home), "files": []}
     # 1) verify nothing changed since planning, 2) back up everything FIRST
     for i, ch in enumerate(plan.changes):
-        current = ch.path.read_text(encoding="utf-8") if ch.path.exists() else None
+        current = _read_exact(ch.path)
         if _sha(current) != _sha(ch.before):
             raise RuntimeError(f"{ch.path} changed after the plan was made; nothing was modified")
         entry = {"path": str(ch.path), "existed": ch.before is not None, "agent": ch.agent,
@@ -299,7 +307,7 @@ def apply_plan(plan: Plan, confirm: str | None) -> dict:
     try:
         for ch, entry in zip(plan.changes, manifest["files"]):
             _atomic_write(ch.path, ch.after, entry["mode"])
-            json.loads(ch.path.read_text(encoding="utf-8"))
+            json.loads(_read_exact(ch.path))
             done.append(ch)
     except Exception:
         for ch in reversed(done):
@@ -335,10 +343,10 @@ def plan_restore(home: Path, backup_id: str | None, force: bool = False) -> tupl
     actions, problems = [], []
     for f in man["files"]:
         p = Path(f["path"])
-        current = p.read_text(encoding="utf-8") if p.exists() else None
+        current = _read_exact(p)
         if _sha(current) != f["sha256_after"]:
             problems.append(f"{display_path(p, home)} changed after Bawwab wrote it")
-        restored = (bdir / f["backup_file"]).read_text(encoding="utf-8") if f.get("existed") else None
+        restored = _read_exact(bdir / f["backup_file"]) if f.get("existed") else None
         actions.append({"path": p, "current": current, "restored": restored, "mode": f.get("mode")})
     if problems and not force:
         problems.append("refusing to restore (use --force to overwrite your later edits)")

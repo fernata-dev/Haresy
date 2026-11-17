@@ -179,3 +179,21 @@ def test_claude_settings_get_pre_and_post_hooks_once(fake):
     assert "hook claude-code --policy" in hooks["PreToolUse"][0]["hooks"][0]["command"]
     assert "hook claude-code-post --policy" in hooks["PostToolUse"][0]["hooks"][0]["command"]
     assert P.make_plan(home, project).changes == []
+
+
+def test_crlf_files_are_handled_and_keep_their_line_endings(fake):
+    """Regression (found by Windows CI): CRLF configs made --apply refuse with 'changed after the plan'."""
+    root, home, project = fake
+    for p in (home / ".claude" / "settings.json", home / ".claude.json", home / ".gemini" / "settings.json"):
+        p.write_bytes(p.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
+    before = {k: v[0] for k, v in tree_digest(root, exclude=".bawwab").items()}
+    plan = P.make_plan(home, project)
+    gem = next(c for c in plan.changes if c.path.name == "settings.json" and ".gemini" in str(c.path))
+    assert "\r\n" in gem.after and "\n" not in gem.after.replace("\r\n", "")
+    assert len([l for l in gem.diff(home).splitlines() if l.startswith(("+", "-")) and not l.startswith(("+++", "---"))]) < 25
+    P.apply_plan(plan, P.APPLY_WORD)
+    assert (home / ".claude.json").read_bytes().count(b"\r\n") > 5
+    bdir, actions, problems = P.plan_restore(home, None)
+    assert problems == []
+    P.apply_restore(home, actions, problems, P.RESTORE_WORD, False)
+    assert {k: v[0] for k, v in tree_digest(root, exclude=".bawwab").items()} == before
