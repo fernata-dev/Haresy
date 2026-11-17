@@ -149,8 +149,9 @@ def _print_summary(result: dict) -> None:
     c = t["counts"]
     print(f"\nattack cases={c['attack_cases']} from {c['attack_base_texts']} authored texts "
           f"(authors: {c['attack_base_by_author']}); benign cases={c['benign_cases']}.")
-    print("CAUTION: cases expanded from the same authored text are not independent; "
-          "the CI treats them as if they were.")
+    print("CAUTION: cases expanded from the same authored text are not independent. Wilson CIs "
+          "treat them as if they were; the cluster-bootstrap CI (by authored text) in the results "
+          "file does not, and is omitted when there are fewer than 5 authored texts in a cell.")
 
 
 # ------------------------------------------------------------ small tools

@@ -56,3 +56,21 @@ def test_cell_and_overlap():
     assert intervals_overlap(cell(5, 10), cell(6, 10)) is True
     assert intervals_overlap(cell(0, 0), b) is None
     assert math.isclose(cell(1, 4)["rate"], 0.25)
+
+
+def test_cluster_bootstrap_needs_enough_clusters_and_is_deterministic():
+    from hares.eval.metrics import MIN_CLUSTERS, cluster_bootstrap
+    assert cluster_bootstrap([(1, 2)] * (MIN_CLUSTERS - 1), seed=1) == (None, None)
+    cl = [(0, 10), (10, 10), (5, 10), (2, 10), (8, 10), (1, 10)]
+    a = cluster_bootstrap(cl, seed=3)
+    assert a == cluster_bootstrap(cl, seed=3)
+    lo, hi = a
+    assert 0 <= lo < 25 / 60 < hi <= 1
+
+
+def test_cluster_interval_is_wider_than_wilson_for_correlated_clusters():
+    from hares.eval.metrics import cluster_bootstrap
+    cl = [(10, 10)] * 3 + [(0, 10)] * 3        # all-or-nothing per base text
+    lo, hi = cluster_bootstrap(cl, seed=0)
+    wlo, whi = wilson(30, 60)
+    assert (hi - lo) > (whi - wlo)

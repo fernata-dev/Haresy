@@ -148,7 +148,7 @@ class Episode:
                 rec["withheld"] = True
                 rec["reason"] = f"content withheld by {verdict.defense}"
                 return ToolResult("withheld", WITHHELD_NOTE.format(name=verdict.defense))
-            self.taint.add_untrusted(out)
+            self.taint.add_untrusted(self.world.untrusted_part(tool, args))
             carries = is_site
         return ToolResult("ok", out, carries)
 

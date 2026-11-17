@@ -15,9 +15,9 @@ from hares.defenses import registry
 from hares.defenses.base import DefenseStack, ScreenVerdict
 from hares.env.tasks import SOURCE_TASKS, compatible_tasks
 from hares.eval.episode import Case, run_episode
-from hares.eval.metrics import cell, mcnemar_exact
+from hares.eval.metrics import cell, cluster_bootstrap, mcnemar_exact
 from hares.util import (DEFAULT_SEED, canonical_digest, git_info, now_iso, runtime_info,
-                        write_csv, write_json)
+                        stable_int, write_csv, write_json)
 
 SCHEMA_VERSION = 1
 
@@ -151,7 +151,14 @@ def _group(rows: list[dict], keys: tuple[str, ...], outcome: str) -> list[dict]:
         g = acc[key]
         row = dict(zip(keys, key))
         row.update(cell(sum(1 for r in g if r.get(outcome)), len(g)))
-        row["n_base"] = len({r["base_id"] for r in g})
+        per_base: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+        for r in g:
+            per_base[r["base_id"]][0] += 1 if r.get(outcome) else 0
+            per_base[r["base_id"]][1] += 1
+        row["n_base"] = len(per_base)
+        lo, hi = cluster_bootstrap([tuple(v) for _, v in sorted(per_base.items())],
+                                   seed=stable_int(DEFAULT_SEED, outcome, *key))
+        row["cluster_ci_lo"], row["cluster_ci_hi"] = lo, hi
         table.append(row)
     return table
 

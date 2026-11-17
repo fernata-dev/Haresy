@@ -51,3 +51,42 @@ def intervals_overlap(a: dict, b: dict) -> bool | None:
     if a.get("ci_lo") is None or b.get("ci_lo") is None:
         return None
     return not (a["ci_lo"] > b["ci_hi"] or b["ci_lo"] > a["ci_hi"])
+
+
+MIN_CLUSTERS = 5
+
+
+def cluster_bootstrap(clusters: list[tuple[int, int]], seed: int, b: int = 1000,
+                      alpha: float = 0.05) -> tuple[float | None, float | None]:
+    """Percentile cluster-bootstrap CI for a pooled rate.
+
+    clusters = [(k_i, n_i)] per authored base text.  Variants generated from the
+    same base text are correlated; resampling whole base texts gives an interval
+    that does not pretend they are independent.  Returns (None, None) when there
+    are fewer than MIN_CLUSTERS base texts (an interval would be meaningless).
+    """
+    m = len(clusters)
+    if m < MIN_CLUSTERS:
+        return None, None
+    try:
+        import numpy as np  # optional speed-up, identical algorithm
+        rng = np.random.default_rng(seed)
+        ks = np.array([c[0] for c in clusters], dtype=float)
+        ns = np.array([c[1] for c in clusters], dtype=float)
+        idx = rng.integers(0, m, size=(b, m))
+        rates = np.sort(ks[idx].sum(1) / ns[idx].sum(1))
+        lo, hi = rates[int(alpha / 2 * b)], rates[min(b - 1, int((1 - alpha / 2) * b))]
+        return float(lo), float(hi)
+    except ImportError:
+        import random
+        rng2 = random.Random(seed)
+        rates = []
+        for _ in range(b):
+            k = n = 0
+            for _ in range(m):
+                ck, cn = clusters[rng2.randrange(m)]
+                k += ck
+                n += cn
+            rates.append(k / n)
+        rates.sort()
+        return rates[int(alpha / 2 * b)], rates[min(b - 1, int((1 - alpha / 2) * b))]

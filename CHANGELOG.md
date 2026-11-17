@@ -10,6 +10,8 @@ _None._ (Checked by `python -m hares verify-freeze`.)
 
 ## History
 
+- m3: D5 capability guard (tools / args / taint, ablation variants), path normalisation,
+  body-only taint, residual-risk tables, cluster-bootstrap CI by authored text.
 - m2: D2 normaliser + concept lexicon (en/msa/arz/arabizi, Arabizi skeletons, cross-script
   matching), extended encoders (tatweel, tashkeel, homoglyph, translit, arabizi_noise, stacks),
   optional D3 (LLM judge) and D4 (chars per token). Developed on dev only; tag `freeze-scanner`.

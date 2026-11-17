@@ -9,3 +9,4 @@ results/raw/*
 !results/raw/.gitkeep
 results/scratch/
 .env
+results/scratch/

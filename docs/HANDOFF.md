@@ -2,14 +2,14 @@
 
 _Updated at every milestone. Read this first if you are continuing the work._
 
-## Status: m2 done (D2 scanner developed on dev, frozen)
+## Status: m3 done (D5 guard, residual risk, benign utility)
 
 | milestone | state |
 |---|---|
 | m1 harness | DONE |
 | m2 D2 scanner + freeze | DONE (tag `freeze-scanner`) |
-| m3 D5 guard, residual risk, benign utility | next |
-| m4 skillscan | pending |
+| m3 D5 guard, residual risk, benign utility | DONE |
+| m4 skillscan | next |
 | m5 LLM adapters + pilot | pending |
 | m6 report + demo | pending |
 | m7 docs + self-audit | pending |
@@ -35,9 +35,25 @@ _Updated at every milestone. Read this first if you are continuing the work._
 - D3 needs a real model; D4 needs tiktoken's cl100k_base vocabulary, which could NOT be
   downloaded in the build environment (proxy blocks the host). Both are reported as skipped.
 
+## D5 capability guard (m3)
+
+- `src/hares/defenses/d5_guard.py`. `authorize(tool, args, manifest, is_tainted)` never receives
+  content text. Ablation variants: `D5-tools`, `D5-args`, `D5-taint`, `D5` (all three).
+- Property test `tests/test_guard.py::test_guard_decisions_are_identical_across_languages_and_encodings`
+  checks the guard's decision trace depends only on (intent, source, task).
+- Taint = byte-exact match of a value against the attacker-controlled part of untrusted content
+  (email BODY, page text, injected skill / tool-description text). Headers are trusted metadata.
+  Known, measured limitation: encoded addresses are not seen as tainted.
+- Residual risk: `in_scope_tamper` (allowed channel, harmful content) and `override` (task lost
+  even when the harmful call is blocked: `task_completed_under_attack` table).
+- Cost: `delegation` benign cases (a real request to e-mail a third party) are blocked by
+  D5-args / D5-taint / D5. Measured as lost utility.
+- Statistics: every table cell also has a cluster-bootstrap CI over authored texts
+  (`cluster_ci_lo/hi`), omitted when a cell has < 5 authored texts.
+
 ## What is not there yet
 
-D5 guard, skillscan, LLM adapters, report, demo.
+skillscan, LLM adapters, report, demo.
 
 ## Conservative decisions taken (ambiguities in the brief)
 
@@ -69,4 +85,5 @@ python -m pytest
 python -m hares validate
 python -m hares eval --split dev --defenses D0,D1,D2
 python -m hares verify-freeze
+python -m hares eval --split dev          # all simulator defenses, writes results/sim_dev.json
 ```

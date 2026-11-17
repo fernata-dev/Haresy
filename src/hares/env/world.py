@@ -158,6 +158,15 @@ class MockWorld:
         self.posts.append({"url": url, "data": args.get("data")})
         return f"(mock) POST recorded for {url}"
 
+    def untrusted_part(self, tool: str, args: dict) -> str:
+        """The attacker-controllable part of a tool result (headers come from the mail system)."""
+        if tool == "read_email":
+            m = self.emails.get(args.get("id"))
+            return m["body"] if m else ""
+        if tool == "read_page":
+            return self.pages.get(args.get("url"), "")
+        return ""
+
     def _t_final_answer(self, args: dict) -> str:
         self.answers.append(str(args.get("text", "")))
         return "(done)"
