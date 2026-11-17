@@ -97,6 +97,10 @@ encoders produce. A clean evaluation of D6 needs a new test set and encodings it
 
 ## 8. Statistics
 
+- Reproducibility was first checked only inside one container; a numpy-dependent random stream made
+  digests differ elsewhere until it was found by CI and fixed (CHANGELOG). Treat any claim of
+  reproducibility as only as strong as the environments it was checked in (see the CI matrix).
+
 - Many cells, many comparisons, no multiple-comparison correction: treat individual "non-
   overlapping" cells with suspicion. The go/no-go rule is fixed in advance in
   `src/hares/eval/report.py::GROUPS`; do not add groups after looking at results.

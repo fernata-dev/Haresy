@@ -10,7 +10,7 @@ def main(policy: str) -> int:
     name = "taint" if "taint" in policy else "demo"
     cmd = [sys.executable, "-m", "bawwab", "mcp-proxy", "--policy", policy, "--name", name, "--",
            sys.executable, "-m", "bawwab.testing.fake_mcp_server"]
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, encoding="utf-8", bufsize=1)
 
     def ask(mid, method, params=None):
         p.stdin.write(json.dumps({"jsonrpc": "2.0", "id": mid, "method": method, "params": params or {}}) + "\n")

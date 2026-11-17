@@ -88,3 +88,19 @@ def test_paired_table_reports_text_level_mcnemar():
     assert (p["n_pairs"], p["only_a"], p["only_b"]) == (60, 30, 0)
     assert (p["text_pairs"], p["text_only_a"], p["text_only_b"]) == (6, 3, 0)
     assert p["text_mcnemar_exact_p"] == 0.25 and p["mcnemar_exact_p"] < 1e-8
+
+
+def test_cluster_bootstrap_does_not_depend_on_optional_packages(monkeypatch):
+    """Regression (found by CI): results must be identical with and without numpy."""
+    import builtins
+    from hares.eval.metrics import cluster_bootstrap
+    cl = [(k, 37) for k in (0, 3, 9, 14, 22, 30, 37, 5, 11, 19)]
+    a = cluster_bootstrap(cl, seed=123, b=500)
+    real = builtins.__import__
+    def blocked(name, *args, **kw):
+        if name.split(".")[0] == "numpy":
+            raise ImportError("blocked")
+        return real(name, *args, **kw)
+    monkeypatch.setattr(builtins, "__import__", blocked)
+    assert cluster_bootstrap(cl, seed=123, b=500) == a
+    assert a[0] < a[1]

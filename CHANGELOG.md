@@ -28,6 +28,15 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- **Reproducibility bug found by CI (fixed):** the cluster-bootstrap CI used numpy's random
+  generator when numpy was installed and Python's `random` otherwise, so results digests depended
+  on whether an optional package was present. GitHub CI (no numpy) got different digests than the
+  build container (numpy) on every push since m3 (`verify-repro` failed there). The m7
+  "clean-checkout reproduction" was done in the same container and could not catch it. Fix: one
+  pure-Python generator always; regression test; results regenerated (Wilson CIs, counts and rates
+  are unchanged; only cluster-bootstrap intervals move). CI now runs on Linux, Windows and macOS,
+  with and without numpy. Also: LF line endings pinned (`.gitattributes`) because the freeze check
+  compares bytes; UTF-8 forced on subprocess pipes (Windows).
 - `pilot --authors student`: run the real-model pilot on the student's own texts only (empty set is
   refused with instructions); install/run commands added to docs/STUDENT_GUIDE.md (checked in a fresh clone).
 - m14: new real recording under the name Bawwab (allowlist vs taint mode, D5-taint vs D6), docs updated.

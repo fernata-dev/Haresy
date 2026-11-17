@@ -87,7 +87,7 @@ def test_hook_cli_prints_only_json(tmp_path):
     pf.write_text(json.dumps(dict(DEFAULT_POLICY, log_file="")), encoding="utf-8")
     r = subprocess.run([sys.executable, "-m", "bawwab", "hook", "claude-code", "--policy", str(pf)],
                        input=json.dumps({"tool_name": "WebFetch", "tool_input": {"url": "https://attacker.test.local"}}),
-                       capture_output=True, text=True, env=env_with_src(), timeout=60)
+                       capture_output=True, text=True, encoding="utf-8", env=env_with_src(), timeout=60)
     assert r.returncode == 0 and json.loads(r.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny"
 
 
@@ -96,7 +96,7 @@ class Client:
         cmd = [sys.executable, "-m", "bawwab", "mcp-proxy", "--policy", str(policy), "--name", "t", "--",
                sys.executable, "-m", "bawwab.testing.fake_mcp_server"]
         self.p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                  text=True, bufsize=1, env=env_with_src())
+                                  text=True, encoding="utf-8", bufsize=1, env=env_with_src())
 
     def send(self, obj):
         self.p.stdin.write((obj if isinstance(obj, str) else json.dumps(obj)) + "\n")

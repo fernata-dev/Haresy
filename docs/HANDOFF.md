@@ -56,7 +56,9 @@ _Updated at every milestone. Read this first if you are continuing the work (per
    is installable but its vocabulary could not be downloaded; D4 now refuses to download it).
 3. **All attack and benign texts are AI drafts.** No student-written data yet.
 4. The skill scanner has no measured detection rate (fixtures only).
-5. The GitHub Actions workflow (`.github/workflows/ci.yml`) was written but not run on GitHub.
+5. CI correction: an earlier version of this file said the GitHub workflow had never run. It had
+   run on every push and failed at `verify-repro` (numpy-dependent bootstrap; see CHANGELOG). Fixed;
+   CI now covers Linux, Windows and macOS, with and without numpy.
 7. **Real CLIs (m12):** MCP wrapping verified with Claude Code 2.1.326 and Gemini CLI 0.68.0 via their
    `mcp list` health checks (docs/VERIFICATION.md, script tools/verify/verify_agents.sh). The
    PreToolUse hook was NOT exercised by a real Claude Code session (needs a model + credentials).

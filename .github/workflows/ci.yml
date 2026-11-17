@@ -2,18 +2,32 @@ name: ci
 on: [push, pull_request]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }} / py${{ matrix.python }}${{ matrix.numpy && ' + numpy' || '' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, python: "3.11", numpy: false}
+          - {os: ubuntu-latest, python: "3.13", numpy: true}
+          - {os: windows-latest, python: "3.12", numpy: false}
+          - {os: macos-latest, python: "3.12", numpy: false}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0        # tags are needed for verify-freeze
+          fetch-depth: 0        # full history: the freeze check needs the pinned freeze commit
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - run: pip install pytest
+          python-version: ${{ matrix.python }}
+      - run: pip install -e ".[dev]"
+      - if: matrix.numpy
+        run: pip install numpy        # results must be identical with or without optional packages
+      - run: python -m hares restore-tags
       - run: python -m pytest
       - run: python -m hares validate
-      - run: python -m hares restore-tags
       - run: python -m hares verify-freeze
       - run: python -m hares verify-repro
-      - run: python -m hares scan-skill fixtures/malicious_skill.md --fail-on high || test $? -eq 3
+      - run: bawwab --version
+      - run: bawwab --home tests --no-project --no-color
+      - shell: bash
+        run: python -m hares scan-skill fixtures/malicious_skill.md --fail-on high || test $? -eq 3

@@ -41,7 +41,8 @@ def now_iso() -> str:
 def _git(*args: str) -> str | None:
     try:
         out = subprocess.run(
-            ["git", *args], cwd=project_root(), capture_output=True, text=True, timeout=10
+            ["git", *args], cwd=project_root(), capture_output=True, text=True, encoding="utf-8",
+            errors="replace", timeout=10
         )
     except (OSError, subprocess.SubprocessError):
         return None

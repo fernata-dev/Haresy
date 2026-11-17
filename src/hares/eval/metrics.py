@@ -68,25 +68,20 @@ def cluster_bootstrap(clusters: list[tuple[int, int]], seed: int, b: int = 1000,
     m = len(clusters)
     if m < MIN_CLUSTERS:
         return None, None
-    try:
-        import numpy as np  # optional speed-up, identical algorithm
-        rng = np.random.default_rng(seed)
-        ks = np.array([c[0] for c in clusters], dtype=float)
-        ns = np.array([c[1] for c in clusters], dtype=float)
-        idx = rng.integers(0, m, size=(b, m))
-        rates = np.sort(ks[idx].sum(1) / ns[idx].sum(1))
-        lo, hi = rates[int(alpha / 2 * b)], rates[min(b - 1, int((1 - alpha / 2) * b))]
-        return float(lo), float(hi)
-    except ImportError:
-        import random
-        rng2 = random.Random(seed)
-        rates = []
-        for _ in range(b):
-            k = n = 0
-            for _ in range(m):
-                ck, cn = clusters[rng2.randrange(m)]
-                k += ck
-                n += cn
-            rates.append(k / n)
-        rates.sort()
-        return rates[int(alpha / 2 * b)], rates[min(b - 1, int((1 - alpha / 2) * b))]
+    # Pure-Python RNG on purpose: the result must not depend on which optional
+    # packages are installed (an earlier numpy fast path gave different digests
+    # on machines without numpy; found by CI, see CHANGELOG).
+    import random
+    rng = random.Random(seed)
+    ks = [c[0] for c in clusters]
+    ns = [c[1] for c in clusters]
+    rates = []
+    for _ in range(b):
+        k = n = 0
+        for _ in range(m):
+            i = rng.randrange(m)
+            k += ks[i]
+            n += ns[i]
+        rates.append(k / n)
+    rates.sort()
+    return rates[int(alpha / 2 * b)], rates[min(b - 1, int((1 - alpha / 2) * b))]

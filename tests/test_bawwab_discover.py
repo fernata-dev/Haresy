@@ -92,7 +92,10 @@ def test_symlink_outside_and_invalid_json_and_missing_agent(tmp_path):
     (home / ".claude" / "skills" / "x").mkdir(parents=True)
     outside = tmp_path / "outside.md"
     outside.write_text("---\nname: o\ndescription: o\n---\nsecret stuff\n", encoding="utf-8")
-    (home / ".claude" / "skills" / "x" / "SKILL.md").symlink_to(outside)
+    try:
+        (home / ".claude" / "skills" / "x" / "SKILL.md").symlink_to(outside)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlinks need extra privileges on this OS")
     (home / ".gemini").mkdir()
     (home / ".gemini" / "settings.json").write_text("{ // comment\n}", encoding="utf-8")
     res = discover(home, None)
