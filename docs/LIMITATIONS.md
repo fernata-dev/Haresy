@@ -95,3 +95,47 @@ Read this before quoting any number. Each point below can, on its own, make a co
   `src/hares/eval/report.py::GROUPS`; do not add groups after looking at results.
 - N/A cells (an encoding that does not change a script, e.g. leet on Arabic letters) are excluded,
   so pooled "encoded" groups contain different encodings for different languages.
+
+## 9. The Zorfa tool (m8–m10): what is supported and what is NOT covered
+
+**Supported list** (`data/supported_agents.json`, official docs read on 2026-11-17, sources in
+`docs/INTEGRATIONS.md`):
+
+| agent | discover | protect mechanisms |
+|---|---|---|
+| Claude Code | user + project settings, `~/.claude.json` MCP servers (user and local scope), project `.mcp.json`, personal and project skills | PreToolUse command hook (user settings); MCP stdio proxy |
+| Gemini CLI | `mcpServers` in user and project `settings.json` | MCP stdio proxy |
+
+**Never verified end to end.** Neither Claude Code nor Gemini CLI was installed in the build
+environment. The hook output format and the config edits follow the official documentation and
+were tested only against a fake HOME, a fake MCP server and hand-written hook events. Run
+`zorfa protect --dry-run`, read the diff, and try it on a throwaway account first.
+
+**Not covered at all:** Claude Desktop, Cursor, VS Code / GitHub Copilot, OpenAI Codex CLI, Windsurf,
+Cline, Continue, Zed and every other agent (their docs were not reachable or not checked); remote
+(HTTP/SSE) MCP servers (cannot be wrapped by a stdio proxy); Gemini CLI built-in tools (no documented
+hook was verified); Claude Code project-level settings (only the user settings file gets the hook);
+managed/enterprise settings; plugins; MCP resources and prompts (the proxy only checks tools);
+anything an agent does without a tool call.
+
+**Platforms.** Paths are home-relative per the docs; only Linux was exercised. macOS and Windows are
+untested on real machines (Windows quoting of the hook command is untested).
+
+**Policy heuristics are bypassable.** Destinations are found as URLs, e-mail addresses, and bare
+host names after network commands (curl, wget, …). They are missed when encoded (Base64, decimal IPs,
+string concatenation in a script, DNS tricks) or when data leaves through an allowed destination.
+Secret-path patterns are a short default list. The default allowlist (localhost only) blocks every
+other destination, so web-fetching tools stop working until you edit `allowed_hosts`: that is the
+cost of the default, not a bug. In-scope tampering (harmful content inside an allowed call) is not
+stopped, exactly as for D5 in the benchmark.
+
+**Tool-description scanning inherits D2's blind spots.** Poisoned descriptions are detected with the
+frozen Hares scanner, whose attack success on the test split shows it misses wording it was not
+built from (see `results/sim_test.json`). A tool that is not hidden is not proven safe.
+
+**Operational risks.** Claude Code rewrites `~/.claude.json` while it runs: quit it before
+`--apply`. Wrapped servers start through the Python interpreter that ran `protect`: run
+`zorfa unprotect` before uninstalling Zorfa or removing that interpreter, or the servers will not
+start. A broken policy file makes the hook deny everything and the proxy refuse to start (fail
+closed). The decision log (`~/.zorfa/decisions.jsonl`) records tool names, rules and hosts, but not
+arguments.

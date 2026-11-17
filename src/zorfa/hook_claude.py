@@ -1,0 +1,46 @@
+"""Claude Code PreToolUse hook (documented: https://code.claude.com/docs/en/hooks).
+
+stdin: JSON with tool_name and tool_input.  To deny, print ONLY
+{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
+ "permissionDecisionReason": ...}} and exit 0.  To allow, print nothing and exit 0
+(the normal permission flow applies).  A broken policy fails CLOSED (deny).
+"""
+from __future__ import annotations
+
+import json
+import os
+import sys
+from pathlib import Path
+
+from zorfa.policy import PolicyError, evaluate, load_policy, log_decision
+
+
+def _deny(reason: str) -> str:
+    return json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
+                                              "permissionDecisionReason": reason}})
+
+
+def run(stdin_text: str, policy_path: Path | None, home: Path | None = None) -> tuple[str, int]:
+    home = Path(home or os.path.expanduser("~"))
+    try:
+        policy = load_policy(policy_path)
+    except PolicyError as exc:
+        return _deny(f"Zorfa: policy could not be loaded ({exc}); blocking to stay safe."), 0
+    try:
+        event = json.loads(stdin_text or "{}")
+    except json.JSONDecodeError:
+        return _deny("Zorfa: hook input was not valid JSON; blocking to stay safe."), 0
+    tool = str(event.get("tool_name", ""))
+    d = evaluate(tool, event.get("tool_input", {}), policy, home)
+    log_decision(policy, home, {"source": "claude-code-hook", "tool": tool, **d.to_dict()})
+    if d.allowed:
+        return "", 0
+    return _deny(f"Blocked by Zorfa policy ({d.rule}): {d.detail}"), 0
+
+
+def main(policy_path: str | None) -> int:
+    out, code = run(sys.stdin.read(), Path(policy_path) if policy_path else None)
+    if out:
+        sys.stdout.write(out)
+        sys.stdout.flush()
+    return code

@@ -2,7 +2,7 @@
 
 _Updated at every milestone. Read this first if you are continuing the work (person or model)._
 
-## Status: m9 done (install) — m10 next; real-model pilot NOT RUN
+## Status: m10 done (Zorfa protect, opt-in) — all milestones m1–m10 complete; real-model pilot NOT RUN
 
 ### m8–m10 (Zorfa) summary
 - Product name: **Zorfa** (`zorfa` command, `src/zorfa/`). The research core keeps the package name
@@ -13,7 +13,13 @@ _Updated at every milestone. Read this first if you are continuing the work (per
   writes, no network, no reads of unsupported (.cursor) or secret (.ssh) files, secrets redacted.
 - m9 install: `pipx install .` / `pip install .` (distribution `zorfa`, commands `zorfa` and `hares`,
   agent list shipped as package data). Verified in the build container: fresh venv and pipx, run
-  from a directory outside the repo. `pipx install git+https://...` depends on repo access.
+  from a directory outside the repo; `pipx install "git+https://github.com/fernata-dev/Haresy.git@ccr-bf26486f-ag5cn6"`
+  also verified.
+- m10 `zorfa protect --dry-run|--apply`, `zorfa unprotect`, `zorfa mcp-proxy`, `zorfa hook claude-code`,
+  `zorfa policy show|check`: tests in tests/test_zorfa_protect.py and tests/test_zorfa_runtime.py
+  (dry run changes nothing, typed confirmation, backup first, rollback, refuse on later edits,
+  unparseable/unsupported files untouched, proxy hides poisoned tools and blocks denied calls,
+  hook fails closed). NOT verified against a real Claude Code or Gemini CLI (not installed here).
 
 | milestone | state | tag |
 |---|---|---|
@@ -26,7 +32,7 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 | m7 docs + self-audit + clean-checkout reproduction | DONE | `m7` |
 | m8 Zorfa discover (read-only) | DONE | `m8` |
 | m9 install (pip/pipx) | DONE (verified: fresh venv + pipx, run outside the repo) | `m9` |
-| m10 protect / unprotect / MCP proxy / hook (opt-in) | next | |
+| m10 protect / unprotect / MCP proxy / hook (opt-in) | DONE (fake HOME only; never run against real agents) | `m10` |
 
 ## What works (verified in the build environment)
 

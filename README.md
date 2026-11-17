@@ -83,7 +83,7 @@ Every number above is written by `python -m hares report` from a file in `result
 ## Install Zorfa (one command)
 
 ```bash
-pipx install git+https://github.com/fernata-dev/Haresy.git     # or, from a checkout: pipx install .
+pipx install "git+https://github.com/fernata-dev/Haresy.git@ccr-bf26486f-ag5cn6"   # or from a checkout: pipx install .
 zorfa                     # = zorfa discover: READ-ONLY report of what is on this machine
 ```
 
@@ -99,6 +99,9 @@ zorfa unprotect           # restores that backup (asks you to type RESTORE)
 ```
 
 Nothing runs automatically: installing Zorfa changes nothing, and `discover` never writes.
+(The `@ccr-…` branch suffix is needed until this work is merged into the default branch.)
+Read [`docs/LIMITATIONS.md` §9](docs/LIMITATIONS.md) before `--apply`: the hook and proxy follow the
+official docs but were never run against a real Claude Code or Gemini CLI.
 
 ## Quick start (research benchmark, from a checkout)
 

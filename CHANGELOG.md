@@ -28,6 +28,9 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- m10: opt-in `protect` (dry-run diff with secret masking, typed confirmation, timestamped backup,
+  atomic writes, validation, rollback), `unprotect`, MCP stdio policy proxy (hides poisoned tools,
+  blocks denied calls with isError), Claude Code PreToolUse hook (fails closed), policy engine.
 - m9: distribution renamed `zorfa` (v0.2.0) with `zorfa` and `hares` commands; agent list shipped as
   package data; README install section.
 - m8: Zorfa discover (read-only) for the documented agents in data/supported_agents.json
