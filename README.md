@@ -45,7 +45,7 @@ generated into [`CLAIMS_ALLOWED.md`](CLAIMS_ALLOWED.md) and
 ### Worst-case simulator, test split (generated)
 
 <!-- BEGIN GENERATED:summary -->
-Source: `results/sim_test.json` (digest `2cc4d4b0716b9362`, commit `b4051b14dc`, seed 1337). Agent: **worst-case simulated agent, not a real model**.
+Source: `results/sim_test.json` (digest `50a64bebdd01649c`, commit `08124864fb`, seed 1337). Agent: **worst-case simulated agent, not a real model**.
 
 | defense | attack success (Wilson 95% CI) | benign utility | benign flagged |
 |---|---|---|---|
