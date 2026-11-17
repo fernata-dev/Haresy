@@ -103,7 +103,14 @@ bawwab scan ~/.claude/skills            # scan skills / tool manifests (reads te
 bawwab protect --dry-run   # OPT-IN: exact diff of every file that would change (nothing is written)
 bawwab protect --apply     # asks you to type APPLY, writes a timestamped backup first
 bawwab unprotect           # restores that backup (asks you to type RESTORE)
+bawwab policy show         # the policy; set "destination_mode": "taint" in ~/.bawwab/policy.json
+                           # to block only destinations that appeared in untrusted tool output
 ```
+
+Two destination modes: **allowlist** (default; strict: only `allowed_hosts`) and **taint** (any
+destination except those seen in untrusted tool output, even Base64/zero-width/look-alike encoded).
+MCP wrapping was checked with the real Claude Code 2.1.326 and Gemini CLI 0.68.0
+([`docs/VERIFICATION.md`](docs/VERIFICATION.md)); the hooks were not exercised by a real session.
 
 Nothing runs automatically: installing Bawwab changes nothing, and `discover` never writes.
 (The `@ccr-…` branch suffix is needed until this work is merged into the default branch.)
@@ -112,12 +119,12 @@ official docs but were never run against a real Claude Code or Gemini CLI.
 
 ## Demo (real recording)
 
-[`docs/media/zorfa-demo.mp4`](docs/media/zorfa-demo.mp4) and the screenshots in
+[`docs/media/bawwab-demo.mp4`](docs/media/bawwab-demo.mp4) and the screenshots in
 [`docs/media/`](docs/media/) were recorded from real commands in a pseudo-terminal; `HOME` was a
 **fake** home with synthetic configs ([how they were made](docs/media/README.md)).
 
 ![discover](docs/media/02-discover.png)
-![MCP proxy](docs/media/07-mcp-proxy.png)
+![MCP proxy, taint mode](docs/media/08-mcp-proxy-taint.png)
 
 ## Quick start (research benchmark, from a checkout)
 

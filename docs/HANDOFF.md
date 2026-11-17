@@ -2,7 +2,7 @@
 
 _Updated at every milestone. Read this first if you are continuing the work (person or model)._
 
-## Status: m12 done (real-CLI verification of MCP wrapping); m13 next; real-model pilot NOT RUN
+## Status: m14 done (Bawwab: rename, real-CLI check, taint mode, D6, new recording); real-model pilot NOT RUN
 
 ### m8–m10 (Bawwab) summary
 - Product name: **Bawwab** (بوّاب; `bawwab` command, `src/bawwab/`). m8–m10 were built under the name Zorfa;
@@ -33,7 +33,11 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 | m7 docs + self-audit + clean-checkout reproduction | DONE | `m7` |
 | m8 Bawwab discover (read-only) | DONE | `m8` |
 | m9 install (pip/pipx) | DONE (verified: fresh venv + pipx, run outside the repo) | `m9` |
-| m10 protect / unprotect / MCP proxy / hook (opt-in) | DONE (fake HOME only; never run against real agents) | `m10` |
+| m10 protect / unprotect / MCP proxy / hook (opt-in) | DONE | `m10` |
+| m11 rename to Bawwab (بوّاب) | DONE (`zorfa` alias kept) | `m11` |
+| m12 MCP wrapping checked with real Claude Code / Gemini CLI | DONE (hooks not exercised) | `m12` |
+| m13 taint mode + destination hardening; benchmark D6 | DONE (D6 not held-out: LIMITATIONS 4b) | `m13` |
+| m14 new real recording, docs | DONE | `m14` |
 
 ## What works (verified in the build environment)
 

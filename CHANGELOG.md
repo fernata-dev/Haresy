@@ -28,6 +28,7 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- m14: new real recording under the name Bawwab (allowlist vs taint mode, D5-taint vs D6), docs updated.
 - m13: Bawwab policy hardening (Base64/percent-encoded and disguised destinations, numeric IP forms,
   destination-named arguments, punycode for look-alike hosts) and **taint mode** (MCP proxy: outputs
   and descriptions; Claude Code: PostToolUse hook + per-session host store). Benchmark: new guard

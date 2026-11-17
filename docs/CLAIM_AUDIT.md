@@ -31,6 +31,10 @@ and lists every number that appears in README.md, CLAIMS_ALLOWED.md and docs/PIL
 | Never touches unsupported or unparseable files | `tests/test_bawwab_protect.py::test_unparseable_and_unsupported_files_are_never_modified` |
 | MCP proxy hides poisoned tools and blocks denied calls; hook prints the documented deny JSON and fails closed | `tests/test_bawwab_runtime.py` |
 | Policy decisions do not depend on the language or encoding of the text | `tests/test_bawwab_runtime.py::test_policy_decision_does_not_depend_on_language_or_encoding` |
+| MCP wrapping checked with the real Claude Code 2.1.326 and Gemini CLI 0.68.0 | `docs/VERIFICATION.md`, `tools/verify/verify_agents.sh` |
+| Taint mode blocks destinations seen in untrusted tool output, even encoded | `tests/test_bawwab_runtime.py` (`test_taint_mode_policy`, `test_claude_code_taint_flow_across_tools`, `test_mcp_proxy_taint_mode_blocks_destinations_from_tool_output`, `test_hosts_from_obfuscated_content`) |
+| Look-alike hosts are never folded into allowed hosts | `tests/test_bawwab_runtime.py::test_lookalike_hosts_are_never_folded_into_allowed_ones` |
+| D6 decisions identical across languages and encodings; D6 catches encoded destinations D5-taint misses | `tests/test_guard.py` (`test_d6_*`); numbers in CLAIMS_ALLOWED.md |
 | Demo video and screenshots are real recordings with a fake HOME | `docs/media/README.md`, `docs/media/zorfa-session.cast.json`, `tools/record/` |
 
 ## B. Numbers (generated — do not edit)
