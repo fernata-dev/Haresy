@@ -111,8 +111,9 @@ fixtures/   malicious_skill.md benign_skill.md malicious_tool_descriptions.json
 ## Exact next commands
 
 ```bash
-# Bawwab (tool)
+# Bawwab (tool) — per-OS install: docs/INSTALL.md
 pipx install .                         # or: pip install .
+bawwab ui                              # the app (local only)
 bawwab                                  # discover (read-only)
 bawwab protect --dry-run                # read the diff; --apply only on a throwaway account first
 python -m bawwab.testing.fake_home /tmp/bawwab-fake && bawwab --home /tmp/bawwab-fake/home --project /tmp/bawwab-fake/project

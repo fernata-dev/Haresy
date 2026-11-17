@@ -131,8 +131,10 @@ hook was verified); Claude Code project-level settings (only the user settings f
 managed/enterprise settings; plugins; MCP resources and prompts (the proxy only checks tools);
 anything an agent does without a tool call.
 
-**Platforms.** Paths are home-relative per the docs; only Linux was exercised. macOS and Windows are
-untested on real machines (Windows quoting of the hook command is untested).
+**Platforms.** Paths are home-relative per the docs. The test suite (fake HOME, fake MCP server,
+protect/restore, proxy, hooks, app API) runs on Linux, macOS and Windows CI runners. The real agent
+CLIs (docs/VERIFICATION.md) and the app in a real browser were exercised on Linux only; Windows
+quoting of the hook command inside a real Claude Code session is untested.
 
 **Taint mode** (`"destination_mode": "taint"`): a destination is blocked only if it was seen in
 untrusted tool output (MCP proxy: that server's outputs and tool descriptions; Claude Code: the

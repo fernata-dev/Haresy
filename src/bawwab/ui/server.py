@@ -286,9 +286,9 @@ def serve(home: Path, project: Path | None, port: int = 8777, open_browser: bool
     except OSError:
         srv = make_server(app, 0)          # port busy: pick a free one
     url = f"http://127.0.0.1:{srv.server_address[1]}/#token={app.token}"
-    print("Bawwab UI is running on this computer only.")
-    print(f"Open: {url}")
-    print("Press Ctrl+C to stop. (The link contains a one-time secret; do not share it.)")
+    print("Bawwab UI is running on this computer only.", flush=True)
+    print(f"Open: {url}", flush=True)
+    print("Press Ctrl+C to stop. (The link contains a one-time secret; do not share it.)", flush=True)
     if open_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:
