@@ -1,6 +1,6 @@
 {
   "status": "not run",
-  "date": "2026-11-17T08:21:56Z",
+  "date": "2026-11-17T08:38:46Z",
   "agent_kind": "ollama",
   "endpoint": "http://127.0.0.1:11434",
   "reason": "Ollama not reachable: URLError: <urlopen error [Errno 111] Connection refused>",

@@ -1,13 +1,12 @@
 {
   "meta": {
     "schema_version": 1,
-    "generated_at": "2026-11-17T08:33:53Z",
+    "generated_at": "2026-11-17T08:38:45Z",
     "git": {
-      "commit": "42427c42c8e77765b73e0bf7636deecc8d011637",
-      "dirty": true,
-      "tags_at_head": [
-        "m5"
-      ]
+      "commit": "fdddb8f9e568985d8ea810940c83a006835be5e1",
+      "dirty": false,
+      "dirty_scope": "src/, data/, pyproject.toml, hares.py",
+      "tags_at_head": []
     },
     "runtime": {
       "hares_version": "0.1.0",

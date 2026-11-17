@@ -30,7 +30,7 @@ generated into [`CLAIMS_ALLOWED.md`](CLAIMS_ALLOWED.md) and
 ### Worst-case simulator, test split (generated)
 
 <!-- BEGIN GENERATED:summary -->
-Source: `results/sim_test.json` (digest `9e1eaa7b43488798`, commit `42427c42c8`, seed 1337). Agent: **worst-case simulated agent, not a real model**.
+Source: `results/sim_test.json` (digest `9e1eaa7b43488798`, commit `fdddb8f9e5`, seed 1337). Agent: **worst-case simulated agent, not a real model**.
 
 | defense | attack success (Wilson 95% CI) | benign utility | benign flagged |
 |---|---|---|---|
@@ -53,7 +53,7 @@ Scanner freeze: OK; post-freeze changes recorded: 1 (`src/hares/defenses/d4_cpt.
 ### Real-model pilot (generated)
 
 <!-- BEGIN GENERATED:pilot -->
-Real-model pilot: **NOT RUN** (2026-11-17T08:21:56Z). Reason: Ollama not reachable: URLError: <urlopen error [Errno 111] Connection refused>. Source: `results/pilot_status.json`. No statement about real models is supported.
+Real-model pilot: **NOT RUN** (2026-11-17T08:38:46Z). Reason: Ollama not reachable: URLError: <urlopen error [Errno 111] Connection refused>. Source: `results/pilot_status.json`. No statement about real models is supported.
 <!-- END GENERATED:pilot -->
 
 Every number above is written by `python -m hares report` from a file in `results/`;
