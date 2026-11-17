@@ -28,6 +28,10 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- m11: product renamed **Bawwab** (بوّاب, the Egyptian building doorman: decides by destination and
+  what is carried out, not by language). Package `src/bawwab`, command `bawwab` (`zorfa` kept as an
+  alias), config dir `~/.bawwab`; servers and hooks wrapped under the old name are still recognised.
+  The research package `hares` and its frozen files are unchanged.
 - post-m10: real terminal recording (pty, fake HOME) -> `docs/media/` (11 screenshots, MP4, raw cast,
   replay page) and `tools/record/`; discover fix (analyse the real server behind the proxy), found
   while reviewing the recording; README demo section; prompt log, provenance and claim audit updated.

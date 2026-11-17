@@ -1,4 +1,4 @@
-from zorfa.cli import main
+from bawwab.cli import main
 
 if __name__ == "__main__":
     raise SystemExit(main())

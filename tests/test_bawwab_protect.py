@@ -3,11 +3,11 @@ import json
 
 import pytest
 
-from zorfa import protect as P
-from zorfa.cli import main
-from zorfa.discover import discover
-from zorfa.testing.fake_home import build
-from zorfa_helpers import SECRETS, tree_digest
+from bawwab import protect as P
+from bawwab.cli import main
+from bawwab.discover import discover
+from bawwab.testing.fake_home import build
+from bawwab_helpers import SECRETS, tree_digest
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def fake(tmp_path):
 
 
 def _files(root):
-    return tree_digest(root, exclude=".zorfa")
+    return tree_digest(root, exclude=".bawwab")
 
 
 def test_dry_run_changes_nothing_and_shows_exact_diff_without_secrets(fake, capsys):
@@ -34,7 +34,7 @@ def test_dry_run_changes_nothing_and_shows_exact_diff_without_secrets(fake, caps
 
 
 def test_diff_masking_of_secret_values():
-    from zorfa.redact import mask_diff_line
+    from bawwab.redact import mask_diff_line
     st = {"masked": 0}
     assert "ghp_" not in mask_diff_line('       "GITHUB_TOKEN": "ghp_FAKEFAKEFAKEFAKEFAKEFAKEFAKE00",', st)
     assert "$KEY" in mask_diff_line('   "API_KEY": "$KEY"', st)               # a reference, not a secret
@@ -76,7 +76,7 @@ def test_apply_backup_validate_idempotent_and_unprotect_restores_exactly(fake):
     assert problems == []
     P.apply_restore(home, actions, problems, P.RESTORE_WORD, False)
     assert {k: v[0] for k, v in _files(root).items()} == {k: v[0] for k, v in before.items()}  # same bytes
-    assert not (home / ".zorfa" / "policy.json").exists()
+    assert not (home / ".bawwab" / "policy.json").exists()
 
 
 def test_unprotect_refuses_after_user_edits_unless_forced(fake):
@@ -85,7 +85,7 @@ def test_unprotect_refuses_after_user_edits_unless_forced(fake):
     s = home / ".gemini" / "settings.json"
     s.write_text(s.read_text(encoding="utf-8").replace("Default", "Dark"), encoding="utf-8")
     bdir, actions, problems = P.plan_restore(home, None)
-    assert any("changed after Zorfa wrote it" in p for p in problems)
+    assert any("changed after Bawwab wrote it" in p for p in problems)
     with pytest.raises(RuntimeError):
         P.apply_restore(home, actions, problems, P.RESTORE_WORD, False)
     bdir, actions, problems = P.plan_restore(home, None, force=True)
@@ -143,7 +143,7 @@ def test_hook_only_when_agent_installed_and_not_duplicated(tmp_path):
     settings = json.loads((home / ".claude" / "settings.json").read_text(encoding="utf-8"))
     hook = settings["hooks"]["PreToolUse"][0]
     assert hook["matcher"] == "*" and hook["hooks"][0]["type"] == "command"
-    assert "zorfa hook claude-code --policy" in hook["hooks"][0]["command"]
+    assert "bawwab hook claude-code --policy" in hook["hooks"][0]["command"]
     assert P.make_plan(home, None, mechs=("pretooluse-hook",)).changes == []
 
 
@@ -159,4 +159,13 @@ def test_discover_sees_through_the_proxy_after_protect(fake):
     after = risks()
     assert {n: r for n, (r, _) in after.items()} == {n: r for n, (r, _) in before.items()}
     assert "unpinned_package" in after["github"][0]
-    assert after["github"][1].startswith("[zorfa proxy] npx -y @modelcontextprotocol/server-github")
+    assert after["github"][1].startswith("[bawwab proxy] npx -y @modelcontextprotocol/server-github")
+
+
+def test_servers_and_hooks_wrapped_under_the_previous_name_are_recognised(tmp_path):
+    from bawwab.discover import is_our_hook, is_wrapped
+    old = {"command": "/usr/bin/python3", "args": ["-m", "zorfa", "mcp-proxy", "--policy", "p", "--name", "x", "--", "npx", "pkg"]}
+    assert is_wrapped(old) and is_wrapped({"command": "/x/bin/bawwab", "args": ["mcp-proxy", "--", "node"]})
+    assert not is_wrapped({"command": "npx", "args": ["-y", "mcp-proxy-server"]})
+    assert is_our_hook("python3 -m zorfa hook claude-code --policy p") and is_our_hook("bawwab hook claude-code")
+    assert not is_our_hook("./scripts/hook-lint.sh")

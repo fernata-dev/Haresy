@@ -2,15 +2,15 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const [player, out] = process.argv.slice(2);
 const SHOTS = [
-  [0, 2, 0, "01-agents", "zorfa agents — the documented support list"],
-  [3, 3, 64, "02-discover", "zorfa (= discover) — read-only report"],
-  [4, 4, 0, "03-scan-skill", "zorfa scan — poisoned SKILL.md (Egyptian Arabic + Arabizi)"],
-  [5, 5, 62, "04-protect-dry-run", "zorfa protect --dry-run — exact diff, nothing written"],
-  [6, 6, 26, "05-protect-apply", "zorfa protect --apply — typed confirmation + backup"],
-  [7, 7, 0, "06-discover-after-protect", "zorfa discover after protect"],
+  [0, 2, 0, "01-agents", "bawwab agents — the documented support list"],
+  [3, 3, 64, "02-discover", "bawwab (= discover) — read-only report"],
+  [4, 4, 0, "03-scan-skill", "bawwab scan — poisoned SKILL.md (Egyptian Arabic + Arabizi)"],
+  [5, 5, 62, "04-protect-dry-run", "bawwab protect --dry-run — exact diff, nothing written"],
+  [6, 6, 26, "05-protect-apply", "bawwab protect --apply — typed confirmation + backup"],
+  [7, 7, 0, "06-discover-after-protect", "bawwab discover after protect"],
   [8, 8, 0, "07-mcp-proxy", "MCP proxy: poisoned tool hidden, exfiltration blocked"],
   [9, 9, 0, "08-claude-code-hook", "Claude Code PreToolUse hook decision"],
-  [10, 10, 24, "09-unprotect", "zorfa unprotect — restore from backup"],
+  [10, 10, 24, "09-unprotect", "bawwab unprotect — restore from backup"],
   [11, 11, 0, "10-benchmark", "Hares research benchmark (worst-case simulator)"],
   [12, 12, 0, "11-tests", "full test suite"],
 ];

@@ -23,14 +23,14 @@ and lists every number that appears in README.md, CLAIMS_ALLOWED.md and docs/PIL
 | Demo calls the evaluator's own functions | `src/hares/demo/api.py`; `tests/test_demo.py::test_demo_uses_the_evaluator_code_path`, `::test_demo_module_contains_no_defense_logic` |
 | Wilson CI / McNemar / cluster bootstrap are correct | `tests/test_metrics.py` (known values from Newcombe 1998; exact binomial tails) |
 | Real-model adapters work end to end | `tests/test_llm_adapter.py` (scripted local endpoint, NOT a model) |
-| Zorfa supports only Claude Code and Gemini CLI, each checked in official docs | `data/supported_agents.json`, `docs/INTEGRATIONS.md`; `tests/test_zorfa_discover.py::test_registry_is_documented_and_shipped_copy_is_identical` |
-| `discover` is read-only, offline, never reads unsupported/secret files, never prints secrets | `tests/test_zorfa_discover.py::test_discover_is_read_only_offline_and_never_opens_unsupported_or_secret_files` |
-| One-command install; `discover` is the default | `tests/test_zorfa_packaging.py`, `tests/test_zorfa_discover.py::test_cli_default_is_discover_and_json_out`; HANDOFF (venv, pipx and git-URL installs verified) |
-| `protect --dry-run` changes nothing and shows the exact diff (secrets masked in display) | `tests/test_zorfa_protect.py::test_dry_run_changes_nothing_and_shows_exact_diff_without_secrets`, `::test_diff_masking_of_secret_values` |
-| `--apply` needs typed confirmation, backs up first, rolls back on failure; `unprotect` restores | `tests/test_zorfa_protect.py` (`test_apply_requires_confirmation`, `test_apply_backup_validate_idempotent_and_unprotect_restores_exactly`, `test_apply_rolls_back_on_failure`, `test_unprotect_refuses_after_user_edits_unless_forced`) |
-| Never touches unsupported or unparseable files | `tests/test_zorfa_protect.py::test_unparseable_and_unsupported_files_are_never_modified` |
-| MCP proxy hides poisoned tools and blocks denied calls; hook prints the documented deny JSON and fails closed | `tests/test_zorfa_runtime.py` |
-| Policy decisions do not depend on the language or encoding of the text | `tests/test_zorfa_runtime.py::test_policy_decision_does_not_depend_on_language_or_encoding` |
+| Bawwab supports only Claude Code and Gemini CLI, each checked in official docs | `data/supported_agents.json`, `docs/INTEGRATIONS.md`; `tests/test_bawwab_discover.py::test_registry_is_documented_and_shipped_copy_is_identical` |
+| `discover` is read-only, offline, never reads unsupported/secret files, never prints secrets | `tests/test_bawwab_discover.py::test_discover_is_read_only_offline_and_never_opens_unsupported_or_secret_files` |
+| One-command install; `discover` is the default | `tests/test_bawwab_packaging.py`, `tests/test_bawwab_discover.py::test_cli_default_is_discover_and_json_out`; HANDOFF (venv, pipx and git-URL installs verified) |
+| `protect --dry-run` changes nothing and shows the exact diff (secrets masked in display) | `tests/test_bawwab_protect.py::test_dry_run_changes_nothing_and_shows_exact_diff_without_secrets`, `::test_diff_masking_of_secret_values` |
+| `--apply` needs typed confirmation, backs up first, rolls back on failure; `unprotect` restores | `tests/test_bawwab_protect.py` (`test_apply_requires_confirmation`, `test_apply_backup_validate_idempotent_and_unprotect_restores_exactly`, `test_apply_rolls_back_on_failure`, `test_unprotect_refuses_after_user_edits_unless_forced`) |
+| Never touches unsupported or unparseable files | `tests/test_bawwab_protect.py::test_unparseable_and_unsupported_files_are_never_modified` |
+| MCP proxy hides poisoned tools and blocks denied calls; hook prints the documented deny JSON and fails closed | `tests/test_bawwab_runtime.py` |
+| Policy decisions do not depend on the language or encoding of the text | `tests/test_bawwab_runtime.py::test_policy_decision_does_not_depend_on_language_or_encoding` |
 | Demo video and screenshots are real recordings with a fake HOME | `docs/media/README.md`, `docs/media/zorfa-session.cast.json`, `tools/record/` |
 
 ## B. Numbers (generated — do not edit)

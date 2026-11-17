@@ -12,7 +12,7 @@ import os
 import sys
 from pathlib import Path
 
-from zorfa.policy import PolicyError, evaluate, load_policy, log_decision
+from bawwab.policy import PolicyError, evaluate, load_policy, log_decision
 
 
 def _deny(reason: str) -> str:
@@ -25,17 +25,17 @@ def run(stdin_text: str, policy_path: Path | None, home: Path | None = None) -> 
     try:
         policy = load_policy(policy_path)
     except PolicyError as exc:
-        return _deny(f"Zorfa: policy could not be loaded ({exc}); blocking to stay safe."), 0
+        return _deny(f"Bawwab: policy could not be loaded ({exc}); blocking to stay safe."), 0
     try:
         event = json.loads(stdin_text or "{}")
     except json.JSONDecodeError:
-        return _deny("Zorfa: hook input was not valid JSON; blocking to stay safe."), 0
+        return _deny("Bawwab: hook input was not valid JSON; blocking to stay safe."), 0
     tool = str(event.get("tool_name", ""))
     d = evaluate(tool, event.get("tool_input", {}), policy, home)
     log_decision(policy, home, {"source": "claude-code-hook", "tool": tool, **d.to_dict()})
     if d.allowed:
         return "", 0
-    return _deny(f"Blocked by Zorfa policy ({d.rule}): {d.detail}"), 0
+    return _deny(f"Blocked by Bawwab policy ({d.rule}): {d.detail}"), 0
 
 
 def main(policy_path: str | None) -> int:

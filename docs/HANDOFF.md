@@ -2,21 +2,22 @@
 
 _Updated at every milestone. Read this first if you are continuing the work (person or model)._
 
-## Status: m10 done (Zorfa protect, opt-in) — all milestones m1–m10 complete; real-model pilot NOT RUN
+## Status: m10 done (Bawwab protect, opt-in) — all milestones m1–m10 complete; real-model pilot NOT RUN
 
-### m8–m10 (Zorfa) summary
-- Product name: **Zorfa** (`zorfa` command, `src/zorfa/`). The research core keeps the package name
+### m8–m10 (Bawwab) summary
+- Product name: **Bawwab** (بوّاب; `bawwab` command, `src/bawwab/`). m8–m10 were built under the name Zorfa;
+  renamed in m11 (`zorfa` is kept as a command alias; servers/hooks wrapped under the old name are recognised). The research core keeps the package name
   `hares` on purpose: renaming it would change every import line in the frozen scanner files.
 - Supported agents (official docs checked 2026-11-17, see docs/INTEGRATIONS.md): **claude-code**,
   **gemini-cli**. Everything else is listed as not supported with the reason.
-- m8 `zorfa discover` (default command): read-only; tests in tests/test_zorfa_discover.py prove no
+- m8 `bawwab discover` (default command): read-only; tests in tests/test_bawwab_discover.py prove no
   writes, no network, no reads of unsupported (.cursor) or secret (.ssh) files, secrets redacted.
-- m9 install: `pipx install .` / `pip install .` (distribution `zorfa`, commands `zorfa` and `hares`,
+- m9 install: `pipx install .` / `pip install .` (distribution `bawwab`, commands `bawwab` and `hares`,
   agent list shipped as package data). Verified in the build container: fresh venv and pipx, run
   from a directory outside the repo; `pipx install "git+https://github.com/fernata-dev/Haresy.git@ccr-bf26486f-ag5cn6"`
   also verified.
-- m10 `zorfa protect --dry-run|--apply`, `zorfa unprotect`, `zorfa mcp-proxy`, `zorfa hook claude-code`,
-  `zorfa policy show|check`: tests in tests/test_zorfa_protect.py and tests/test_zorfa_runtime.py
+- m10 `bawwab protect --dry-run|--apply`, `bawwab unprotect`, `bawwab mcp-proxy`, `bawwab hook claude-code`,
+  `bawwab policy show|check`: tests in tests/test_bawwab_protect.py and tests/test_bawwab_runtime.py
   (dry run changes nothing, typed confirmation, backup first, rollback, refuse on later edits,
   unparseable/unsupported files untouched, proxy hides poisoned tools and blocks denied calls,
   hook fails closed). NOT verified against a real Claude Code or Gemini CLI (not installed here).
@@ -30,7 +31,7 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 | m5 real-LLM adapters + pilot | adapters DONE, **pilot NOT RUN** | `m5` |
 | m6 report generator + demo | DONE | `m6` |
 | m7 docs + self-audit + clean-checkout reproduction | DONE | `m7` |
-| m8 Zorfa discover (read-only) | DONE | `m8` |
+| m8 Bawwab discover (read-only) | DONE | `m8` |
 | m9 install (pip/pipx) | DONE (verified: fresh venv + pipx, run outside the repo) | `m9` |
 | m10 protect / unprotect / MCP proxy / hook (opt-in) | DONE (fake HOME only; never run against real agents) | `m10` |
 
@@ -52,7 +53,7 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 3. **All attack and benign texts are AI drafts.** No student-written data yet.
 4. The skill scanner has no measured detection rate (fixtures only).
 5. The GitHub Actions workflow (`.github/workflows/ci.yml`) was written but not run on GitHub.
-7. **Zorfa protect/hook/proxy never ran against a real Claude Code or Gemini CLI** (not installed in
+7. **Bawwab protect/hook/proxy never ran against a real Claude Code or Gemini CLI** (not installed in
    the build container). Only fake HOME + fake MCP server + hand-written hook events. Only Linux.
 8. Claude Desktop, Cursor, VS Code, Codex CLI, Windsurf are NOT supported (official docs not
    reachable from the build session: modelcontextprotocol.io, cursor.com, code.visualstudio.com).
@@ -102,11 +103,11 @@ fixtures/   malicious_skill.md benign_skill.md malicious_tool_descriptions.json
 ## Exact next commands
 
 ```bash
-# Zorfa (tool)
+# Bawwab (tool)
 pipx install .                         # or: pip install .
-zorfa                                  # discover (read-only)
-zorfa protect --dry-run                # read the diff; --apply only on a throwaway account first
-python -m zorfa.testing.fake_home /tmp/zorfa-fake && zorfa --home /tmp/zorfa-fake/home --project /tmp/zorfa-fake/project
+bawwab                                  # discover (read-only)
+bawwab protect --dry-run                # read the diff; --apply only on a throwaway account first
+python -m bawwab.testing.fake_home /tmp/bawwab-fake && bawwab --home /tmp/bawwab-fake/home --project /tmp/bawwab-fake/project
 
 # demo recording (real commands, fake HOME): see docs/media/README.md and tools/record/
 

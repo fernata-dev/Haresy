@@ -1,4 +1,4 @@
-"""Convenience shim so `python -m zorfa` works from a fresh checkout (puts ./src on the path)."""
+"""Convenience shim so `python -m bawwab` works from a fresh checkout (puts ./src on the path)."""
 import os
 import sys
 
@@ -10,7 +10,7 @@ sys.path.insert(0, _SRC)
 if __name__ == "__main__":
     import runpy
 
-    runpy.run_module("zorfa", run_name="__main__", alter_sys=True)
+    runpy.run_module("bawwab", run_name="__main__", alter_sys=True)
 else:
     import importlib
 

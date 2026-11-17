@@ -1,12 +1,12 @@
-# INTEGRATIONS — what Zorfa supports and the official source for each fact
+# INTEGRATIONS — what Bawwab supports and the official source for each fact
 
 Rule: an agent is supported only if its integration points were checked against its **official**
 documentation, fetched during the build. Every fact below lists the URL and the date it was read.
 If no documented mechanism for intervention exists, the agent is **scan-only**. If its official
-documentation could not be read, it is **not supported** (Zorfa does not guess file locations).
+documentation could not be read, it is **not supported** (Bawwab does not guess file locations).
 
 Machine-readable list: [`data/supported_agents.json`](../data/supported_agents.json) (a byte-identical
-copy ships inside the package as `src/zorfa/_data/supported_agents.json`; a test enforces that).
+copy ships inside the package as `src/bawwab/_data/supported_agents.json`; a test enforces that).
 
 All documentation below was read on **2026-11-17**.
 
@@ -23,7 +23,7 @@ All documentation below was read on **2026-11-17**.
 | MCP servers: user and local scope in `~/.claude.json` (local scope under `projects.<path>.mcpServers`), project scope in `.mcp.json` at the project root; an entry with no `type` and a `command` is a stdio server with `command`, `args`, `env` | https://code.claude.com/docs/en/mcp |
 | Skills: `~/.claude/skills/<skill-name>/SKILL.md` (personal), `.claude/skills/<skill-name>/SKILL.md` (project, also parent directories up to the repo root); YAML front matter, `description` recommended | https://code.claude.com/docs/en/skills |
 
-Mechanisms Zorfa uses: **PreToolUse command hook** (in `~/.claude/settings.json`) and the **MCP stdio
+Mechanisms Bawwab uses: **PreToolUse command hook** (in `~/.claude/settings.json`) and the **MCP stdio
 proxy** (wrapping stdio entries in `~/.claude.json` and project `.mcp.json`).
 
 Not verified and therefore not used: the location of `~/.claude.json` on Windows beyond "home
@@ -36,8 +36,8 @@ directory"; managed (organization) settings; plugin hooks.
 | MCP servers live in `mcpServers` of `~/.gemini/settings.json` (user) or `.gemini/settings.json` (project) | https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/tools/mcp-server.md (official repository docs) |
 | stdio entry fields: `command`, `args`, `env` (may reference `$VAR`/`${VAR}`), `cwd` | same |
 
-Mechanism Zorfa uses: **MCP stdio proxy**. Gemini CLI hooks, extensions and context files were not
-verified, so Zorfa neither reads nor changes them.
+Mechanism Bawwab uses: **MCP stdio proxy**. Gemini CLI hooks, extensions and context files were not
+verified, so Bawwab neither reads nor changes them.
 
 ## The protocol behind the MCP proxy
 
@@ -49,7 +49,7 @@ verified, so Zorfa neither reads nor changes them.
 (The same specification is published on modelcontextprotocol.io, which was not reachable from the
 build session; the GitHub repository is its source.)
 
-The proxy denies a call by answering it itself with `{"content": [{"type": "text", "text": "Blocked by Zorfa policy: ..."}], "isError": true}`, so the model sees why.
+The proxy denies a call by answering it itself with `{"content": [{"type": "text", "text": "Blocked by Bawwab policy: ..."}], "isError": true}`, so the model sees why.
 
 ## Not supported (and why)
 
@@ -61,11 +61,11 @@ The proxy denies a call by answering it itself with `{"content": [{"type": "text
 | OpenAI Codex CLI | not supported | The repository's `docs/config.md` now covers only hooks and points to developers.openai.com, which was not tried after other hosts failed. |
 | Windsurf, Cline, Continue, Zed, others | not supported | not checked |
 
-You can still scan any file yourself: `zorfa scan PATH` (the skill scanner reads any text file).
+You can still scan any file yourself: `bawwab scan PATH` (the skill scanner reads any text file).
 
 ## How to add an agent
 
 1. Read its official documentation; quote the paths and the mechanism here with URL and date.
-2. Add an entry to `data/supported_agents.json` and copy the file to `src/zorfa/_data/`.
-3. Add fake-HOME fixtures and tests in `tests/test_zorfa_*.py` before touching any real machine.
+2. Add an entry to `data/supported_agents.json` and copy the file to `src/bawwab/_data/`.
+3. Add fake-HOME fixtures and tests in `tests/test_bawwab_*.py` before touching any real machine.
 4. If the agent documents no hook or MCP configuration, set `"support": "scan-only"`.

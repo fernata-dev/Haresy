@@ -3,9 +3,9 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "zorfa"
-version = "0.2.0"
-description = "Zorfa (formerly Hares, حارس): discover, scan and opt-in protect AI agent setups (Claude Code, Gemini CLI) against prompt injection, plus the Hares research benchmark across Arabic dialects and encodings."
+name = "bawwab"
+version = "0.3.0"
+description = "Bawwab (بوّاب; formerly Hares/Zorfa): discover, scan and opt-in protect AI agent setups (Claude Code, Gemini CLI) against prompt injection, plus the Hares research benchmark across Arabic dialects and encodings."
 requires-python = ">=3.11"
 readme = "README.md"
 license = { text = "MIT" }
@@ -16,7 +16,8 @@ dev = ["pytest>=7"]
 tokenizer = ["tiktoken"]
 
 [project.scripts]
-zorfa = "zorfa.cli:main"
+bawwab = "bawwab.cli:main"
+zorfa = "bawwab.cli:main"          # previous name, kept as an alias
 hares = "hares.cli:main"
 
 [tool.setuptools.packages.find]
@@ -24,7 +25,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 hares = ["demo/static/*"]
-zorfa = ["_data/*.json"]
+bawwab = ["_data/*.json"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

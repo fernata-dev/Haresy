@@ -57,9 +57,9 @@ window.shot=function(a,b,maxLines,title){reset(); for(let i=CAST.marks[a].start;
   document.getElementById("title").textContent=title; render(0,false);};
 function reset2(n){const note=`⋮ ${n} earlier line(s) of this command's output not shown in this screenshot (full output: video / cast file)`;
   lines.unshift([...note].map(ch=>({ch,fg:90})));}
-window.play=async function(){document.getElementById("title").textContent="zorfa — recorded "+CAST.meta.recorded_at;
+window.play=async function(){document.getElementById("title").textContent="bawwab — recorded "+CAST.meta.recorded_at;
   const intro=document.createElement("div");intro.className="intro";
-  intro.innerHTML="<b>Zorfa</b><span>real terminal recording</span><small>Every command really ran in a pseudo-terminal in the build container on "+CAST.meta.recorded_at+
+  intro.innerHTML="<b>Bawwab</b><span>real terminal recording</span><small>Every command really ran in a pseudo-terminal in the build container on "+CAST.meta.recorded_at+
   ". HOME is a FAKE home with synthetic Claude Code and Gemini CLI configs (no real secrets, attacker = attacker@test.local). Only the typing is animated.</small>";
   document.body.appendChild(intro); await new Promise(r=>setTimeout(r,4200)); intro.remove();
   reset(); render(34,true); let prev=0;

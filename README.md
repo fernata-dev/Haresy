@@ -1,15 +1,21 @@
-# Zorfa (formerly Hares, حارس)
+# Bawwab — بوّاب (formerly Hares / Zorfa)
 
 **Hares reduces the damage an injected instruction can cause; it does not stop a model from following it.**
-(Zorfa is the new name of Hares; the same sentence holds for Zorfa.)
+(Bawwab is the new name of Hares; the same sentence holds for Bawwab.)
 
-Zorfa has two parts:
+**Why "Bawwab"?** An Egyptian *bawwab* (بوّاب, building doorman) does not need to understand the
+language a visitor speaks: he looks at where they are going and what they carry out. Bawwab's guard
+works the same way. It decides from tool calls (destinations, files), never from the language of
+the text, so Egyptian Arabic, Arabizi or Base64 make no difference to it. That is also the research
+question of this project: content filters depend on language; action guards do not.
 
-1. **Zorfa tool** (`zorfa`): finds the AI-agent setup on your machine (configs, skills, MCP servers)
+Bawwab has two parts:
+
+1. **Bawwab tool** (`bawwab`): finds the AI-agent setup on your machine (configs, skills, MCP servers)
    for a short, documented list of agents, scans it, and — only if you ask — puts a policy proxy and
    a hook in front of tool calls. Supported: **Claude Code** and **Gemini CLI** (official docs checked,
-   see [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)). Zorfa does **not** support "any AI".
-2. **Hares benchmark** (`zorfa bench …` / `python -m hares …`): the research measurement below.
+   see [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)). Bawwab does **not** support "any AI".
+2. **Hares benchmark** (`bawwab bench …` / `python -m hares …`): the research measurement below.
 
 Hares is a mock-environment benchmark and toolkit for **indirect prompt injection** against
 tool-using LLM agents, built around one question:
@@ -80,25 +86,25 @@ Every number above is written by `python -m hares report` from a file in `result
 - No network calls, except to an LLM endpoint **you** configure for the optional real-model runs.
   D4 never downloads its tokenizer (a test blocks all sockets during a full simulator run).
 
-## Install Zorfa (one command)
+## Install Bawwab (one command)
 
 ```bash
 pipx install "git+https://github.com/fernata-dev/Haresy.git@ccr-bf26486f-ag5cn6"   # or from a checkout: pipx install .
-zorfa                     # = zorfa discover: READ-ONLY report of what is on this machine
+bawwab                     # = bawwab discover: READ-ONLY report of what is on this machine
 ```
 
 `pip install .` works too. Then:
 
 ```bash
-zorfa agents              # the supported list and the official doc behind each integration
-zorfa discover --json --out zorfa-report.json
-zorfa scan ~/.claude/skills            # scan skills / tool manifests (reads text only; --sarif for CI)
-zorfa protect --dry-run   # OPT-IN: exact diff of every file that would change (nothing is written)
-zorfa protect --apply     # asks you to type APPLY, writes a timestamped backup first
-zorfa unprotect           # restores that backup (asks you to type RESTORE)
+bawwab agents              # the supported list and the official doc behind each integration
+bawwab discover --json --out bawwab-report.json
+bawwab scan ~/.claude/skills            # scan skills / tool manifests (reads text only; --sarif for CI)
+bawwab protect --dry-run   # OPT-IN: exact diff of every file that would change (nothing is written)
+bawwab protect --apply     # asks you to type APPLY, writes a timestamped backup first
+bawwab unprotect           # restores that backup (asks you to type RESTORE)
 ```
 
-Nothing runs automatically: installing Zorfa changes nothing, and `discover` never writes.
+Nothing runs automatically: installing Bawwab changes nothing, and `discover` never writes.
 (The `@ccr-…` branch suffix is needed until this work is merged into the default branch.)
 Read [`docs/LIMITATIONS.md` §9](docs/LIMITATIONS.md) before `--apply`: the hook and proxy follow the
 official docs but were never run against a real Claude Code or Gemini CLI.

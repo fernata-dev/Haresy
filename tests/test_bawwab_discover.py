@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from zorfa.cli import main
-from zorfa.discover import discover, render
-from zorfa.registry import load_registry, resolve_locations
-from zorfa.testing.fake_home import build
-from zorfa_helpers import SECRETS, tree_digest
+from bawwab.cli import main
+from bawwab.discover import discover, render
+from bawwab.registry import load_registry, resolve_locations
+from bawwab.testing.fake_home import build
+from bawwab_helpers import SECRETS, tree_digest
 
 
 @pytest.fixture
@@ -21,7 +21,7 @@ def fake(tmp_path):
 
 def test_registry_is_documented_and_shipped_copy_is_identical():
     root = Path(__file__).resolve().parents[1]
-    assert (root / "data/supported_agents.json").read_bytes() == (root / "src/zorfa/_data/supported_agents.json").read_bytes()
+    assert (root / "data/supported_agents.json").read_bytes() == (root / "src/bawwab/_data/supported_agents.json").read_bytes()
     reg = load_registry()
     integrations = (root / "docs/INTEGRATIONS.md").read_text(encoding="utf-8")
     ids = {a["id"] for a in reg["agents"]}
@@ -116,7 +116,7 @@ def test_cli_default_is_discover_and_json_out(fake, capsys, tmp_path):
     out = tmp_path / "report.json"
     assert main(["--home", str(home), "--project", str(project), "--no-color", "--out", str(out)]) == 0
     text = capsys.readouterr().out
-    assert "Zorfa discover" in text and "Nothing was modified" in text
+    assert "Bawwab discover" in text and "Nothing was modified" in text
     assert json.loads(out.read_text(encoding="utf-8"))["summary"]["skills_high_risk"] == 1
     assert main(["agents", "--no-color"]) == 0
     assert "does not support 'any AI'" in capsys.readouterr().out

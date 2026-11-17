@@ -1,4 +1,4 @@
-"""`zorfa discover`: READ-ONLY discovery of supported agents' assets.
+"""`bawwab discover`: READ-ONLY discovery of supported agents' assets.
 
 Guarantees (tested against a fake HOME):
   * only paths from data/supported_agents.json are looked at;
@@ -14,9 +14,9 @@ import os
 import shlex
 from pathlib import Path
 
-from zorfa import __version__
-from zorfa.redact import SECRET_NAME, display_path, redact_args
-from zorfa.registry import Location, current_os, load_registry, resolve_locations
+from bawwab import __version__
+from bawwab.redact import SECRET_NAME, display_path, redact_args
+from bawwab.registry import Location, current_os, load_registry, resolve_locations
 
 MAX_BYTES = 5_000_000
 MAX_SKILL_FILES = 500
@@ -54,14 +54,23 @@ def read_bytes(p: Path, roots: list[Path]) -> tuple[bytes | None, str]:
     return data, ""
 
 
+NAMES = ("bawwab", "zorfa")          # current name + the previous name (m8-m10), still recognised
+
+
 def is_wrapped(server: dict) -> bool:
     args = [str(a) for a in server.get("args", []) or []]
     cmd = Path(str(server.get("command", ""))).name.lower()
-    return ("zorfa" in args and "mcp-proxy" in args) or (cmd.startswith("zorfa") and args[:1] == ["mcp-proxy"])
+    return (any(n in args for n in NAMES) and "mcp-proxy" in args) or \
+        (cmd.startswith(NAMES) and args[:1] == ["mcp-proxy"])
+
+
+def is_our_hook(command: str) -> bool:
+    c = f" {command} "
+    return any(n in c for n in NAMES) and " hook " in c
 
 
 def unwrap(s: dict) -> dict:
-    """For a server behind the Zorfa proxy, the real server command is after '--'."""
+    """For a server behind the Bawwab proxy, the real server command is after '--'."""
     if not is_wrapped(s):
         return s
     args = [str(a) for a in s.get("args", []) or []]
@@ -108,7 +117,7 @@ def server_risks(name: str, s: dict) -> list[dict]:
                       "message": f"{n} argument(s) look like a literal secret (redacted); prefer env variables"})
     if not wrapped:
         risks.append({"severity": "info", "rule": "not_protected",
-                      "message": "stdio server is not behind the Zorfa policy proxy"})
+                      "message": "stdio server is not behind the Bawwab policy proxy"})
     return risks
 
 
@@ -123,7 +132,7 @@ def describe_server(name: str, s: dict, scope: str) -> dict:
     if remote:
         d["url_host"] = str(s.get("url", "")).split("://")[-1].split("/")[0]
     else:
-        d["command"] = ("[zorfa proxy] " if d["protected"] else "") + \
+        d["command"] = ("[bawwab proxy] " if d["protected"] else "") + \
             " ".join(shlex.quote(x) for x in [str(real.get("command", ""))] + args)
     return d
 
@@ -147,10 +156,10 @@ def settings_hooks(doc: dict) -> dict:
     hooks = doc.get("hooks") if isinstance(doc.get("hooks"), dict) else {}
     counts = {ev: sum(len(g.get("hooks", [])) for g in groups if isinstance(g, dict))
               for ev, groups in hooks.items() if isinstance(groups, list)}
-    zorfa = any("zorfa" in str(h.get("command", "")) and "hook" in str(h.get("command", ""))
+    bawwab = any(is_our_hook(str(h.get("command", "")))
                 for g in hooks.get("PreToolUse", []) if isinstance(g, dict)
                 for h in g.get("hooks", []) if isinstance(h, dict))
-    return {"events": counts, "zorfa_hook_installed": zorfa}
+    return {"events": counts, "bawwab_hook_installed": bawwab}
 
 
 def scan_skill_dir(d: Path, roots: list[Path], home: Path) -> list[dict]:
@@ -186,14 +195,14 @@ def scan_skill_dir(d: Path, roots: list[Path], home: Path) -> list[dict]:
 
 def discover(home: Path | None = None, project: Path | None = None,
              agents: tuple[str, ...] | None = None) -> dict:
-    from zorfa.registry import default_home
+    from bawwab.registry import default_home
 
-    from zorfa.redact import set_project
+    from bawwab.redact import set_project
     set_project(project)
     home = Path(home or default_home())
     reg = load_registry()
     roots = [home] + ([project] if project else [])
-    result = {"tool": "zorfa discover", "zorfa_version": __version__, "read_only": True,
+    result = {"tool": "bawwab discover", "bawwab_version": __version__, "read_only": True,
               "os": current_os(), "home": str(home), "project": str(project) if project else None,
               "supported_agents": [a["id"] for a in reg["agents"]],
               "not_supported": reg.get("not_supported", []), "agents": []}
@@ -222,7 +231,7 @@ def _asset(loc: Location, roots: list[Path], home: Path) -> dict:
     try:
         doc = json.loads(data.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        asset.update({"parsed": False, "note": f"not valid JSON ({type(exc).__name__}); Zorfa will not modify it"})
+        asset.update({"parsed": False, "note": f"not valid JSON ({type(exc).__name__}); Bawwab will not modify it"})
         return asset
     asset["parsed"] = isinstance(doc, dict)
     if not isinstance(doc, dict):
@@ -258,9 +267,9 @@ def _summary(res: dict) -> dict:
 
 
 def render(res: dict) -> str:
-    from zorfa.term import c, rule, sev
+    from bawwab.term import c, rule, sev
 
-    L = [c("Zorfa discover", "bold") + c(f"  v{res['zorfa_version']} · read-only · no network · os={res['os']}", "dim"),
+    L = [c("Bawwab discover", "bold") + c(f"  v{res['bawwab_version']} · read-only · no network · os={res['os']}", "dim"),
          c(f"home: {res['home']}" + (f"   project: {res['project']}" if res["project"] else ""), "dim"), ""]
     for a in res["agents"]:
         L.append(rule(a["name"]))
@@ -280,8 +289,8 @@ def render(res: dict) -> str:
             if "hooks" in asset:
                 h = asset["hooks"]
                 ev = ", ".join(f"{k}:{v}" for k, v in h["events"].items()) or "none"
-                L.append(f"     hooks: {ev}   zorfa hook: " +
-                         (c("installed", "green") if h["zorfa_hook_installed"] else c("not installed", "yellow")))
+                L.append(f"     hooks: {ev}   bawwab hook: " +
+                         (c("installed", "green") if h["bawwab_hook_installed"] else c("not installed", "yellow")))
             for srv in asset.get("mcp_servers", []):
                 prot = c("protected", "green") if srv["protected"] else (
                     c("unprotected", "yellow") if srv["transport"] == "stdio" else c("remote", "cyan"))
@@ -314,6 +323,6 @@ def render(res: dict) -> str:
     L.append(f" findings: {c(str(s['high']) + ' high', 'bred' if s['high'] else 'green')}, "
              f"{c(str(s['medium']) + ' medium', 'byellow' if s['medium'] else 'green')}")
     L.append(c(" not covered: " + ", ".join(x["id"] for x in res["not_supported"]) +
-               "  (see docs/INTEGRATIONS.md; scan any file with `zorfa scan PATH`)", "dim"))
-    L.append(c(" Nothing was modified. Next: `zorfa protect --dry-run` to preview opt-in protection.", "dim"))
+               "  (see docs/INTEGRATIONS.md; scan any file with `bawwab scan PATH`)", "dim"))
+    L.append(c(" Nothing was modified. Next: `bawwab protect --dry-run` to preview opt-in protection.", "dim"))
     return "\n".join(L)

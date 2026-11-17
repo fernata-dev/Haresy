@@ -1,4 +1,4 @@
-"""`zorfa` command line.  With no arguments it runs `discover` (read-only)."""
+"""`bawwab` command line.  With no arguments it runs `discover` (read-only)."""
 from __future__ import annotations
 
 import argparse
@@ -6,13 +6,13 @@ import json
 import sys
 from pathlib import Path
 
-from zorfa import __version__
+from bawwab import __version__
 
 COMMANDS = ("discover", "agents", "scan", "protect", "unprotect", "policy", "mcp-proxy", "hook", "bench", "demo")
 
 
 def _home(a) -> Path:
-    from zorfa.registry import default_home
+    from bawwab.registry import default_home
     return Path(a.home).expanduser().resolve() if a.home else default_home()
 
 
@@ -27,7 +27,7 @@ def _agents(a):
 
 
 def cmd_discover(a) -> int:
-    from zorfa.discover import discover, render
+    from bawwab.discover import discover, render
     res = discover(_home(a), _project(a), _agents(a))
     if a.out:
         Path(a.out).write_text(json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -38,8 +38,8 @@ def cmd_discover(a) -> int:
 
 
 def cmd_agents(a) -> int:
-    from zorfa.registry import load_registry
-    from zorfa.term import c
+    from bawwab.registry import load_registry
+    from bawwab.term import c
     reg = load_registry()
     print(c(f"Supported agents (verified against official docs on {reg['verified_on']}):", "bold"))
     for ag in reg["agents"]:
@@ -50,7 +50,7 @@ def cmd_agents(a) -> int:
     print(c("Not supported:", "bold"))
     for ns in reg["not_supported"]:
         print(f"  {c(ns['id'], 'yellow'):<22} {ns['reason']}")
-    print(c("Zorfa does not support 'any AI'. Details: docs/INTEGRATIONS.md", "dim"))
+    print(c("Bawwab does not support 'any AI'. Details: docs/INTEGRATIONS.md", "dim"))
     return 0
 
 
@@ -73,7 +73,7 @@ def _confirm(word: str, given: str | None) -> str | None:
 
 
 def cmd_protect(a) -> int:
-    from zorfa import protect as P
+    from bawwab import protect as P
     home = _home(a)
     mechs = tuple(x.strip() for x in a.mechanism.split(",")) if a.mechanism else None
     plan = P.make_plan(home, _project(a), _agents(a), mechs, Path(a.policy).expanduser() if a.policy else None)
@@ -92,12 +92,12 @@ def cmd_protect(a) -> int:
         print(f"\nFAILED and rolled back: {exc}")
         return 4
     print(f"\nApplied {res['applied']} change(s). Backup: {res['backup']}")
-    print(f"Undo with: zorfa unprotect --backup {res['backup_id']}")
+    print(f"Undo with: bawwab unprotect --backup {res['backup_id']}")
     return 0
 
 
 def cmd_unprotect(a) -> int:
-    from zorfa import protect as P
+    from bawwab import protect as P
     home = _home(a)
     if a.list:
         for b in P.list_backups(home):
@@ -126,7 +126,7 @@ def cmd_unprotect(a) -> int:
 
 
 def cmd_policy(a) -> int:
-    from zorfa.policy import DEFAULT_POLICY, evaluate, load_policy
+    from bawwab.policy import DEFAULT_POLICY, evaluate, load_policy
     pol = load_policy(Path(a.policy).expanduser()) if a.policy else dict(DEFAULT_POLICY)
     if a.action == "show":
         print(json.dumps(pol, indent=2))
@@ -137,13 +137,13 @@ def cmd_policy(a) -> int:
 
 
 def cmd_mcp_proxy(a) -> int:
-    from zorfa.mcp_proxy import main
+    from bawwab.mcp_proxy import main
     cmd = a.server[1:] if a.server[:1] == ["--"] else a.server
     return main(a.policy, a.name, cmd)
 
 
 def cmd_hook(a) -> int:
-    from zorfa.hook_claude import main
+    from bawwab.hook_claude import main
     return main(a.policy)
 
 
@@ -158,9 +158,9 @@ def cmd_demo(a) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="zorfa", description="Zorfa: discover, scan and (opt-in) protect AI agent "
+    p = argparse.ArgumentParser(prog="bawwab", description="Bawwab: discover, scan and (opt-in) protect AI agent "
                                 "setups. Runs `discover` (read-only) when called without a command.")
-    p.add_argument("--version", action="version", version=f"zorfa {__version__}")
+    p.add_argument("--version", action="version", version=f"bawwab {__version__}")
     p.add_argument("--no-color", action="store_true")
     sub = p.add_subparsers(dest="cmd")
 
@@ -191,7 +191,7 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--apply", action="store_true", help="apply after typed confirmation; backup first")
     s.add_argument("--confirm", help="non-interactive confirmation word (APPLY)")
     s.add_argument("--mechanism", help="mcp-stdio-proxy,pretooluse-hook")
-    s.add_argument("--policy", help="policy file (default ~/.zorfa/policy.json)")
+    s.add_argument("--policy", help="policy file (default ~/.bawwab/policy.json)")
     s.set_defaults(fn=cmd_protect)
 
     s = sub.add_parser("unprotect", help="restore a protect backup")
@@ -204,7 +204,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--tool", default=""); s.add_argument("--args")
     s.set_defaults(fn=cmd_policy)
 
-    s = sub.add_parser("mcp-proxy", help="run an MCP stdio server behind the Zorfa policy")
+    s = sub.add_parser("mcp-proxy", help="run an MCP stdio server behind the Bawwab policy")
     s.add_argument("--policy"); s.add_argument("--name", default="server")
     s.add_argument("server", nargs=argparse.REMAINDER)
     s.set_defaults(fn=cmd_mcp_proxy)
@@ -237,7 +237,7 @@ def main(argv: list[str] | None = None) -> int:
         argv = ["discover"] + argv          # discover is the default first step
     p = build_parser()
     a = p.parse_args(argv)
-    from zorfa.term import set_color
+    from bawwab.term import set_color
     set_color(False if (a.no_color or no_color) else None)
     if not a.cmd:
         a = p.parse_args(["discover"])

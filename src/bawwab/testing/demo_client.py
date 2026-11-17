@@ -1,4 +1,4 @@
-"""Talk to an MCP server through `zorfa mcp-proxy` and print what happens (demo only)."""
+"""Talk to an MCP server through `bawwab mcp-proxy` and print what happens (demo only)."""
 from __future__ import annotations
 
 import json
@@ -7,8 +7,8 @@ import sys
 
 
 def main(policy: str) -> int:
-    cmd = [sys.executable, "-m", "zorfa", "mcp-proxy", "--policy", policy, "--name", "demo", "--",
-           sys.executable, "-m", "zorfa.testing.fake_mcp_server"]
+    cmd = [sys.executable, "-m", "bawwab", "mcp-proxy", "--policy", policy, "--name", "demo", "--",
+           sys.executable, "-m", "bawwab.testing.fake_mcp_server"]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
 
     def ask(mid, method, params=None):

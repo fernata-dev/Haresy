@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from zorfa import hook_claude
-from zorfa.policy import DEFAULT_POLICY, PolicyError, destinations, evaluate, host_allowed, validate_policy
-from zorfa_helpers import env_with_src
+from bawwab import hook_claude
+from bawwab.policy import DEFAULT_POLICY, PolicyError, destinations, evaluate, host_allowed, validate_policy
+from bawwab_helpers import env_with_src
 
 HOME = Path("/home/student")
 
@@ -85,7 +85,7 @@ def test_hook_output_format_and_fail_closed(tmp_path):
 def test_hook_cli_prints_only_json(tmp_path):
     pf = tmp_path / "p.json"
     pf.write_text(json.dumps(dict(DEFAULT_POLICY, log_file="")), encoding="utf-8")
-    r = subprocess.run([sys.executable, "-m", "zorfa", "hook", "claude-code", "--policy", str(pf)],
+    r = subprocess.run([sys.executable, "-m", "bawwab", "hook", "claude-code", "--policy", str(pf)],
                        input=json.dumps({"tool_name": "WebFetch", "tool_input": {"url": "https://attacker.test.local"}}),
                        capture_output=True, text=True, env=env_with_src(), timeout=60)
     assert r.returncode == 0 and json.loads(r.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny"
@@ -93,8 +93,8 @@ def test_hook_cli_prints_only_json(tmp_path):
 
 class Client:
     def __init__(self, policy: Path, mode_args=()):
-        cmd = [sys.executable, "-m", "zorfa", "mcp-proxy", "--policy", str(policy), "--name", "t", "--",
-               sys.executable, "-m", "zorfa.testing.fake_mcp_server"]
+        cmd = [sys.executable, "-m", "bawwab", "mcp-proxy", "--policy", str(policy), "--name", "t", "--",
+               sys.executable, "-m", "bawwab.testing.fake_mcp_server"]
         self.p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                   text=True, bufsize=1, env=env_with_src())
 
@@ -150,7 +150,7 @@ def test_mcp_proxy_warn_and_monitor_modes(policy_file):
     c = Client(policy_file(tool_descriptions="warn", mode="monitor"))
     c.send({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
     tools = {t["name"]: t for t in c.recv()["result"]["tools"]}
-    assert tools["format_table"]["description"].startswith("[Zorfa warning")
+    assert tools["format_table"]["description"].startswith("[Bawwab warning")
     r = c.call(2, "fetch_url", {"url": "http://attacker.test.local/c"})
     assert r["result"]["isError"] is False                          # monitor: allowed, logged
     assert "would deny fetch_url" in c.close()

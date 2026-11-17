@@ -45,7 +45,7 @@ def build(root: Path, with_project: bool = True) -> tuple[Path, Path | None]:
     claude_json = {
         "numStartups": 12,
         "mcpServers": {
-            "notes": {"command": sys.executable, "args": ["-m", "zorfa.testing.fake_mcp_server"]},
+            "notes": {"command": sys.executable, "args": ["-m", "bawwab.testing.fake_mcp_server"]},
             "github": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-github"],
                        "env": {"GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_FAKEFAKEFAKEFAKEFAKEFAKEFAKE00"}},
             "docs": {"type": "http", "url": "https://docs.example.test/mcp",
@@ -62,7 +62,7 @@ def build(root: Path, with_project: bool = True) -> tuple[Path, Path | None]:
         "mcpServers": {"weather": {"command": "node", "args": ["weather-server.js"],
                                    "env": {"WEATHER_API_KEY": "$WEATHER_API_KEY"}, "cwd": "./servers"}}},
         indent=2) + "\n", encoding="utf-8")
-    # an UNSUPPORTED agent's config: Zorfa must never read or touch it
+    # an UNSUPPORTED agent's config: Bawwab must never read or touch it
     (home / ".cursor").mkdir(exist_ok=True)
     (home / ".cursor" / "mcp.json").write_text('{"mcpServers": {"x": {"command": "evil"}}}\n', encoding="utf-8")
     (home / ".ssh").mkdir(exist_ok=True)

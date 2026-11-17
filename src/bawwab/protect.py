@@ -1,15 +1,15 @@
-"""`zorfa protect` / `zorfa unprotect`: OPT-IN changes to supported agents' configs.
+"""`bawwab protect` / `bawwab unprotect`: OPT-IN changes to supported agents' configs.
 
 Only documented mechanisms (docs/INTEGRATIONS.md) are used:
-  * mcp-stdio-proxy  wrap stdio MCP server entries so they run behind `zorfa mcp-proxy`
-  * pretooluse-hook  add a Claude Code PreToolUse command hook calling `zorfa hook claude-code`
+  * mcp-stdio-proxy  wrap stdio MCP server entries so they run behind `bawwab mcp-proxy`
+  * pretooluse-hook  add a Claude Code PreToolUse command hook calling `bawwab hook claude-code`
 
 Safety:
   * --dry-run prints the exact unified diff of every file that would change;
   * --apply needs an explicit typed confirmation, writes a timestamped backup FIRST,
     writes atomically, re-reads and validates every file, and rolls back on any error;
   * files that are not valid JSON are never modified;
-  * `unprotect` restores a backup, refusing if a file changed since Zorfa wrote it
+  * `unprotect` restores a backup, refusing if a file changed since Bawwab wrote it
     (unless --force);
   * nothing runs automatically; nothing outside data/supported_agents.json is touched.
 """
@@ -28,11 +28,11 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from zorfa import __version__
-from zorfa.discover import is_wrapped, read_bytes
-from zorfa.policy import DEFAULT_POLICY
-from zorfa.redact import display_path
-from zorfa.registry import load_registry, mechanisms, resolve_locations
+from bawwab import __version__
+from bawwab.discover import is_our_hook, is_wrapped, read_bytes
+from bawwab.policy import DEFAULT_POLICY
+from bawwab.redact import display_path
+from bawwab.registry import load_registry, mechanisms, resolve_locations
 
 APPLY_WORD = "APPLY"
 RESTORE_WORD = "RESTORE"
@@ -63,8 +63,8 @@ class Plan:
     policy_path: Path | None = None
 
 
-def zorfa_cmd() -> list[str]:
-    return [sys.executable, "-m", "zorfa"]
+def bawwab_cmd() -> list[str]:
+    return [sys.executable, "-m", "bawwab"]
 
 
 def _indent_of(text: str) -> int | str:
@@ -81,8 +81,8 @@ def _dump(doc: dict, like: str | None) -> str:
 
 def wrap_server(name: str, s: dict, policy_path: Path) -> dict:
     new = dict(s)
-    new["command"] = zorfa_cmd()[0]
-    new["args"] = zorfa_cmd()[1:] + ["mcp-proxy", "--policy", str(policy_path), "--name", name, "--",
+    new["command"] = bawwab_cmd()[0]
+    new["args"] = bawwab_cmd()[1:] + ["mcp-proxy", "--policy", str(policy_path), "--name", name, "--",
                                      str(s["command"])] + [str(a) for a in (s.get("args") or [])]
     return new
 
@@ -95,22 +95,22 @@ def _wrap_all(servers: dict, policy_path: Path, prefix: str, summary: list[str])
         if is_wrapped(s):
             continue
         servers[n] = wrap_server(n, s, policy_path)
-        summary.append(f"wrap MCP server {prefix}{n!r} with the Zorfa policy proxy")
+        summary.append(f"wrap MCP server {prefix}{n!r} with the Bawwab policy proxy")
         changed = True
     return changed
 
 
 def hook_command(policy_path: Path) -> str:
-    parts = zorfa_cmd() + ["hook", "claude-code", "--policy", str(policy_path)]
+    parts = bawwab_cmd() + ["hook", "claude-code", "--policy", str(policy_path)]
     return subprocess.list2cmdline(parts) if os.name == "nt" else " ".join(shlex.quote(p) for p in parts)
 
 
 def make_plan(home: Path, project: Path | None = None, agents: tuple[str, ...] | None = None,
               mechs: tuple[str, ...] | None = None, policy_path: Path | None = None) -> Plan:
-    from zorfa.redact import set_project
+    from bawwab.redact import set_project
     set_project(project)
     reg = load_registry()
-    policy_path = Path(policy_path or (home / ".zorfa" / "policy.json"))
+    policy_path = Path(policy_path or (home / ".bawwab" / "policy.json"))
     plan = Plan(home=home, policy_path=policy_path)
     roots = [home] + ([project] if project else [])
     locs = {(l.agent, l.id): l for l in resolve_locations(reg, home, project, agents)}
@@ -129,7 +129,7 @@ def make_plan(home: Path, project: Path | None = None, agents: tuple[str, ...] |
                     plan.changes.append(ch)
     if plan.changes and not policy_path.exists():
         plan.changes.insert(0, Change(policy_path, None, json.dumps(DEFAULT_POLICY, indent=2) + "\n",
-                                      "zorfa", "policy-file", ["create the default Zorfa policy (edit allowed_hosts!)"]))
+                                      "bawwab", "policy-file", ["create the default Bawwab policy (edit allowed_hosts!)"]))
     return plan
 
 
@@ -150,7 +150,7 @@ def _plan_location(loc, mech: str, policy_path: Path, plan: Plan, roots: list[Pa
             try:
                 doc = json.loads(before)
             except json.JSONDecodeError:
-                plan.notes.append(f"{disp}: not valid JSON; Zorfa never modifies files it cannot parse")
+                plan.notes.append(f"{disp}: not valid JSON; Bawwab never modifies files it cannot parse")
                 return None
             if not isinstance(doc, dict):
                 plan.notes.append(f"{disp}: not a JSON object; skipped")
@@ -161,13 +161,13 @@ def _plan_location(loc, mech: str, policy_path: Path, plan: Plan, roots: list[Pa
             return None
         groups = hooks.setdefault("PreToolUse", [])
         cmd = hook_command(policy_path)
-        if any("zorfa" in str(h.get("command", "")) and " hook " in f" {h.get('command', '')} "
+        if any(is_our_hook(str(h.get("command", "")))
                for g in groups if isinstance(g, dict) for h in g.get("hooks", []) if isinstance(h, dict)):
-            plan.notes.append(f"{disp}: Zorfa hook already installed")
+            plan.notes.append(f"{disp}: Bawwab hook already installed")
             return None
         groups.append({"matcher": "*", "hooks": [{"type": "command", "command": cmd}]})
         return Change(loc.path, before, _dump(doc, before), loc.agent, mech,
-                      ["add a PreToolUse hook (all tools) that asks the Zorfa policy before each tool call"])
+                      ["add a PreToolUse hook (all tools) that asks the Bawwab policy before each tool call"])
     if mech == "mcp-stdio-proxy":
         if not loc.path.exists():
             return None
@@ -179,7 +179,7 @@ def _plan_location(loc, mech: str, policy_path: Path, plan: Plan, roots: list[Pa
             before = data.decode("utf-8")
             doc = json.loads(before)
         except (UnicodeDecodeError, json.JSONDecodeError):
-            plan.notes.append(f"{disp}: not valid JSON; Zorfa never modifies files it cannot parse")
+            plan.notes.append(f"{disp}: not valid JSON; Bawwab never modifies files it cannot parse")
             return None
         if not isinstance(doc, dict):
             return None
@@ -200,11 +200,11 @@ def _plan_location(loc, mech: str, policy_path: Path, plan: Plan, roots: list[Pa
 
 
 def render_plan(plan: Plan) -> str:
-    from zorfa.term import c, rule
+    from bawwab.term import c, rule
 
-    from zorfa.redact import mask_diff_line
+    from bawwab.redact import mask_diff_line
 
-    L = [c("Zorfa protect — DRY RUN (nothing has been changed)", "bold"), ""]
+    L = [c("Bawwab protect — DRY RUN (nothing has been changed)", "bold"), ""]
     mask = {"masked": 0}
     if not plan.changes:
         L.append(c("Nothing to change.", "green"))
@@ -230,7 +230,7 @@ def render_plan(plan: Plan) -> str:
                    "the files keep their real values.", "yellow"))
     if plan.changes:
         L += ["", f"{len(plan.changes)} file(s) would change. To apply: "
-              + c(f"zorfa protect --apply", "bold") + f" (you will be asked to type {APPLY_WORD})."]
+              + c(f"bawwab protect --apply", "bold") + f" (you will be asked to type {APPLY_WORD})."]
     return "\n".join(L)
 
 
@@ -241,7 +241,7 @@ def _sha(text: str | None) -> str | None:
 
 def _atomic_write(path: Path, text: str, mode: int | None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp = tempfile.mkstemp(prefix=".zorfa-", dir=str(path.parent))
+    fd, tmp = tempfile.mkstemp(prefix=".bawwab-", dir=str(path.parent))
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="") as fh:
             fh.write(text)
@@ -255,7 +255,7 @@ def _atomic_write(path: Path, text: str, mode: int | None) -> None:
 
 
 def backups_dir(home: Path) -> Path:
-    return home / ".zorfa" / "backups"
+    return home / ".bawwab" / "backups"
 
 
 def apply_plan(plan: Plan, confirm: str | None) -> dict:
@@ -270,7 +270,7 @@ def apply_plan(plan: Plan, confirm: str | None) -> dict:
         n += 1
         bdir = backups_dir(plan.home) / f"{stamp}-{n}"
     bdir.mkdir(parents=True)
-    manifest = {"created": stamp, "zorfa_version": __version__, "home": str(plan.home), "files": []}
+    manifest = {"created": stamp, "bawwab_version": __version__, "home": str(plan.home), "files": []}
     # 1) verify nothing changed since planning, 2) back up everything FIRST
     for i, ch in enumerate(plan.changes):
         current = ch.path.read_text(encoding="utf-8") if ch.path.exists() else None
@@ -316,7 +316,7 @@ def list_backups(home: Path) -> list[dict]:
 def plan_restore(home: Path, backup_id: str | None, force: bool = False) -> tuple[Path, list[dict], list[str]]:
     bl = list_backups(home)
     if not bl:
-        raise FileNotFoundError("no Zorfa backups found")
+        raise FileNotFoundError("no Bawwab backups found")
     bid = backup_id or bl[-1]["id"]
     bdir = backups_dir(home) / bid
     if not (bdir / "manifest.json").exists():
@@ -327,7 +327,7 @@ def plan_restore(home: Path, backup_id: str | None, force: bool = False) -> tupl
         p = Path(f["path"])
         current = p.read_text(encoding="utf-8") if p.exists() else None
         if _sha(current) != f["sha256_after"]:
-            problems.append(f"{display_path(p, home)} changed after Zorfa wrote it")
+            problems.append(f"{display_path(p, home)} changed after Bawwab wrote it")
         restored = (bdir / f["backup_file"]).read_text(encoding="utf-8") if f.get("existed") else None
         actions.append({"path": p, "current": current, "restored": restored, "mode": f.get("mode")})
     if problems and not force:

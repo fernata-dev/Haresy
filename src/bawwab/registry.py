@@ -15,7 +15,7 @@ def load_registry() -> dict:
     repo = here.parents[2] / "data" / "supported_agents.json"
     if repo.exists():
         return json.loads(repo.read_text(encoding="utf-8"))
-    return json.loads(resources.files("zorfa").joinpath("_data/supported_agents.json").read_text(encoding="utf-8"))
+    return json.loads(resources.files("bawwab").joinpath("_data/supported_agents.json").read_text(encoding="utf-8"))
 
 
 def current_os() -> str:

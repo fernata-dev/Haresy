@@ -1,4 +1,4 @@
-"""Zorfa policy: decisions on tool calls, from the call's name and arguments only.
+"""Bawwab policy: decisions on tool calls, from the call's name and arguments only.
 
 Like the benchmark's D5 guard, the policy never interprets natural-language
 content: it looks at tool names, destinations (URLs, e-mail addresses, hosts
@@ -25,7 +25,7 @@ DEFAULT_POLICY = {
     "secret_paths": ["~/.ssh/*", "~/.aws/*", "~/.gnupg/*", "~/.config/gcloud/*", "~/.netrc",
                      "*/.env", "*.pem", "*id_rsa*", "*id_ed25519*"],
     "tool_descriptions": "hide",
-    "log_file": "~/.zorfa/decisions.jsonl",
+    "log_file": "~/.bawwab/decisions.jsonl",
 }
 MODES = ("enforce", "monitor")
 DESC_ACTIONS = ("hide", "warn", "off")

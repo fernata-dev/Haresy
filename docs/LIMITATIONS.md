@@ -96,7 +96,7 @@ Read this before quoting any number. Each point below can, on its own, make a co
 - N/A cells (an encoding that does not change a script, e.g. leet on Arabic letters) are excluded,
   so pooled "encoded" groups contain different encodings for different languages.
 
-## 9. The Zorfa tool (m8–m10): what is supported and what is NOT covered
+## 9. The Bawwab tool (m8–m10): what is supported and what is NOT covered
 
 **Supported list** (`data/supported_agents.json`, official docs read on 2026-11-17, sources in
 `docs/INTEGRATIONS.md`):
@@ -109,7 +109,7 @@ Read this before quoting any number. Each point below can, on its own, make a co
 **Never verified end to end.** Neither Claude Code nor Gemini CLI was installed in the build
 environment. The hook output format and the config edits follow the official documentation and
 were tested only against a fake HOME, a fake MCP server and hand-written hook events. Run
-`zorfa protect --dry-run`, read the diff, and try it on a throwaway account first.
+`bawwab protect --dry-run`, read the diff, and try it on a throwaway account first.
 
 **Not covered at all:** Claude Desktop, Cursor, VS Code / GitHub Copilot, OpenAI Codex CLI, Windsurf,
 Cline, Continue, Zed and every other agent (their docs were not reachable or not checked); remote
@@ -135,7 +135,7 @@ built from (see `results/sim_test.json`). A tool that is not hidden is not prove
 
 **Operational risks.** Claude Code rewrites `~/.claude.json` while it runs: quit it before
 `--apply`. Wrapped servers start through the Python interpreter that ran `protect`: run
-`zorfa unprotect` before uninstalling Zorfa or removing that interpreter, or the servers will not
+`bawwab unprotect` before uninstalling Bawwab or removing that interpreter, or the servers will not
 start. A broken policy file makes the hook deny everything and the proxy refuse to start (fail
-closed). The decision log (`~/.zorfa/decisions.jsonl`) records tool names, rules and hosts, but not
+closed). The decision log (`~/.bawwab/decisions.jsonl`) records tool names, rules and hosts, but not
 arguments.

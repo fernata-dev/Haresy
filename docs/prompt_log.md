@@ -99,3 +99,13 @@ All of m8-m10 are tested only against a mocked fake HOME directory first. docs/L
 ```text
 كمل
 ```
+
+## Prompt 5 — 2026-11-17 — rename and strengthen
+
+```text
+طوره اكتر واقوى واختارله اسم ليه معنى
+```
+
+Response summary: the assistant chose the name Bawwab (بوّاب) and explained why (the guard decides
+by destination, not language), then prioritised strengthening over feature count: verification
+with the real agent CLIs, hardening the policy against encoded destinations, and a taint mode.
