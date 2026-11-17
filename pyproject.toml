@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hares"
+version = "0.1.0"
+description = "Hares (حارس): a mock-environment benchmark of prompt-injection defenses across Arabic dialects and encodings, plus a task-bound capability guard and a SKILL.md scanner."
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+tokenizer = ["tiktoken"]
+
+[project.scripts]
+hares = "hares.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+hares = ["demo/static/*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"

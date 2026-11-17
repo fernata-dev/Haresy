@@ -1,0 +1,20 @@
+"""Convenience shim: lets `python -m hares ...` (and `import hares`) work from a
+fresh checkout without `pip install -e .`.  It only puts ./src first on
+sys.path and hands over to the real package in src/hares.  No project logic
+lives here."""
+import os
+import sys
+
+_SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
+
+if __name__ == "__main__":
+    import runpy
+
+    runpy.run_module("hares", run_name="__main__", alter_sys=True)
+else:
+    import importlib
+
+    sys.modules.pop(__name__, None)
+    sys.modules[__name__] = importlib.import_module(__name__)
