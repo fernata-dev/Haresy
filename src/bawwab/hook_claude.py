@@ -12,7 +12,8 @@ import os
 import sys
 from pathlib import Path
 
-from bawwab.policy import PolicyError, evaluate, load_policy, log_decision
+from bawwab import taintstore
+from bawwab.policy import PolicyError, content_strings, evaluate, hosts_from_content, load_policy, log_decision
 
 
 def _deny(reason: str) -> str:
@@ -31,14 +32,38 @@ def run(stdin_text: str, policy_path: Path | None, home: Path | None = None) -> 
     except json.JSONDecodeError:
         return _deny("Bawwab: hook input was not valid JSON; blocking to stay safe."), 0
     tool = str(event.get("tool_name", ""))
-    d = evaluate(tool, event.get("tool_input", {}), policy, home)
+    tainted = taintstore.load(home, str(event.get("session_id", ""))) if policy["destination_mode"] == "taint" else None
+    d = evaluate(tool, event.get("tool_input", {}), policy, home, tainted)
     log_decision(policy, home, {"source": "claude-code-hook", "tool": tool, **d.to_dict()})
     if d.allowed:
         return "", 0
     return _deny(f"Blocked by Bawwab policy ({d.rule}): {d.detail}"), 0
 
 
-def main(policy_path: str | None) -> int:
+def run_post(stdin_text: str, policy_path: Path | None, home: Path | None = None) -> tuple[str, int]:
+    """PostToolUse: record hosts found in the tool's output (taint mode only). Never blocks, prints nothing."""
+    home = Path(home or os.path.expanduser("~"))
+    try:
+        policy = load_policy(policy_path)
+        event = json.loads(stdin_text or "{}")
+    except (PolicyError, json.JSONDecodeError):
+        return "", 0
+    if policy["destination_mode"] != "taint":
+        return "", 0
+    hosts: set[str] = set()
+    for text in content_strings(event.get("tool_response", {})):
+        hosts |= hosts_from_content(text)
+    try:
+        taintstore.add(home, str(event.get("session_id", "")), hosts)
+    except OSError:
+        pass
+    return "", 0
+
+
+def main(policy_path: str | None, event: str = "pre") -> int:
+    if event == "post":
+        out, code = run_post(sys.stdin.read(), Path(policy_path) if policy_path else None)
+        return code
     out, code = run(sys.stdin.read(), Path(policy_path) if policy_path else None)
     if out:
         sys.stdout.write(out)

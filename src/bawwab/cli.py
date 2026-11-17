@@ -144,7 +144,7 @@ def cmd_mcp_proxy(a) -> int:
 
 def cmd_hook(a) -> int:
     from bawwab.hook_claude import main
-    return main(a.policy)
+    return main(a.policy, "post" if a.agent == "claude-code-post" else "pre")
 
 
 def cmd_bench(a) -> int:
@@ -210,7 +210,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(fn=cmd_mcp_proxy)
 
     s = sub.add_parser("hook", help="agent hook entry points (documented mechanisms only)")
-    s.add_argument("agent", choices=("claude-code",)); s.add_argument("--policy")
+    s.add_argument("agent", choices=("claude-code", "claude-code-post")); s.add_argument("--policy")
     s.set_defaults(fn=cmd_hook)
 
     s = sub.add_parser("bench", help="the Hares research benchmark (needs a checkout of the repository)")

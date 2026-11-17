@@ -9,7 +9,7 @@ from typing import Any
 
 from hares.defenses.base import DefenseStack
 from hares.env import world as W
-from hares.env.taint import TaintTracker
+from hares.env.taint import TaintOracle, TaintTracker
 from hares.env.tasks import TASKS, Task, call_matches, task_completed
 
 WITHHELD_NOTE = "[content withheld by defense {name}]"
@@ -70,6 +70,7 @@ class Episode:
             "expected_extra_call": v.get("expected_extra_call"),
         }
         self.taint = TaintTracker(trusted=[self.task.instruction, *self.task.manifest.trusted_values()])
+        self.taint_oracle = TaintOracle(self.taint)
         self.site_withheld = False
         self.injection_in_context = False
         self.parse_failures = 0
@@ -124,7 +125,7 @@ class Episode:
         if tool not in W.TOOL_SIGNATURES or not isinstance(args, dict):
             rec["status"], rec["reason"] = "error", "unknown tool or malformed arguments"
             return ToolResult("error", rec["reason"])
-        dec = self.stack.authorize(tool, args, self.task.manifest, self.taint.is_tainted)
+        dec = self.stack.authorize(tool, args, self.task.manifest, self.taint_oracle)
         if not dec.allowed:
             rec["status"] = "blocked"
             rec["reason"] = f"{dec.defense}:{dec.rule}" + (f" ({dec.detail})" if dec.detail else "")

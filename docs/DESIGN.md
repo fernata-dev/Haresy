@@ -58,6 +58,7 @@ for opaque encodings (`base64: `, `rot13: `), so the carrier adds no natural-lan
 | D5-args | action | + argument constraints |
 | D5-taint | action | + destination arguments may not come from untrusted content (byte-exact) |
 | D5 | action | tools + args + taint |
+| D6 | action | tools + taint on normalised / decoded content (invisible chars, look-alikes, spacing, leet, ROT13, Base64 undone with the frozen D2 normaliser functions). Added in m13, after D5-taint's dev **and test** numbers were seen |
 | D2+D5 | both | stack |
 
 The action hook receives `(tool, args, manifest, is_tainted)` and never content text.

@@ -28,6 +28,12 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- m13: Bawwab policy hardening (Base64/percent-encoded and disguised destinations, numeric IP forms,
+  destination-named arguments, punycode for look-alike hosts) and **taint mode** (MCP proxy: outputs
+  and descriptions; Claude Code: PostToolUse hook + per-session host store). Benchmark: new guard
+  variant **D6** (taint over normalised/decoded content), added to the simulator defaults; designed
+  after D5-taint's dev and test numbers were seen (LIMITATIONS 4b). D5 and the frozen scanners are
+  unchanged; results regenerated.
 - m12: MCP wrapping verified with the real Claude Code 2.1.326 and Gemini CLI 0.68.0 (`mcp list`
   health checks, clean env without credentials): docs/VERIFICATION.md, tools/verify/verify_agents.sh.
   Hook not verified (`claude mcp list` does not validate hooks: shown with a broken value).

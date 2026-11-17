@@ -67,6 +67,13 @@
           "doc": "https://code.claude.com/docs/en/hooks"
         },
         {
+          "id": "posttooluse-hook",
+          "applies_to": [
+            "user-settings"
+          ],
+          "doc": "https://code.claude.com/docs/en/hooks"
+        },
+        {
           "id": "mcp-stdio-proxy",
           "applies_to": [
             "user-state",
@@ -79,7 +86,8 @@
         "version": "2.1.326",
         "date": "2026-11-17",
         "mcp-stdio-proxy": "verified (claude mcp list)",
-        "pretooluse-hook": "not verified (needs a model run)"
+        "pretooluse-hook": "not verified (needs a model run)",
+        "posttooluse-hook": "not verified (needs a model run)"
       }
     },
     {

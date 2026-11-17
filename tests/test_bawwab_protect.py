@@ -60,7 +60,7 @@ def test_apply_backup_validate_idempotent_and_unprotect_restores_exactly(fake):
     root, home, project = fake
     before = _files(root)
     plan = P.make_plan(home, project)
-    assert {c.mechanism for c in plan.changes} == {"policy-file", "pretooluse-hook", "mcp-stdio-proxy"}
+    assert {c.mechanism for c in plan.changes} == {"policy-file", "pretooluse-hook+posttooluse-hook", "mcp-stdio-proxy"}
     res = P.apply_plan(plan, P.APPLY_WORD)
     man = json.loads((P.backups_dir(home) / res["backup_id"] / "manifest.json").read_text(encoding="utf-8"))
     assert len(man["files"]) == len(plan.changes) and all("sha256_after" in f for f in man["files"])
@@ -169,3 +169,13 @@ def test_servers_and_hooks_wrapped_under_the_previous_name_are_recognised(tmp_pa
     assert not is_wrapped({"command": "npx", "args": ["-y", "mcp-proxy-server"]})
     assert is_our_hook("python3 -m zorfa hook claude-code --policy p") and is_our_hook("bawwab hook claude-code")
     assert not is_our_hook("./scripts/hook-lint.sh")
+
+
+
+def test_claude_settings_get_pre_and_post_hooks_once(fake):
+    root, home, project = fake
+    P.apply_plan(P.make_plan(home, project), P.APPLY_WORD)
+    hooks = json.loads((home / ".claude" / "settings.json").read_text(encoding="utf-8"))["hooks"]
+    assert "hook claude-code --policy" in hooks["PreToolUse"][0]["hooks"][0]["command"]
+    assert "hook claude-code-post --policy" in hooks["PostToolUse"][0]["hooks"][0]["command"]
+    assert P.make_plan(home, project).changes == []

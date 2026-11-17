@@ -23,7 +23,9 @@ All documentation below was read on **2026-11-17**.
 | MCP servers: user and local scope in `~/.claude.json` (local scope under `projects.<path>.mcpServers`), project scope in `.mcp.json` at the project root; an entry with no `type` and a `command` is a stdio server with `command`, `args`, `env` | https://code.claude.com/docs/en/mcp |
 | Skills: `~/.claude/skills/<skill-name>/SKILL.md` (personal), `.claude/skills/<skill-name>/SKILL.md` (project, also parent directories up to the repo root); YAML front matter, `description` recommended | https://code.claude.com/docs/en/skills |
 
-Mechanisms Bawwab uses: **PreToolUse command hook** (in `~/.claude/settings.json`) and the **MCP stdio
+| PostToolUse hooks receive `tool_input` and `tool_response` (the tool's output) and support the same `matcher` values as PreToolUse | https://code.claude.com/docs/en/hooks (PostToolUse section) |
+
+Mechanisms Bawwab uses: **PostToolUse command hook** (records hosts seen in tool output; taint mode only), **PreToolUse command hook** (in `~/.claude/settings.json`) and the **MCP stdio
 proxy** (wrapping stdio entries in `~/.claude.json` and project `.mcp.json`).
 
 Not verified and therefore not used: the location of `~/.claude.json` on Windows beyond "home

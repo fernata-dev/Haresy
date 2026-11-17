@@ -20,7 +20,7 @@ def _single(name: str, llm_client=None) -> Defense:
     if name == "D4":
         from hares.defenses.d4_cpt import D4CharsPerToken
         return D4CharsPerToken()
-    if name in ("D5", "D5-tools", "D5-args", "D5-taint"):
+    if name in ("D5", "D5-tools", "D5-args", "D5-taint", "D6"):
         from hares.defenses.d5_guard import D5Guard
         return D5Guard.variant(name)
     raise KeyError(f"unknown defense: {name}")
@@ -45,5 +45,5 @@ def availability(name: str, llm_client=None) -> tuple[bool, str]:
 
 # Defenses the worst-case simulator runs by default.  D3 needs a real model
 # and D4 needs a tokenizer; both are attempted only when available.
-SIM_DEFAULT = ("D0", "D1", "D2", "D4", "D5-tools", "D5-args", "D5-taint", "D5", "D2+D5")
+SIM_DEFAULT = ("D0", "D1", "D2", "D4", "D5-tools", "D5-args", "D5-taint", "D5", "D2+D5", "D6")
 LLM_DEFAULT = ("D0", "D1", "D2", "D5")

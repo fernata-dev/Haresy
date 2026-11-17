@@ -56,6 +56,13 @@ Read this before quoting any number. Each point below can, on its own, make a co
   encoder and D2's cross-script matching follow the same Egyptian-Arabizi conventions: the
   `translit` cells are optimistic for D2.
 
+## 4b. D6 is not a held-out result
+
+D6 (normalised taint) was designed in m13 after D5-taint's failure on encoded addresses had been
+seen on the dev split (m3) **and on the test split** (m6 report). Its test-split numbers are
+therefore development numbers in disguise. It also undoes exactly the obfuscations this project's
+encoders produce. A clean evaluation of D6 needs a new test set and encodings it was not built for.
+
 ## 5. The defenses are simplified on purpose
 
 - D1 is a naive English list; D2 is a hand-written lexicon with proximity rules and a fixed
@@ -123,9 +130,20 @@ anything an agent does without a tool call.
 **Platforms.** Paths are home-relative per the docs; only Linux was exercised. macOS and Windows are
 untested on real machines (Windows quoting of the hook command is untested).
 
-**Policy heuristics are bypassable.** Destinations are found as URLs, e-mail addresses, and bare
-host names after network commands (curl, wget, …). They are missed when encoded (Base64, decimal IPs,
-string concatenation in a script, DNS tricks) or when data leaves through an allowed destination.
+**Taint mode** (`"destination_mode": "taint"`): a destination is blocked only if it was seen in
+untrusted tool output (MCP proxy: that server's outputs and tool descriptions; Claude Code: the
+PostToolUse hook records hosts per session). It catches the classic indirect-injection flow (a page
+names an address, the agent sends data there) with less breakage than the allowlist, but it misses
+destinations the model builds from pieces, and in Claude Code it relies on `session_id` being stable
+across hook events (an assumption; not stated in the docs read). The taint store keeps host names,
+never content, for 24 hours.
+
+**Policy heuristics are bypassable.** Destinations are found as URLs, e-mail addresses, bare host
+names after network commands (curl, wget, …) and in destination-named arguments (url, to, host, …),
+also after percent-decoding, Base64-decoding and removing invisible characters; numeric IP forms are
+canonicalised and non-ASCII hosts are compared as punycode (look-alikes are never folded into
+allowed hosts). They are still missed when assembled at run time (string concatenation in a script,
+variables, DNS tricks, other encodings) or when data leaves through an allowed destination.
 Secret-path patterns are a short default list. The default allowlist (localhost only) blocks every
 other destination, so web-fetching tools stop working until you edit `allowed_hosts`: that is the
 cost of the default, not a bug. In-scope tampering (harmful content inside an allowed call) is not

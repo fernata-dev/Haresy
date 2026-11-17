@@ -100,8 +100,8 @@ def _wrap_all(servers: dict, policy_path: Path, prefix: str, summary: list[str])
     return changed
 
 
-def hook_command(policy_path: Path) -> str:
-    parts = bawwab_cmd() + ["hook", "claude-code", "--policy", str(policy_path)]
+def hook_command(policy_path: Path, which: str = "claude-code") -> str:
+    parts = bawwab_cmd() + ["hook", which, "--policy", str(policy_path)]
     return subprocess.list2cmdline(parts) if os.name == "nt" else " ".join(shlex.quote(p) for p in parts)
 
 
@@ -135,8 +135,12 @@ def make_plan(home: Path, project: Path | None = None, agents: tuple[str, ...] |
 
 def _plan_location(loc, mech: str, policy_path: Path, plan: Plan, roots: list[Path]) -> Change | None:
     disp = display_path(loc.path, plan.home)
-    if mech == "pretooluse-hook":
-        if not loc.path.exists():
+    if mech in ("pretooluse-hook", "posttooluse-hook"):
+        event, which = ("PreToolUse", "claude-code") if mech == "pretooluse-hook" else ("PostToolUse", "claude-code-post")
+        pending = next((c for c in plan.changes if c.path == loc.path), None)
+        if pending is not None:
+            before, doc = pending.before, json.loads(pending.after)
+        elif not loc.path.exists():
             if not loc.path.parent.is_dir():
                 plan.notes.append(f"{loc.agent}: {display_path(loc.path.parent, plan.home)} not found; agent not installed, skipped")
                 return None
@@ -159,15 +163,21 @@ def _plan_location(loc, mech: str, policy_path: Path, plan: Plan, roots: list[Pa
         if not isinstance(hooks, dict):
             plan.notes.append(f"{disp}: 'hooks' is not an object; skipped")
             return None
-        groups = hooks.setdefault("PreToolUse", [])
-        cmd = hook_command(policy_path)
+        groups = hooks.setdefault(event, [])
         if any(is_our_hook(str(h.get("command", "")))
                for g in groups if isinstance(g, dict) for h in g.get("hooks", []) if isinstance(h, dict)):
-            plan.notes.append(f"{disp}: Bawwab hook already installed")
+            plan.notes.append(f"{disp}: Bawwab {event} hook already installed")
             return None
-        groups.append({"matcher": "*", "hooks": [{"type": "command", "command": cmd}]})
-        return Change(loc.path, before, _dump(doc, before), loc.agent, mech,
-                      ["add a PreToolUse hook (all tools) that asks the Bawwab policy before each tool call"])
+        groups.append({"matcher": "*", "hooks": [{"type": "command", "command": hook_command(policy_path, which)}]})
+        summary = (["add a PreToolUse hook (all tools) that asks the Bawwab policy before each tool call"]
+                   if event == "PreToolUse" else
+                   ["add a PostToolUse hook that records hosts seen in tool output (used only in taint mode)"])
+        if pending is not None:
+            pending.after = _dump(doc, before)
+            pending.summary += summary
+            pending.mechanism += "+" + mech
+            return None
+        return Change(loc.path, before, _dump(doc, before), loc.agent, mech, summary)
     if mech == "mcp-stdio-proxy":
         if not loc.path.exists():
             return None

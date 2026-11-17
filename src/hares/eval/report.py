@@ -22,7 +22,7 @@ from hares.util import project_root, read_json, write_csv, write_json
 
 LANG_ORDER = ("en", "msa", "arz", "arabizi", "mixed")
 LANG_AR = {"en": "إنجليزي", "msa": "فصحى", "arz": "مصري", "arabizi": "فرانكو", "mixed": "مخلوط"}
-DEF_ORDER = ("D0", "D1", "D2", "D3", "D4", "D5-tools", "D5-args", "D5-taint", "D5", "D2+D5")
+DEF_ORDER = ("D0", "D1", "D2", "D3", "D4", "D5-tools", "D5-args", "D5-taint", "D6", "D5", "D2+D5")
 SIM_LABEL = "worst-case simulated agent, not a real model"
 FAKE_PREFIX = "hares-fake"
 
@@ -300,20 +300,22 @@ def claims(F: Facts, data: dict) -> tuple[str, str]:
                                f"{F.add('claim.d5.override.task', fmt(c), src, f'tables.attack.task_completed_under_attack.by_defense_intent[{i}]')} "
                                f"of override cases (simulator). `{src}` → `tables.attack.task_completed_under_attack.by_defense_intent[{i}]`")
                 n += 1
-        for d in ("D5-tools", "D5-args", "D5-taint", "D5"):
+        for d in ("D5-tools", "D5-args", "D5-taint", "D6", "D5"):
             i, c = find(t["benign"]["utility"]["by_defense_category"], defense=d, category="delegation")
             if c:
                 allowed.append(f"{n}. {d} benign utility on legitimate delegation requests: "
                                f"{F.add(f'claim.deleg.{d}', fmt(c), src, f'tables.benign.utility.by_defense_category[{i}]')}. "
                                f"`{src}` → `tables.benign.utility.by_defense_category[{i}]`")
                 n += 1
-        for enc in ("none", "b64", "zwsp", "homoglyph"):
-            i, c = find(t["attack"]["asr"]["by_defense_encoding"], defense="D5-taint", encoding=enc)
-            if c:
-                allowed.append(f"{n}. D5-taint (byte-exact taint, no argument constraints) attack success with encoding "
-                               f"{enc}: {F.add(f'claim.taint.{enc}', fmt(c), src, f'tables.attack.asr.by_defense_encoding[{i}]')}. "
-                               f"`{src}` → `tables.attack.asr.by_defense_encoding[{i}]`")
-                n += 1
+        for dname, label in (("D5-taint", "byte-exact taint"), ("D6", "normalised taint, designed after D5-taint's "
+                                                                          "dev and test numbers were seen")):
+            for enc in ("none", "b64", "zwsp", "homoglyph"):
+                i, c = find(t["attack"]["asr"]["by_defense_encoding"], defense=dname, encoding=enc)
+                if c:
+                    allowed.append(f"{n}. {dname} ({label}; no argument constraints) attack success with encoding "
+                                   f"{enc}: {F.add(f'claim.taint.{dname}.{enc}', fmt(c), src, f'tables.attack.asr.by_defense_encoding[{i}]')}. "
+                                   f"`{src}` → `tables.attack.asr.by_defense_encoding[{i}]`")
+                    n += 1
         if dev:
             a, cd = find(dev["tables"]["attack"]["asr"]["by_defense"], defense="D2")
             b, ct = find(t["attack"]["asr"]["by_defense"], defense="D2")
@@ -323,7 +325,7 @@ def claims(F: Facts, data: dict) -> tuple[str, str]:
                            f"`{data['paths']['sim_dev']}` and `{src}` → `tables.attack.asr.by_defense`")
             n += 1
         for p in t["paired"]["attack_success"]:
-            if p["mcnemar_exact_p"] is not None and (p["a"], p["b"]) in (("D0", "D1"), ("D1", "D2"), ("D2", "D5"), ("D5-taint", "D5"), ("D5-tools", "D5-args")):
+            if p["mcnemar_exact_p"] is not None and (p["a"], p["b"]) in (("D0", "D1"), ("D1", "D2"), ("D2", "D5"), ("D5-taint", "D5"), ("D5-tools", "D5-args"), ("D5-taint", "D6")):
                 allowed.append(f"{n}. Paired on {p['text_pairs']} authored texts (majority outcome per text), {p['a']} vs "
                                f"{p['b']}: attack succeeded only under {p['a']} for {p['text_only_a']} texts and only under "
                                f"{p['b']} for {p['text_only_b']} texts (exact McNemar p = {_p(p['text_mcnemar_exact_p'])}). "

@@ -34,6 +34,9 @@ VARIANTS = {
     "D5-args": ("tools", "args"),
     "D5-taint": ("tools", "taint"),
     "D5": ("tools", "args", "taint"),
+    # m13: taint after undoing character-level obfuscation (see env/taint.py; designed after
+    # D5-taint's dev AND test numbers were visible, so its test result is not held-out evidence)
+    "D6": ("tools", "ntaint"),
 }
 
 
@@ -68,7 +71,8 @@ class D5Guard(Defense):
         self.name = name
         self.description = "Capability guard: " + " + ".join(
             {"tools": "task tool allowlist", "args": "argument constraints",
-             "taint": "untrusted values cannot pick destinations"}[r] for r in rules)
+             "taint": "untrusted values cannot pick destinations",
+             "ntaint": "untrusted values cannot pick destinations, even when obfuscated"}[r] for r in rules)
 
     @classmethod
     def variant(cls, name: str) -> "D5Guard":
@@ -84,9 +88,10 @@ class D5Guard(Defense):
                 ok, why = check_constraint(args.get(arg), c)
                 if not ok:
                     return Decision(False, "arg_constraint", f"{tool}.{arg} {why}", self.name)
-        if "taint" in self.rules:
+        if "taint" in self.rules or "ntaint" in self.rules:
+            check = getattr(is_tainted, "normalized", is_tainted) if "ntaint" in self.rules else is_tainted
             for arg in TAINT_PROTECTED_ARGS.get(tool, ()):
-                if is_tainted(args.get(arg)):
+                if check(args.get(arg)):
                     return Decision(False, "tainted_arg",
                                     f"{tool}.{arg} was supplied by untrusted content", self.name)
         return Decision(True, "", "", self.name)
