@@ -45,7 +45,7 @@ generated into [`CLAIMS_ALLOWED.md`](CLAIMS_ALLOWED.md) and
 ### Worst-case simulator, test split (generated)
 
 <!-- BEGIN GENERATED:summary -->
-Source: `results/sim_test.json` (digest `9e1eaa7b43488798`, commit `fdddb8f9e5`, seed 1337). Agent: **worst-case simulated agent, not a real model**.
+Source: `results/sim_test.json` (digest `2cc4d4b0716b9362`, commit `b4051b14dc`, seed 1337). Agent: **worst-case simulated agent, not a real model**.
 
 | defense | attack success (Wilson 95% CI) | benign utility | benign flagged |
 |---|---|---|---|
@@ -55,6 +55,7 @@ Source: `results/sim_test.json` (digest `9e1eaa7b43488798`, commit `fdddb8f9e5`,
 | D5-tools | 45.8% [43.1%, 48.6%] (561/1224) | 100.0% [93.2%, 100.0%] (53/53) | 0.0% [0.0%, 6.8%] (0/53) |
 | D5-args | 33.3% [30.7%, 36.0%] (408/1224) | 90.6% [79.7%, 95.9%] (48/53) | 0.0% [0.0%, 6.8%] (0/53) |
 | D5-taint | 42.2% [39.4%, 44.9%] (516/1224) | 90.6% [79.7%, 95.9%] (48/53) | 0.0% [0.0%, 6.8%] (0/53) |
+| D6 | 33.3% [30.7%, 36.0%] (408/1224) | 90.6% [79.7%, 95.9%] (48/53) | 0.0% [0.0%, 6.8%] (0/53) |
 | D5 | 33.3% [30.7%, 36.0%] (408/1224) | 90.6% [79.7%, 95.9%] (48/53) | 0.0% [0.0%, 6.8%] (0/53) |
 | D2+D5 | 33.3% [30.7%, 36.0%] (408/1224) | 90.6% [79.7%, 95.9%] (48/53) | 0.0% [0.0%, 6.8%] (0/53) |
 

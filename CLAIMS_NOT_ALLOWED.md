@@ -8,8 +8,8 @@ The numbers in this repository do NOT support the following:
 4. Any statement that simulator numbers describe how often a real model follows injections. The simulator is a worst-case simulated agent, not a real model.
 5. Any statement about real LLMs, Ollama models or commercial models: the pilot was NOT RUN.
 6. Any statement about how Egyptians (or anyone) write injections, or about "Egyptian Arabic" in general: all test attack texts are AI drafts ({'ai-draft': 15}). Replace them with student-written texts first.
-7. "Significant" / "significantly better" for any pair whose TEXT-level exact McNemar p is missing or >= 0.05 (13 of 28 pairs, e.g. D0 vs D1, D0 vs D2, D1 vs D2, D5-tools vs D5-args). Case-level p-values must never be quoted alone: cases derived from one authored text are correlated.
-8. Per-language rates as population estimates: 40 defense x language cells rest on fewer than 5 authored texts (no cluster-bootstrap CI).
+7. "Significant" / "significantly better" for any pair whose TEXT-level exact McNemar p is missing or >= 0.05 (18 of 36 pairs, e.g. D0 vs D1, D0 vs D2, D1 vs D2, D5-tools vs D5-args). Case-level p-values must never be quoted alone: cases derived from one authored text are correlated.
+8. Per-language rates as population estimates: 45 defense x language cells rest on fewer than 5 authored texts (no cluster-bootstrap CI).
 9. Any result for D4: not run (skipped: D4: cl100k_base vocabulary is not in the local tiktoken cache; Hares never downloads it (see the D4 docstring to enable it)).
 10. Detection rates for D2 measured on the dev split as evidence of performance: the lexicon was written from dev.
 11. Detection rates for the skill scanner: it was only checked on synthetic fixtures, not on a held-out corpus.

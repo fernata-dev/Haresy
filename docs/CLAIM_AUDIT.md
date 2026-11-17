@@ -56,6 +56,9 @@ and lists every number that appears in README.md, CLAIMS_ALLOWED.md and docs/PIL
 | `sim_test.asr.D5-taint` | 42.2% [39.4%, 44.9%] (516/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[6]` |
 | `sim_test.utility.D5-taint` | 90.6% [79.7%, 95.9%] (48/53) | `results/sim_test.json` | `tables.benign.utility.by_defense[6]` |
 | `sim_test.fpr.D5-taint` | 0.0% [0.0%, 6.8%] (0/53) | `results/sim_test.json` | `tables.benign.false_positive_rate.by_defense[6]` |
+| `sim_test.asr.D6` | 33.3% [30.7%, 36.0%] (408/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[8]` |
+| `sim_test.utility.D6` | 90.6% [79.7%, 95.9%] (48/53) | `results/sim_test.json` | `tables.benign.utility.by_defense[8]` |
+| `sim_test.fpr.D6` | 0.0% [0.0%, 6.8%] (0/53) | `results/sim_test.json` | `tables.benign.false_positive_rate.by_defense[8]` |
 | `sim_test.asr.D5` | 33.3% [30.7%, 36.0%] (408/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[4]` |
 | `sim_test.utility.D5` | 90.6% [79.7%, 95.9%] (48/53) | `results/sim_test.json` | `tables.benign.utility.by_defense[4]` |
 | `sim_test.fpr.D5` | 0.0% [0.0%, 6.8%] (0/53) | `results/sim_test.json` | `tables.benign.false_positive_rate.by_defense[4]` |
@@ -92,6 +95,7 @@ and lists every number that appears in README.md, CLAIMS_ALLOWED.md and docs/PIL
 | `claim.asr.D5-tools` | 45.8% [43.1%, 48.6%] (561/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[7]` |
 | `claim.asr.D5-args` | 33.3% [30.7%, 36.0%] (408/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[5]` |
 | `claim.asr.D5-taint` | 42.2% [39.4%, 44.9%] (516/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[6]` |
+| `claim.asr.D6` | 33.3% [30.7%, 36.0%] (408/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[8]` |
 | `claim.asr.D5` | 33.3% [30.7%, 36.0%] (408/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[4]` |
 | `claim.asr.D2+D5` | 33.3% [30.7%, 36.0%] (408/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[3]` |
 | `claim.d5.exfil_send` | 0.0% [0.0%, 0.9%] (0/408) | `results/sim_test.json` | `tables.attack.asr.by_defense_intent[12]` |
@@ -101,11 +105,16 @@ and lists every number that appears in README.md, CLAIMS_ALLOWED.md and docs/PIL
 | `claim.deleg.D5-tools` | 100.0% [56.6%, 100.0%] (5/5) | `results/sim_test.json` | `tables.benign.utility.by_defense_category[28]` |
 | `claim.deleg.D5-args` | 0.0% [0.0%, 43.4%] (0/5) | `results/sim_test.json` | `tables.benign.utility.by_defense_category[20]` |
 | `claim.deleg.D5-taint` | 0.0% [0.0%, 43.4%] (0/5) | `results/sim_test.json` | `tables.benign.utility.by_defense_category[24]` |
+| `claim.deleg.D6` | 0.0% [0.0%, 43.4%] (0/5) | `results/sim_test.json` | `tables.benign.utility.by_defense_category[32]` |
 | `claim.deleg.D5` | 0.0% [0.0%, 43.4%] (0/5) | `results/sim_test.json` | `tables.benign.utility.by_defense_category[16]` |
-| `claim.taint.none` | 33.3% [25.5%, 42.2%] (40/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[96]` |
-| `claim.taint.b64` | 45.8% [37.2%, 54.7%] (55/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[92]` |
-| `claim.taint.zwsp` | 45.8% [37.2%, 54.7%] (55/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[104]` |
-| `claim.taint.homoglyph` | 45.8% [37.2%, 54.7%] (55/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[93]` |
+| `claim.taint.D5-taint.none` | 33.3% [25.5%, 42.2%] (40/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[96]` |
+| `claim.taint.D5-taint.b64` | 45.8% [37.2%, 54.7%] (55/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[92]` |
+| `claim.taint.D5-taint.zwsp` | 45.8% [37.2%, 54.7%] (55/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[104]` |
+| `claim.taint.D5-taint.homoglyph` | 45.8% [37.2%, 54.7%] (55/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[93]` |
+| `claim.taint.D6.none` | 33.3% [25.5%, 42.2%] (40/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[126]` |
+| `claim.taint.D6.b64` | 33.3% [25.5%, 42.2%] (40/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[122]` |
+| `claim.taint.D6.zwsp` | 33.3% [25.5%, 42.2%] (40/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[134]` |
+| `claim.taint.D6.homoglyph` | 33.3% [25.5%, 42.2%] (40/120) | `results/sim_test.json` | `tables.attack.asr.by_defense_encoding[123]` |
 | `claim.d2.dev` | 2.2% [1.2%, 3.7%] (12/558) | `results/sim_dev.json` | `tables.attack.asr.by_defense[2]` |
 | `claim.d2.test` | 94.1% [92.7%, 95.3%] (1152/1224) | `results/sim_test.json` | `tables.attack.asr.by_defense[2]` |
 <!-- END GENERATED:numbers -->
