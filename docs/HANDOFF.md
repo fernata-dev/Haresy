@@ -52,6 +52,11 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 3. **All attack and benign texts are AI drafts.** No student-written data yet.
 4. The skill scanner has no measured detection rate (fixtures only).
 5. The GitHub Actions workflow (`.github/workflows/ci.yml`) was written but not run on GitHub.
+7. **Zorfa protect/hook/proxy never ran against a real Claude Code or Gemini CLI** (not installed in
+   the build container). Only fake HOME + fake MCP server + hand-written hook events. Only Linux.
+8. Claude Desktop, Cursor, VS Code, Codex CLI, Windsurf are NOT supported (official docs not
+   reachable from the build session: modelcontextprotocol.io, cursor.com, code.visualstudio.com).
+   To add one, follow "How to add an agent" in docs/INTEGRATIONS.md.
 6. **Git tags were NOT pushed.** The build session may only push its branch; every tag push was
    refused by the remote. All tags (`m1`..`m7`, `data-test-before-lexicon`, `freeze-scanner`) are
    pinned to their commits in `docs/tags.json`. After cloning, run `python -m hares restore-tags`
@@ -97,6 +102,14 @@ fixtures/   malicious_skill.md benign_skill.md malicious_tool_descriptions.json
 ## Exact next commands
 
 ```bash
+# Zorfa (tool)
+pipx install .                         # or: pip install .
+zorfa                                  # discover (read-only)
+zorfa protect --dry-run                # read the diff; --apply only on a throwaway account first
+python -m zorfa.testing.fake_home /tmp/zorfa-fake && zorfa --home /tmp/zorfa-fake/home --project /tmp/zorfa-fake/project
+
+# demo recording (real commands, fake HOME): see docs/media/README.md and tools/record/
+
 # after cloning: recreate the tags (they could not be pushed from the build session)
 python -m hares restore-tags
 # sanity

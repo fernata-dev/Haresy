@@ -16,6 +16,11 @@
       "annotated": false,
       "message": ""
     },
+    "m10": {
+      "commit": "14d4a63989b32c651f28821f839f6c4d0167ea9e",
+      "annotated": false,
+      "message": ""
+    },
     "m2": {
       "commit": "15e1f2db09bef943b6f6e4467bdde9c03ffa0bd2",
       "annotated": false,
@@ -45,6 +50,16 @@
       "commit": "6d89b45ef4616d698c733bd3b235c9edb2895d12",
       "annotated": true,
       "message": "m7: docs + self-audit complete.\nClean-checkout reproduction: fresh git clone -> pytest passed, verify-freeze OK,\neval --split test digest 9e1eaa7b43488798 IDENTICAL to results/sim_test.json (seed 1337).\nReal-model pilot: NOT RUN (no model reachable in the build environment)."
+    },
+    "m8": {
+      "commit": "1289388a5a5dcebeaf80a7fdbd370af8ba7801f8",
+      "annotated": false,
+      "message": ""
+    },
+    "m9": {
+      "commit": "68e4c37ebdc3194e9390c201918dc89d27f2e0b5",
+      "annotated": false,
+      "message": ""
     }
   }
 }

@@ -28,6 +28,9 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- post-m10: real terminal recording (pty, fake HOME) -> `docs/media/` (11 screenshots, MP4, raw cast,
+  replay page) and `tools/record/`; discover fix (analyse the real server behind the proxy), found
+  while reviewing the recording; README demo section; prompt log, provenance and claim audit updated.
 - m10: opt-in `protect` (dry-run diff with secret masking, typed confirmation, timestamped backup,
   atomic writes, validation, rollback), `unprotect`, MCP stdio policy proxy (hides poisoned tools,
   blocks denied calls with isError), Claude Code PreToolUse hook (fails closed), policy engine.

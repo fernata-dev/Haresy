@@ -103,6 +103,15 @@ Nothing runs automatically: installing Zorfa changes nothing, and `discover` nev
 Read [`docs/LIMITATIONS.md` §9](docs/LIMITATIONS.md) before `--apply`: the hook and proxy follow the
 official docs but were never run against a real Claude Code or Gemini CLI.
 
+## Demo (real recording)
+
+[`docs/media/zorfa-demo.mp4`](docs/media/zorfa-demo.mp4) and the screenshots in
+[`docs/media/`](docs/media/) were recorded from real commands in a pseudo-terminal; `HOME` was a
+**fake** home with synthetic configs ([how they were made](docs/media/README.md)).
+
+![discover](docs/media/02-discover.png)
+![MCP proxy](docs/media/07-mcp-proxy.png)
+
 ## Quick start (research benchmark, from a checkout)
 
 Python 3.11+, standard library only. `pytest` for tests. Optional: `numpy` (faster bootstrap),

@@ -77,3 +77,25 @@ feature count, then added features that strengthen the measurement: Arabic→Ara
 transliteration as a script control, Arabizi spelling noise, stacked encodings, cluster-bootstrap
 CIs by authored text, text-level McNemar, SARIF output and JSON-manifest scanning in the skill
 scanner, guard ablation variants, a sha256-pinned post-freeze change record.
+
+---
+
+## Prompt 3 — 2026-11-17 — milestones m8–m10, rename, recording
+
+```text
+MILESTONES m8-m10 (after m7). Never claim to support "any AI"; support only a documented list in data/supported_agents.json, and for each agent verify its integration mechanism from its OFFICIAL docs before implementing (record the doc URL and date in docs/INTEGRATIONS.md; if no documented mechanism exists, mark it "scan-only").
+m8 discover: read-only discovery of known AI tools/agent assets (config dirs, SKILL.md folders, MCP config JSON) on Linux/macOS/Windows; run the skill scanner on what is found; JSON + readable report. No file modification, no network, no uploads.
+m9 install: one-command install (pipx/pip) exposing the CLI; `discover` is the default first step.
+m10 protect (opt-in): `protect --dry-run` prints an exact diff of every file it would change; `protect --apply` requires explicit confirmation, writes a timestamped backup first, and `unprotect` restores it. Implement only for integrations with documented mechanisms (e.g. an MCP stdio proxy enforcing a policy file; a documented hook mechanism where an agent provides one). Never run automatically, never touch anything outside the supported list.
+All of m8-m10 are tested only against a mocked fake HOME directory first. docs/LIMITATIONS.md must state the supported list and what is NOT covered. m8-m10 must not delay or weaken the correctness of m1-m7; if time is short, drop m10 first.
+
+واتغير اسمه ل zorfa تقريبا ايوة وطوره وخليه قوي جدا جدا  
+
+عايزك تصورلي اسكرينات كانك شغلته بجد ع تسرمنال وكمان اختبرته كامل وكمان يشتغل ويبقا تمام وقوي ومتطور ويبقا بفيديو برضو ان امكن ع الشاشة
+```
+
+## Prompt 4 — 2026-11-17 — after a session restart
+
+```text
+كمل
+```
