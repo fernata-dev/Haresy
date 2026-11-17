@@ -8,7 +8,7 @@ from pathlib import Path
 
 from bawwab import __version__
 
-COMMANDS = ("discover", "agents", "scan", "protect", "unprotect", "policy", "mcp-proxy", "hook", "bench", "demo")
+COMMANDS = ("discover", "agents", "scan", "protect", "unprotect", "policy", "mcp-proxy", "hook", "bench", "demo", "ui")
 
 
 def _home(a) -> Path:
@@ -152,6 +152,11 @@ def cmd_bench(a) -> int:
     return hares_main(a.rest or ["--help"])
 
 
+def cmd_ui(a) -> int:
+    from bawwab.ui.server import serve
+    return serve(_home(a), _project(a), a.port, not a.no_browser)
+
+
 def cmd_demo(a) -> int:
     from hares.cli import main as hares_main
     return hares_main(["demo", "--port", str(a.port)])
@@ -216,6 +221,12 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("bench", help="the Hares research benchmark (needs a checkout of the repository)")
     s.add_argument("rest", nargs=argparse.REMAINDER)
     s.set_defaults(fn=cmd_bench)
+
+    s = sub.add_parser("ui", help="open the Bawwab app in your browser (local only)")
+    common(s)
+    s.add_argument("--port", type=int, default=8777)
+    s.add_argument("--no-browser", action="store_true", help="only print the link")
+    s.set_defaults(fn=cmd_ui)
 
     s = sub.add_parser("demo", help="local Arabic demo UI of the benchmark")
     s.add_argument("--port", type=int, default=8765)
