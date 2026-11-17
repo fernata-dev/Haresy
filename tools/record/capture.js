@@ -8,11 +8,12 @@ const SHOTS = [
   [5, 5, 62, "04-protect-dry-run", "bawwab protect --dry-run — exact diff, nothing written"],
   [6, 6, 26, "05-protect-apply", "bawwab protect --apply — typed confirmation + backup"],
   [7, 7, 0, "06-discover-after-protect", "bawwab discover after protect"],
-  [8, 8, 0, "07-mcp-proxy", "MCP proxy: poisoned tool hidden, exfiltration blocked"],
-  [9, 9, 0, "08-claude-code-hook", "Claude Code PreToolUse hook decision"],
-  [10, 10, 24, "09-unprotect", "bawwab unprotect — restore from backup"],
-  [11, 11, 0, "10-benchmark", "Hares research benchmark (worst-case simulator)"],
-  [12, 12, 0, "11-tests", "full test suite"],
+  [8, 8, 0, "07-mcp-proxy-allowlist", "MCP proxy, allowlist mode: strict (the news page is blocked too)"],
+  [9, 9, 0, "08-mcp-proxy-taint", "MCP proxy, taint mode: only the destination hidden in the page is blocked"],
+  [10, 10, 0, "09-claude-code-hook", "Claude Code PreToolUse hook decision"],
+  [11, 11, 24, "10-unprotect", "bawwab unprotect — restore from backup"],
+  [12, 12, 0, "11-benchmark", "Hares research benchmark (worst-case simulator): D5-taint vs D6"],
+  [13, 13, 0, "12-tests", "full test suite"],
 ];
 (async () => {
   const b = await chromium.launch();

