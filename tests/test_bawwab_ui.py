@@ -68,8 +68,9 @@ def test_api_needs_token_right_host_and_no_foreign_origin(served):
     for s in SECRETS:
         assert s not in body.decode("utf-8")
     assert req(port, "POST", "/api/scan", headers=tok, body={"text": "x" * 10})[0] == 200
-    big = {"text": "x" * 2_100_000}
-    assert req(port, "POST", "/api/scan", big, headers=tok)[0] == 413
+    # declare an oversized body but send a small one: the server must refuse from the header alone
+    # (sending 2 MB races with the server closing early: BrokenPipe on some OSes, found by CI)
+    assert req(port, "POST", "/api/scan", {"text": "x"}, headers={**tok, "Content-Length": "2100000"})[0] == 413
 
 
 def test_protect_apply_needs_word_and_matching_preview_then_restore(fake):
@@ -121,8 +122,29 @@ def test_check_scan_and_activity(fake):
     assert d["rule"] == "tainted_destination"
     rep = app.scan({"path": str(home / ".claude" / "skills" / "pdf-helper" / "SKILL.md")})
     assert rep["verdict"] == "high-risk"
+    assert app.scan({"path": "~/.claude/skills/pdf-helper/SKILL.md"})["verdict"] == "high-risk"   # ~ = app home
     with pytest.raises(Refused):
         app.scan({"path": str(home / "missing.md")})
     with pytest.raises(Refused):
         app.check({"tool": "x", "args": [1, 2]})
     assert app.activity() == {"rows": []}
+
+
+@pytest.mark.skipif(not __import__("sys").platform.startswith("linux"), reason="launcher is Linux-only")
+def test_linux_launcher_is_opt_in_and_only_touches_its_own_files(tmp_path, monkeypatch, capsys):
+    from bawwab.cli import main
+    monkeypatch.delenv("XDG_DATA_HOME", raising=False)
+    home = tmp_path / "h"
+    home.mkdir()
+    assert main(["shortcut", "--home", str(home), "--dry-run"]) == 0
+    assert "Exec=" in capsys.readouterr().out and not (home / ".local").exists()
+    assert main(["shortcut", "--home", str(home)]) == 0
+    desk = home / ".local/share/applications/bawwab.desktop"
+    text = desk.read_text(encoding="utf-8")
+    assert "-m bawwab ui" in text and "Name[ar]=بوّاب" in text and (home / ".local/share/icons/hicolor/scalable/apps/bawwab.svg").exists()
+    other = home / ".local/share/applications/other.desktop"
+    other.write_text("[Desktop Entry]\nName=Other\n", encoding="utf-8")
+    assert main(["shortcut", "--home", str(home), "--remove"]) == 0
+    assert not desk.exists() and other.exists()
+    desk.write_text("[Desktop Entry]\nName=Mine\n", encoding="utf-8")        # not ours: never overwritten
+    assert main(["shortcut", "--home", str(home)]) == 1 and "Mine" in desk.read_text(encoding="utf-8")

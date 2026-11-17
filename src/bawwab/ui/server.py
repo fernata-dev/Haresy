@@ -104,7 +104,13 @@ class App:
         from hares.skillscan.scanner import scan_path, scan_text
         allow = tuple(a.strip().lower() for a in str(body.get("allow", "")).split(",") if a.strip())
         if body.get("path"):
-            p = Path(os.path.expanduser(str(body["path"])))
+            raw = str(body["path"]).strip()
+            if raw == "~":                                    # "~" means the home this app inspects
+                p = self.home
+            elif raw.startswith(("~/", "~\\")):
+                p = self.home / raw[2:]
+            else:
+                p = Path(raw)
             if not p.exists():
                 raise Refused(400, "path not found")
             return scan_path(p, allow)

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from bawwab import __version__
 
-COMMANDS = ("discover", "agents", "scan", "protect", "unprotect", "policy", "mcp-proxy", "hook", "bench", "demo", "ui")
+COMMANDS = ("discover", "agents", "scan", "protect", "unprotect", "policy", "mcp-proxy", "hook", "bench", "demo", "ui", "shortcut")
 
 
 def _home(a) -> Path:
@@ -157,6 +157,11 @@ def cmd_ui(a) -> int:
     return serve(_home(a), _project(a), a.port, not a.no_browser)
 
 
+def cmd_shortcut(a) -> int:
+    from bawwab.shortcut import run
+    return run(_home(a), "remove" if a.remove else "install", a.dry_run)
+
+
 def cmd_demo(a) -> int:
     from hares.cli import main as hares_main
     return hares_main(["demo", "--port", str(a.port)])
@@ -227,6 +232,10 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--port", type=int, default=8777)
     s.add_argument("--no-browser", action="store_true", help="only print the link")
     s.set_defaults(fn=cmd_ui)
+
+    s = sub.add_parser("shortcut", help="add Bawwab to your app menu (Linux; opt-in)")
+    s.add_argument("--home"); s.add_argument("--remove", action="store_true"); s.add_argument("--dry-run", action="store_true")
+    s.set_defaults(fn=cmd_shortcut)
 
     s = sub.add_parser("demo", help="local Arabic demo UI of the benchmark")
     s.add_argument("--port", type=int, default=8765)
