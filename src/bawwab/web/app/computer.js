@@ -127,7 +127,7 @@ function confirmBox(word, label, button, cls, onGo) {
   const inp = h("input", {class: "in ltr", placeholder: word, autocomplete: "off", autocapitalize: "characters", spellcheck: "false", "aria-label": label});
   const btn = h("button", {class: "btn " + cls, type: "button", disabled: true, onclick: () => onGo(inp.value)}, button);
   inp.addEventListener("input", () => (btn.disabled = inp.value !== word));
-  return h("div", {class: "confirm"}, h("div", {class: "grow"}, h("label", {class: "f", text: label}), inp), btn);
+  return h("div", {class: "confirm"}, h("label", {class: "grow"}, h("span", {class: "f", text: label}), inp), btn);
 }
 function mechText(c) {
   const ar = {"policy-file": "إنشاء ملف السياسة الافتراضي.", "mcp-stdio-proxy": "تغليف سيرفرات MCP المحلية بحيث كل طلب يعدّي على بوّاب الأول.",
@@ -258,10 +258,10 @@ function tryit(root, ctx) {
     } catch (e) { toast(e.message, true); }
   };
   root.append(h("section", {class: "card pad-l"},
-    h("label", {class: "f", text: t("presets")}),
+    h("p", {class: "f", text: t("presets")}),
     h("div", {class: "chips"}, PRESETS.map(([label, tl, a]) => h("button", {class: "chip", type: "button", onclick: () => { tool.value = tl; args.value = JSON.stringify(a, null, 2); decide(); }}, h("bdi", {class: "ltr", text: label})))),
-    h("div", {class: "grid g2 mt"}, h("div", {}, h("label", {class: "f", text: t("tool")}), tool), h("div", {}, h("label", {class: "f", text: t("tainted")}), tainted)),
-    h("div", {class: "mt"}, h("label", {class: "f", text: t("args")}), args),
+    h("div", {class: "grid g2 mt"}, h("label", {}, h("span", {class: "f", text: t("tool")}), tool), h("label", {}, h("span", {class: "f", text: t("tainted")}), tainted)),
+    h("label", {class: "mt"}, h("span", {class: "f", text: t("args")}), args),
     h("button", {class: "btn mt", type: "button", onclick: decide}, icon("play"), t("decide"))), out);
 }
 

@@ -34,6 +34,13 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
   Computer (connected to `bawwab ui`, or install guide), About. Offline (service worker), installable
   (manifest), Arabic/English, dark mode, reduced motion, strict CSP. Word / e-mail / HTML readers.
   `bawwab ui` now serves this app; the m15 static UI was removed. Version 0.4.0.
+  Design pass after review (design critique, WCAG 2.1 AA audit, Apple HIG review, UX copy): the
+  main action above the fold on phones; no scroll area inside the page (long visible runs fold);
+  one meta line per hidden part with a brass edge (red when it reads like an order); hidden text
+  "develops" once when a result appears (off with reduced motion); X-ray beside a sticky summary on
+  wide screens; appearance follows the system (no in-app theme switch, HIG); brand colour kept for
+  the primary action and current tab; muted text 5.1–6.0:1 and field borders ≥ 3:1; focus ring can
+  no longer be erased by `all:unset`; 44 px chips; labels tied to inputs; shorter copy.
 - **Skill scanner severity bug (found while porting it to JavaScript, fixed):** for JSON manifests
   the "is any D2 rule above low?" test took `max()` of the severity *names*, which compares them
   alphabetically ("high" < "low" < "medium"). A tool description that D2 did not flag but that hit

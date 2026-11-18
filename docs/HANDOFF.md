@@ -19,6 +19,9 @@ _Updated at every milestone. Read this first if you are continuing the work (per
   dark mode, reduced motion, strict CSP, no HTML sinks (tests/test_bawwab_web.py). Font: IBM Plex Sans
   Arabic (OFL, third-party). Old `src/bawwab/ui/static` removed; `src/bawwab/ui/server.py` serves the web
   folder from a whitelist built at start-up.
+- **Design review applied:** critique, WCAG 2.1 AA audit (contrast computed from the CSS tokens),
+  Apple HIG review (dark mode follows the system; accent kept for primary actions), UX copy
+  (CHANGELOG m18). Not done: a test with real users or a screen reader on a real device.
 - **Verified:** headless Chromium only (phone profiles + desktop, AR/EN, light/dark, connected mode on a
   fake HOME), no console errors. **Not verified:** a real phone, Safari/WebKit, Firefox, the hosted
   GitHub Pages copy (workflow `pages` is manual and was not run), real-world documents.

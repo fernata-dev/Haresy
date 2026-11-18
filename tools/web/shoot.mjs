@@ -32,11 +32,11 @@ async function tour(p, tag, lang) {
   await settle(p, 1100);
   await shot(p, `${tag}-2-result`);
   await shot(p, `${tag}-2-result-full`, true);
-  await p.getByRole("button", {name: lang === "ar" ? "المخفي بس" : "Hidden only"}).click();
+  await p.getByRole("button", {name: lang === "ar" ? "المخفي" : "Hidden", exact: true}).click();
   await settle(p, 400);
   await p.locator(".xray").scrollIntoViewIfNeeded();
   await shot(p, `${tag}-3-xray-hidden`);
-  await p.getByRole("button", {name: lang === "ar" ? "افحص ملف تاني" : "Check another file"}).click();
+  await p.getByRole("button", {name: lang === "ar" ? "افحص حاجة تانية" : "Check something else"}).click();
   await settle(p, 500);
   await p.getByRole("button", {name: lang === "ar" ? "إيميل مشبوه" : "Suspicious e-mail"}).click();
   await p.waitForSelector(".verdict", {timeout: 15000});

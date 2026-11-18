@@ -47,9 +47,10 @@ function applyLang() {
   document.documentElement.dir = state.lang === "ar" ? "rtl" : "ltr";
   document.title = state.lang === "ar" ? "بوّاب — افحص قبل ما المساعد يقرا" : "Bawwab — check before your AI assistant reads it";
 }
+// Appearance follows the system setting only (HIG dark-mode: no app-specific appearance switch).
 function applyTheme() {
-  const saved = localStorage.getItem("bawwab-theme");
-  const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  localStorage.removeItem("bawwab-theme");
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
   document.documentElement.dataset.theme = dark ? "dark" : "light";
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute("content", dark ? "#0e1311" : "#f6f1e7");
@@ -64,24 +65,19 @@ function shell() {
   const app = document.getElementById("app");
   app.textContent = "";
   app.className = "app" + (ctx.connected ? " connected" : "");
-  const dark = document.documentElement.dataset.theme === "dark";
   const top = h("header", {class: "top"},
     h("a", {class: "mark", href: "#check", onclick: (e) => { e.preventDefault(); nav("check"); }},
       h("img", {src: "icon.svg", alt: "", width: "34", height: "34"}),
-      h("span", {}, h("b", {text: t("name")}), h("small", {text: t("tagline")}))),
+      h("span", {}, h("b", {text: t("name")}))),
     h("span", {class: "grow"}),
     h("span", {class: "conn", title: t("connected")}, h("i"), h("span", {text: "127.0.0.1"})),
-    h("button", {class: "iconbtn", type: "button", "aria-label": t("theme"), "aria-pressed": dark ? "true" : "false", onclick: () => {
-      localStorage.setItem("bawwab-theme", document.documentElement.dataset.theme === "dark" ? "light" : "dark");
-      applyTheme(); render(false);
-    }}, icon(dark ? "sun" : "moon")),
     h("button", {class: "langbtn", type: "button", lang: state.lang === "ar" ? "en" : "ar", onclick: () => {
       state.lang = state.lang === "ar" ? "en" : "ar"; localStorage.setItem("bawwab-lang", state.lang); applyLang(); render(false);
     }, text: t("lang_switch")}));
-  const rail = h("nav", {class: "rail", "aria-label": "main"}, navButtons("tab"), h("div", {class: "spacer"}),
+  const rail = h("nav", {class: "rail", "aria-label": t("name")}, navButtons("tab"), h("div", {class: "spacer"}),
     h("div", {class: "foot"}, `v${VERSION}`, h("br"), t("trust_local")));
   const main = h("main", {class: "main", id: "main", tabindex: "-1"});
-  const tabbar = h("nav", {class: "tabbar", "aria-label": "main"}, navButtons("tab"));
+  const tabbar = h("nav", {class: "tabbar", "aria-label": t("name") + " · tabs"}, navButtons("tab"));
   app.append(top, rail, main, tabbar);
   return main;
 }
@@ -109,7 +105,7 @@ window.addEventListener("hashchange", () => {
   const r = (location.hash.match(/^#(\w+)/) || [])[1];
   if (r && r !== route && ROUTES.some(([x]) => x === r)) { route = r; render(true); }
 });
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!localStorage.getItem("bawwab-theme")) { applyTheme(); render(false); } });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); ctx.installPrompt = e; });
 
 // ------------------------------------------------------------------ boot

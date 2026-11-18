@@ -86,14 +86,15 @@ function renderStart(view) {
   });
 
   view.append(h("div", {class: "hero"},
-    h("div", {},
+    h("div", {class: "head"},
       h("span", {class: "eyebrow"}, icon("lock"), t("eyebrow")),
-      h("h1", {}, t("hero_1"), h("br"), h("em", {text: t("hero_2")})),
+      h("h1", {}, t("hero_1"), h("br"), h("em", {text: t("hero_2")}))),
+    drop,
+    h("div", {class: "more"},
       h("p", {class: "lead", text: t("hero_lead")}),
       h("div", {class: "trust"},
         h("span", {}, icon("phone"), t("trust_local")), h("span", {}, icon("wifi_off"), t("trust_offline")),
-        h("span", {}, icon("cloud_off"), t("trust_nothing")))),
-    drop));
+        h("span", {}, icon("cloud_off"), t("trust_nothing"))))));
 }
 
 async function readFile(view, f) {
@@ -173,31 +174,33 @@ function renderResult(view, {rep, size}) {
         rep.attachments.map((a, i) => [i ? " · " : "", h("bdi", {text: `${a.name} (${fmtSize(a.size)})`})])) : null)));
   }
 
-  res.append(h("div", {class: "stats"},
+  const main = h("div", {class: "stack"}), side = h("aside", {class: "side"});
+  side.append(h("div", {class: "stats"},
     h("div", {class: "stat amber"}, h("b", {text: rep.counts.hidden}), h("span", {text: t("st_hidden")})),
     h("div", {class: "stat bad"}, h("b", {text: instr}), h("span", {text: t("st_instr")})),
     h("div", {class: "stat"}, h("b", {text: rep.counts.unseen}), h("span", {text: t("st_unseen")}))));
 
   if (rep.notes && rep.notes.length) {
-    res.append(h("div", {class: "card soft"}, h("ul", {class: "plain small"}, [...new Set(rep.notes)].map((n) => h("li", {text: t("n_" + n)})))));
+    side.append(h("div", {class: "card soft"}, h("ul", {class: "plain small"}, [...new Set(rep.notes)].map((n) => h("li", {text: t("n_" + n)})))));
   }
 
   // X-ray
-  const paper = h("div", {class: "paper", tabindex: "0", "aria-label": t("xray")});
+  const paper = h("div", {class: "paper reveal"});
   const applyMode = () => {
     paper.classList.toggle("only-hidden", xmode === "hidden");
     paper.classList.toggle("reader", xmode === "reader");
   };
   const shown = segs.slice(0, MAX_SEGMENTS);
   if (!segs.length || segs.every((s) => !s.text.trim())) paper.append(h("div", {class: "empty", text: t("no_text")}));
-  for (const s of shown) paper.append(segmentNode(s));
+  appendFolded(paper, shown);
+  setTimeout(() => paper.classList.remove("reveal"), 1400 + 140 * Math.min(12, shown.filter((s) => s.seen === "hidden").length));
   if (segs.length > MAX_SEGMENTS) {
-    const more = h("button", {class: "btn line mt", type: "button", onclick: () => { more.remove(); for (const s of segs.slice(MAX_SEGMENTS)) paper.append(segmentNode(s)); }},
+    const more = h("button", {class: "btn line mt", type: "button", onclick: () => { more.remove(); appendFolded(paper, segs.slice(MAX_SEGMENTS)); }},
       `+ ${segs.length - MAX_SEGMENTS}`);
     paper.append(more);
   }
   applyMode();
-  res.append(h("section", {class: "xray"},
+  main.append(h("section", {class: "xray"},
     h("header", {}, h("h3", {}, icon("xray"), t("xray")),
       seg([["all", t("x_all")], ["hidden", t("x_hidden")], ["reader", t("x_reader")]], () => xmode, (m) => { xmode = m; applyMode(); }, t("xray"))),
     paper,
@@ -219,33 +222,61 @@ function renderResult(view, {rep, size}) {
   }
   const ordered = [...groups.values()].sort((a, b) => SEV[b.severity] - SEV[a.severity] || b.items.length - a.items.length);
   for (const g of ordered.slice(0, MAX_FINDINGS)) list.append(findingNode(g, segs));
-  res.append(h("section", {class: "card pad-l"}, h("h2", {text: t("findings")}), list,
+  main.append(h("section", {class: "card pad-l"}, h("h2", {text: t("findings")}), list,
     addrs.length ? h("div", {class: "mt"}, h("p", {class: "small muted", text: explain("external_address").text}),
       h("div", {class: "chips"}, addrs.slice(0, 20).map((a) => h("span", {class: "tag info ltr", text: a})))) : null));
 
   // what to do
-  res.append(h("section", {class: "card pad-l"}, h("h2", {text: t("todo")}),
+  side.append(h("section", {class: "card pad-l"}, h("h2", {text: t("todo")}),
     h("ol", {class: "todo"}, t("todo_" + v).map((x) => h("li", {text: x})))));
-  res.append(h("div", {class: "honest"}, icon("lock"), h("span", {text: t("note_local")})));
-  res.append(actions(view, rep));
+  side.append(actions(view, rep));
+  side.append(h("div", {class: "honest"}, icon("lock"), h("span", {text: t("note_local")})));
+  res.append(h("div", {class: "rgrid"}, main, side));
   view.append(res);
 }
 
-function segmentNode(s) {
+// Runs of more than 4 visible paragraphs fold to their first 2 and last 1: the X-ray stays about
+// what is hidden, and the page never needs a scroll area inside it.
+function appendFolded(paper, list) {
+  let i = 0, hiddenIndex = 0;
+  while (i < list.length) {
+    if (list[i].seen !== "visible") { paper.append(segmentNode(list[i], hiddenIndex++)); i++; continue; }
+    let j = i;
+    while (j < list.length && list[j].seen === "visible") j++;
+    const run = list.slice(i, j);
+    if (run.length <= 4) run.forEach((s) => paper.append(segmentNode(s)));
+    else {
+      run.slice(0, 2).forEach((s) => paper.append(segmentNode(s)));
+      const rest = run.slice(2, -1);
+      const tail = segmentNode(run[run.length - 1]);
+      const fold = h("button", {class: "fold", type: "button", onclick: () => {
+        const frag = document.createDocumentFragment();
+        rest.forEach((s) => frag.append(segmentNode(s)));
+        fold.replaceWith(frag);
+      }}, icon("chev"), `${rest.length} ${t("more_paras")}`);
+      paper.append(fold, tail);
+    }
+    i = j;
+  }
+}
+
+function segmentNode(s, order = 0) {
   const cls = `sg ${s.seen}${s.seen !== "visible" && s.instruction ? " instr" : ""}`;
   const node = h("div", {class: cls});
-  if (s.seen !== "visible" || (s.carriers && s.carriers.length)) {
-    node.append(h("div", {class: "labels"},
-      (s.hidden || []).map((r) => h("span", {class: "tag amber", text: reasonLabel(r)})),
-      (s.carriers || []).map((r) => h("span", {class: "tag amber", text: reasonLabel(r)})),
-      s.seen !== "visible" && s.instruction ? h("span", {class: "tag bad"}, icon("warn"), t("instr_tag")) : null,
-      s.where ? h("span", {class: "tag mute", text: whereLabel(s.where)}) : null));
+  if (s.seen === "hidden") node.style.setProperty("--i", String(Math.min(order, 12)));
+  const reasons = [...(s.hidden || []), ...(s.carriers || [])];
+  if (s.seen !== "visible" || reasons.length) {
+    node.append(h("div", {class: "meta"},
+      reasons.length ? h("span", {class: "why", text: [...new Set(reasons.map(reasonLabel))].join(" · ")}) : null,
+      s.where ? h("span", {class: "at", text: whereLabel(s.where)}) : null,
+      s.seen !== "visible" && s.instruction ? h("span", {class: "ord"}, icon("warn"), t("instr_tag")) : null));
   }
   const text = s.text.length > MAX_SEG_CHARS ? s.text.slice(0, MAX_SEG_CHARS) : s.text;
   const span = h("bdi", {class: "txt", text});
   node.append(span);
   if (s.text.length > MAX_SEG_CHARS) {
-    const more = h("button", {class: "link small", type: "button", text: "…", onclick: () => { span.textContent = s.text; more.remove(); }});
+    const more = h("button", {class: "link small", type: "button", text: "…", "aria-label": t("more_paras"),
+      onclick: () => { span.textContent = s.text; more.remove(); }});
     node.append(more);
   }
   return node;
