@@ -165,3 +165,56 @@ built from (see `results/sim_test.json`). A tool that is not hidden is not prove
 start. A broken policy file makes the hook deny everything and the proxy refuse to start (fail
 closed). The decision log (`~/.bawwab/decisions.jsonl`) records tool names, rules and hosts, but not
 arguments.
+
+## 10b. The skill-scanner severity fix
+
+The skill scanner (not a frozen benchmark file) compared severity *names* alphabetically for JSON
+manifest values; fixed in m18 (CHANGELOG). Skill-scanner output before m18 could miss a medium
+finding on a tool description; no benchmark number depends on it (§7).
+
+## 11. The web app, document checks and cloud assistants (m18)
+
+**What it is.** A static web app (`src/bawwab/web/`) that runs the same scanners as the Python
+code, ported to JavaScript, plus readers for Word (.docx), e-mail (.eml / raw source) and HTML.
+It shows which text a person would not see (Word hidden format, white or near-white text, text
+under 2 pt, CSS-hidden elements, HTML comments, invisible Unicode, encoded blobs) and which text
+sits outside the page (comments, file properties, `alt` text, page metadata).
+
+**What is verified.**
+- JS vs Python scanners: byte-identical reports on 434 cases (all dev/test attack texts, benign
+  texts, fixtures, edge cases) — `tests/test_bawwab_engine_parity.py`, run in CI on 4 platforms.
+  Parity says the port is faithful; it says nothing about how good the scanners are (§4, §7).
+- Readers: 9 documents written by Python's standard library with known planted hidden parts, plus
+  pasted e-mail / HTML / plain text (`tools/parity/make_doc_fixtures.py`, `check_docs.mjs`).
+- The app: headless Chromium at phone (iPhone 13 / Pixel 7 profiles) and desktop sizes, Arabic and
+  English, light and dark, no console errors (`tools/web/shoot.mjs`); the desktop mode against
+  `bawwab ui` on a fake HOME (`tools/web/shoot_connected.mjs`).
+
+**Not verified.** No real phone, no Safari/WebKit and no Firefox were used (Chromium only; module
+workers and `DecompressionStream("deflate-raw")` need recent browsers: Chrome/Edge 103+, Safari
+16.4+, Firefox 113+). No real user documents, newsletters or web pages were tested: the
+document checks have **no measured detection or false-positive rate**. The hosted (GitHub Pages)
+copy was not deployed from this session.
+
+**Known blind spots of the readers.** Only simple CSS selectors (`.class`, `#id`, `tag`) are
+evaluated, not the cascade; colours are compared with a white page, not with the real background
+(dark-mode e-mails and white text on a coloured shape can be wrong in both directions); Word theme
+colours other than `background1`, text boxes drawn as shapes, fields and SmartArt are partly
+covered; PDF, images, slides, spreadsheets, `.doc`, `.odt` and RTF are **not read at all** (the
+app says so). Text hidden inside an image cannot be found by any of these checks.
+
+**Verdicts are modest on purpose.** "Nothing found" is not "safe". Hidden text in web pages and
+newsletters (preview text, screen-reader labels) is common, so it raises a warning only together
+with another sign; in Word files hidden text alone raises a warning.
+
+**Cloud assistants.** Assistants such as Gemini in Drive/Gmail, ChatGPT or Copilot run on the
+provider's servers. Bawwab cannot see, intercept or block what they do, and no app on a phone can.
+The app only helps *before* content is handed to an assistant, and gives general habits (fewer
+permissions, review actions); it does not describe any provider's settings screens, which were
+not checked.
+
+**Privacy claim, and how it is enforced.** The page's Content-Security-Policy allows network
+requests only to its own origin (`connect-src 'self'`), tests forbid `fetch` to other hosts,
+`XMLHttpRequest`, `WebSocket` and `sendBeacon` in the app code, and the service worker never
+caches `/api/*`. The hosting server (e.g. GitHub Pages) still sees normal page requests (not file
+contents), like for any website.

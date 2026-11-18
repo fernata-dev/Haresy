@@ -27,3 +27,15 @@
 | `10-unprotect.png` | typed `RESTORE`, files restored |
 | `11-benchmark.png` | Hares benchmark, worst-case simulator: D5-taint vs D6 |
 | `12-tests.png` | full test suite |
+
+## The app (m18)
+
+- `bawwab-phone-tour.mp4` (36 s) and `app/*.png` were captured with the pre-installed Playwright
+  Chromium in headless mode, at iPhone 13 / Pixel 7 profiles and at 1440×900 — **not on a real
+  phone**. The app was served from `src/bawwab/web/` by `python -m http.server` on 127.0.0.1; the
+  "connected" screenshots used `bawwab ui` on a **fake HOME** (`bawwab.testing.fake_home`).
+- The documents in the examples are the synthetic samples in `src/bawwab/web/samples/` (written by
+  `tools/parity/make_doc_fixtures.py`; attacker = `attacker@test.local`).
+- Reproduce: `node tools/web/shoot.mjs URL OUT`, `node tools/web/shoot_connected.mjs "URL#token=…" OUT`,
+  `node tools/web/record_phone.mjs URL OUT` then `ffmpeg -i OUT/*.webm -vf scale=780:-2:flags=lanczos …`.
+- The screenshots of the m15 app were removed (that design was replaced).

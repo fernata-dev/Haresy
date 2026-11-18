@@ -8,6 +8,25 @@ commands: `bawwab` (the tool and the app) and `hares` (the research benchmark).
 > Until this branch is merged, the install URL needs `@ccr-bf26486f-ag5cn6` at the end.
 > If the repository is private, git will ask you to sign in to GitHub.
 
+## On a phone (Android / iPhone) — the web app
+
+There is nothing to install from a store. The app is a static page that runs entirely in the
+browser and keeps working offline once opened.
+
+1. Open the hosted copy of the app. It exists only after the repository owner deploys it once:
+   GitHub → Settings → Pages → Source: **GitHub Actions**, then Actions → **pages** → *Run
+   workflow*. The address is then `https://<owner>.github.io/<repo>/`. (GitHub Pages for a
+   private repository needs a paid plan; otherwise make the repository public or host the
+   `src/bawwab/web/` folder on any static host.)
+2. Android (Chrome): menu ⋮ → **Add to Home screen** / **Install app**.
+   iPhone (Safari): Share → **Add to Home Screen**.
+3. Use **Check** with a file from Files / Drive (download it first: e.g. Google Docs → Download →
+   Word .docx) or paste text. For an e-mail, paste its original source (Gmail on the web: ⋮ →
+   *Show original*) to see hidden HTML parts; copying the visible text is not enough for those.
+
+To try it on a computer without installing anything: `cd src/bawwab/web && python3 -m http.server 8000`
+and open `http://127.0.0.1:8000`.
+
 ## CachyOS / Arch Linux
 
 Arch marks the system Python as "externally managed", so do **not** use `sudo pip install`;
@@ -28,6 +47,7 @@ sudo pacman -S ollama          # NVIDIA: ollama-cuda   AMD: ollama-rocm
 sudo systemctl enable --now ollama
 ollama pull qwen2.5:7b-instruct
 ```
+
 
 ## Debian / Ubuntu
 

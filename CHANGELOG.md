@@ -28,6 +28,12 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- **m18 — web app for phones + desktop, one product with three faces.** New static app
+  (`src/bawwab/web/`): Check (file / paste / examples → X-ray of hidden and unseen text, plain-language
+  findings, what to do), Learn (indirect injection through cloud assistants, habits, honest limits),
+  Computer (connected to `bawwab ui`, or install guide), About. Offline (service worker), installable
+  (manifest), Arabic/English, dark mode, reduced motion, strict CSP. Word / e-mail / HTML readers.
+  `bawwab ui` now serves this app; the m15 static UI was removed. Version 0.4.0.
 - **Skill scanner severity bug (found while porting it to JavaScript, fixed):** for JSON manifests
   the "is any D2 rule above low?" test took `max()` of the severity *names*, which compares them
   alphabetically ("high" < "low" < "medium"). A tool description that D2 did not flag but that hit

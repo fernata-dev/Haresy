@@ -2,7 +2,26 @@
 
 _Updated at every milestone. Read this first if you are continuing the work (person or model)._
 
-## Status: m14 done (Bawwab: rename, real-CLI check, taint mode, D6, new recording); real-model pilot NOT RUN
+## Status: m18 done (one product, three faces: offline web app for phones + desktop app + CLI); real-model pilot NOT RUN
+
+### m18 summary (read this first)
+- **Product shape:** web app (PWA, `src/bawwab/web/`, static files, runs on phones, offline) — the same
+  app inside `bawwab ui` on a computer, connected to the local API for agent protection — and the CLI.
+- **Why a web app for phones:** cloud assistants (Gemini in Drive/Gmail, ChatGPT, Copilot) run on the
+  providers' servers; nothing on a phone can intercept them. The useful thing a phone app can do is
+  check content *before* it is handed over, on the device. That is what the Check screen does.
+- **Engine:** `src/bawwab/web/engine/` = JavaScript port of the frozen D2 scanner and of the skill
+  scanner. Rule tables are generated (`tools/export_engine_data.py`, `--check` in tests and in the
+  pages workflow). Parity: byte-identical reports on 434 cases (`tests/test_bawwab_engine_parity.py`,
+  Node 22 in CI). Readers for .docx / .eml / HTML in `engine/docs.js`; orchestrator `engine/check.js`;
+  runs in a Web Worker.
+- **App:** `src/bawwab/web/app/*` (Check with X-ray result, Learn, Computer, About), Arabic/English,
+  dark mode, reduced motion, strict CSP, no HTML sinks (tests/test_bawwab_web.py). Font: IBM Plex Sans
+  Arabic (OFL, third-party). Old `src/bawwab/ui/static` removed; `src/bawwab/ui/server.py` serves the web
+  folder from a whitelist built at start-up.
+- **Verified:** headless Chromium only (phone profiles + desktop, AR/EN, light/dark, connected mode on a
+  fake HOME), no console errors. **Not verified:** a real phone, Safari/WebKit, Firefox, the hosted
+  GitHub Pages copy (workflow `pages` is manual and was not run), real-world documents.
 
 ### m8–m10 (Bawwab) summary
 - Product name: **Bawwab** (بوّاب; `bawwab` command, `src/bawwab/`). m8–m10 were built under the name Zorfa;
@@ -38,6 +57,10 @@ _Updated at every milestone. Read this first if you are continuing the work (per
 | m12 MCP wrapping checked with real Claude Code / Gemini CLI | DONE (hooks not exercised) | `m12` |
 | m13 taint mode + destination hardening; benchmark D6 | DONE (D6 not held-out: LIMITATIONS 4b) | `m13` |
 | m14 new real recording, docs | DONE | `m14` |
+| m15 `bawwab ui` local bilingual app | DONE (replaced by the m18 app) | `m15` |
+| m16 cross-platform CI (Linux, Windows, macOS) | DONE | `m16` |
+| m17 per-OS install guide (CachyOS), Linux launcher | DONE | `m17` |
+| m18 web app for phones (PWA) + JS engine with Python parity + Word/e-mail/HTML readers + redesign | DONE (Chromium only; no real phone) | `m18` |
 
 ## What works (verified in the build environment)
 
@@ -63,6 +86,8 @@ _Updated at every milestone. Read this first if you are continuing the work (per
    `mcp list` health checks (docs/VERIFICATION.md, script tools/verify/verify_agents.sh). The
    PreToolUse hook was NOT exercised by a real Claude Code session (needs a model + credentials).
    Only Linux.
+9. **Web app (m18):** no real phone, Safari or Firefox; Pages copy not deployed; the document
+   readers have no measured detection or false-positive rate (LIMITATIONS §11).
 8. Claude Desktop, Cursor, VS Code, Codex CLI, Windsurf are NOT supported (official docs not
    reachable from the build session: modelcontextprotocol.io, cursor.com, code.visualstudio.com).
    To add one, follow "How to add an agent" in docs/INTEGRATIONS.md.
@@ -106,6 +131,9 @@ report/     index.html results.json tables/*.csv            (generated)
 docs/       HANDOFF LIMITATIONS DESIGN CLAIM_AUDIT AI_PROVENANCE prompt_log PILOT_DECISION
             STUDENT_GUIDE post_freeze_changes.json
 fixtures/   malicious_skill.md benign_skill.md malicious_tool_descriptions.json
+src/bawwab/ discover registry redact policy mcp_proxy hook_claude protect cli ui/server.py testing/
+src/bawwab/web/  index.html app.css app/*.js engine/*.js (data.js generated) fonts/ icons/ samples/ sw.js
+tools/      export_engine_data.py parity/ (corpus, docs fixtures, Node checks) web/ (icons, screenshots, video)
 ```
 
 ## Exact next commands
@@ -117,6 +145,12 @@ bawwab ui                              # the app (local only)
 bawwab                                  # discover (read-only)
 bawwab protect --dry-run                # read the diff; --apply only on a throwaway account first
 python -m bawwab.testing.fake_home /tmp/bawwab-fake && bawwab --home /tmp/bawwab-fake/home --project /tmp/bawwab-fake/project
+
+# the web app without installing (any OS): serve the folder and open http://127.0.0.1:8000
+cd src/bawwab/web && python3 -m http.server 8000; cd -
+# after changing a Python rule file used by the app: regenerate and re-check parity (needs node)
+python tools/export_engine_data.py && python -m pytest tests/test_bawwab_engine_parity.py tests/test_bawwab_web.py
+# screenshots / phone video (Playwright Chromium): tools/web/shoot.mjs, shoot_connected.mjs, record_phone.mjs
 
 # demo recording (real commands, fake HOME): see docs/media/README.md and tools/record/
 

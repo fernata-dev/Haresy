@@ -109,3 +109,34 @@ All of m8-m10 are tested only against a mocked fake HOME directory first. docs/L
 Response summary: the assistant chose the name Bawwab (بوّاب) and explained why (the guard decides
 by destination, not language), then prioritised strengthening over feature count: verification
 with the real agent CLIs, hardening the policy against encoded destinations, and a taint mode.
+
+## Prompt 6 — 2026-11-17 — install and run commands
+
+```text
+ماشي يعم هات اوامر التزيل كامله والتشغليل وانا هشغله ع ai حقيقي بس عايزين نعرف العنوان هل هيبقا برنامج ولا هيبقا ايه ؟
+```
+
+Response summary: full install/run commands, the real-model pilot command (`--authors student`),
+and the product shape at that time (command-line tool + local app).
+
+## Prompt 7 — 2026-11-17 — cross-platform professional program
+
+```text
+انا cashy os وانت عارف عموما عايزك تخليه برنامج ايه رايك يبقا برنامج كامل يشتغل ع كل الانظمه لينكس او ماك او ويندوز ويبقا احترافي وبتصميم قوي ويفهم اي حد مهما كان ايه بيعمل ويبقا مفيد وقوي وطوره وانه يمنع الجيلبريك والنصوص القوية ويبقا قوي جدا جدا جدا جدا
+```
+
+Response summary (m15–m17): a local bilingual app (`bawwab ui`), CI on Linux/Windows/macOS, a
+CachyOS install guide. The assistant declined to claim that Bawwab "prevents jailbreaks" and kept
+the honest sentence (it limits damage; it does not stop a model from following text).
+
+## Prompt 8 — 2026-11-18 — redesign, phones and cloud agents
+
+```text
+يسطا ده خرا وشكله خرا وزباله ومش جميفل ولا سلسل وكمان زباله وخد بالك في برضو ناس بتستخدم وكلاء ع السحابه يعني زي جيمناي على درايف وجميل عايزك تطور كامل وتخليه احسن وتخلي الاداة كامله ومتطورة وقوي جدا جدا جدا جدا جدا جدا جدا جدا وتبقا متطورة واقترح ايه هو هل هو برنامج هيبقا ولا اداة ولا ايه عشان في ناس بتستخدم تلفونات عشان شغاله ع سحابه فهمني يعم طور كامل
+```
+
+Response summary (m18): one product with three faces — an offline web app for phones (PWA),
+the same app on the desktop (`bawwab ui`, plus agent protection), and the CLI. The scanners were
+ported to JavaScript with a byte-exact parity test against Python; Word / e-mail / HTML readers
+reveal hidden text; full redesign. The assistant stated that no app on a phone can sit between a
+user and a cloud assistant such as Gemini in Drive: Bawwab checks content before it is handed over.

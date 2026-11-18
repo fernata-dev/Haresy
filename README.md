@@ -9,13 +9,27 @@ works the same way. It decides from tool calls (destinations, files), never from
 the text, so Egyptian Arabic, Arabizi or Base64 make no difference to it. That is also the research
 question of this project: content filters depend on language; action guards do not.
 
-Bawwab has two parts:
+Bawwab is **one product with three faces** and a research benchmark behind it:
 
-1. **Bawwab tool** (`bawwab`): finds the AI-agent setup on your machine (configs, skills, MCP servers)
-   for a short, documented list of agents, scans it, and — only if you ask — puts a policy proxy and
-   a hook in front of tool calls. Supported: **Claude Code** and **Gemini CLI** (official docs checked,
-   see [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)). Bawwab does **not** support "any AI".
-2. **Hares benchmark** (`bawwab bench …` / `python -m hares …`): the research measurement below.
+| face | for whom | what it does |
+|---|---|---|
+| **Web app** (phone or any browser; installs to the home screen, works offline) | people who use **cloud assistants** (Gemini in Drive/Gmail, ChatGPT, Copilot…) | checks a Word file, an e-mail, a web page or pasted text **on the device** and shows, as an X-ray, the text a person does not see but an assistant reads (white / tiny / hidden-format text, CSS-hidden parts, comments, metadata, invisible Unicode, encoded blobs) |
+| **Desktop app** (`bawwab ui`; Linux, macOS, Windows) | people who run agents on their computer | the same app, plus discovery and opt-in protection of **Claude Code** and **Gemini CLI**: MCP policy proxy, tool hook, policy editor, backups, activity log |
+| **Command line** (`bawwab`) | developers, CI | discover, scan skills / tool manifests (SARIF), protect / unprotect, policy |
+
+The **Hares benchmark** (`bawwab bench …` / `python -m hares …`) is the research measurement below.
+Supported agents for protection: **Claude Code** and **Gemini CLI** only (official docs checked, see
+[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)). Bawwab does **not** support "any AI", and **no app
+on a phone can sit between you and a cloud assistant**: for cloud assistants Bawwab checks content
+*before* you hand it over (limits: [`docs/LIMITATIONS.md` §11](docs/LIMITATIONS.md)).
+
+<p>
+<img src="docs/media/app/phone-2-result-ar.png" width="260" alt="Result of checking a Word file with hidden text (Arabic)">
+<img src="docs/media/app/phone-3-xray-hidden-ar.png" width="260" alt="X-ray view: only the hidden parts">
+<img src="docs/media/app/phone-8-result-en.png" width="260" alt="The same result in English">
+</p>
+
+Video: [`docs/media/bawwab-phone-tour.mp4`](docs/media/bawwab-phone-tour.mp4) (phone size, 36 s).
 
 Hares is a mock-environment benchmark and toolkit for **indirect prompt injection** against
 tool-using LLM agents, built around one question:
@@ -114,8 +128,24 @@ MCP wrapping was checked with the real Claude Code 2.1.326 and Gemini CLI 0.68.0
 
 Nothing runs automatically: installing Bawwab changes nothing, and `discover` never writes.
 (The `@ccr-…` branch suffix is needed until this work is merged into the default branch.)
-Read [`docs/LIMITATIONS.md` §9](docs/LIMITATIONS.md) before `--apply`: the hook and proxy follow the
-official docs but were never run against a real Claude Code or Gemini CLI.
+Read [`docs/LIMITATIONS.md` §9](docs/LIMITATIONS.md) before `--apply`: MCP wrapping was checked with the
+real CLIs, but the hook was never exercised in a real Claude Code session and no model was run.
+
+## The app on a phone or in a browser
+
+The app is a folder of static files (`src/bawwab/web/`): no server code, no tracking, no
+dependency. Every check runs in the browser (a Web Worker); files are never uploaded.
+
+- **Desktop:** `bawwab ui` opens it at `http://127.0.0.1:<port>`, connected to this computer.
+- **Phone:** open the hosted copy (GitHub Pages, deployed by hand with the `pages` workflow) and use
+  the browser's **Add to Home screen**. It then works offline. See [`docs/INSTALL.md`](docs/INSTALL.md).
+- **Try it locally without installing:** `cd src/bawwab/web && python3 -m http.server 8000`, then
+  open `http://127.0.0.1:8000`.
+
+The scanners in the app are a JavaScript port of the Python ones. `tools/export_engine_data.py`
+generates their rule tables from the Python files and `tests/test_bawwab_engine_parity.py` checks
+that both give byte-identical reports on a shared corpus (434 cases); Word / e-mail / HTML readers
+are checked against documents written independently by Python's standard library.
 
 ## Demo (real recording)
 
