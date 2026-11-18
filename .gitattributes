@@ -4,3 +4,5 @@
 *.png binary
 *.mp4 binary
 *.webm binary
+# sample e-mail keeps its CRLF line endings (as sent by mail servers)
+src/bawwab/web/samples/*.eml -text
