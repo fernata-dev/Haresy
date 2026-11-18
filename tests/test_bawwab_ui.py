@@ -50,7 +50,7 @@ def test_static_page_has_strict_csp_and_no_inline_code(served):
     assert 'dir="rtl"' in html and '<script type="module" src="app/main.js"></script>' in html
     assert "style=" not in html and "onclick=" not in html
     for path in ("/app/main.js", "/engine/check.js", "/engine/worker.js", "/sw.js", "/manifest.webmanifest",
-                 "/fonts/plex-arabic-arabic-400.woff2", "/samples/hidden.docx"):
+                 "/fonts/plex-arabic-arabic-400.woff2", "/samples/samples.js"):
         assert req(port, "GET", path)[0] == 200, path
     for bad in ("/../server.py", "/app/../../ui/server.py", "/%2e%2e/server.py", "/web/index.html", "/fonts/OFL.txt/x"):
         assert req(port, "GET", bad)[0] == 404, bad

@@ -10,7 +10,7 @@ const FILES = [
   "fonts/plex-arabic-arabic-400.woff2", "fonts/plex-arabic-arabic-600.woff2", "fonts/plex-arabic-arabic-700.woff2",
   "fonts/plex-arabic-latin-400.woff2", "fonts/plex-arabic-latin-600.woff2", "fonts/plex-arabic-latin-700.woff2",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png",
-  "samples/hidden.docx", "samples/mail.eml", "samples/page.html", "samples/smuggle.txt",
+  "samples/samples.js",
 ];
 
 self.addEventListener("install", (e) => {

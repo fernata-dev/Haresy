@@ -2,8 +2,8 @@
 import {copyText, explain, h, icon, seg, state, t, toast} from "./dom.js";
 
 const SEV = {info: 0, low: 1, medium: 2, high: 3};
-const EXAMPLES = [["ex_docx", "samples/hidden.docx", "file"], ["ex_eml", "samples/mail.eml", "mail"],
-                  ["ex_html", "samples/page.html", "globe"], ["ex_txt", "samples/smuggle.txt", "paste"]];
+const EXAMPLES = [["ex_docx", "hidden.docx", "file"], ["ex_eml", "mail.eml", "mail"],
+                  ["ex_html", "page.html", "globe"], ["ex_txt", "smuggle.txt", "paste"]];
 const MAX_SEGMENTS = 400, MAX_SEG_CHARS = 1600, MAX_FINDINGS = 60;
 
 let worker = null, seq = 0;
@@ -102,12 +102,12 @@ async function readFile(view, f) {
   go(view, {bytes: buf, name: f.name, size: f.size});
 }
 
-async function example(view, url) {
+async function example(view, name) {
   try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(r.statusText);
-    const bytes = new Uint8Array(await r.arrayBuffer());
-    go(view, {bytes, name: url.split("/").pop(), size: bytes.length});
+    const {default: SAMPLES} = await import("../samples/samples.js");     // bundled: works on any static host
+    const bin = atob(SAMPLES[name]);
+    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+    go(view, {bytes, name, size: bytes.length});
   } catch (e) { toast(`${t("error")}: ${e.message}`, true); }
 }
 

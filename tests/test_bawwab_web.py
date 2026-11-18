@@ -84,3 +84,10 @@ def test_every_string_key_exists_in_both_languages():
     for f in (WEB / "app").glob("*.js"):
         used |= set(re.findall(r'\bt\("([a-z][a-z0-9_]*)"\)', f.read_text(encoding="utf-8")))
     assert used <= ke, f"used but not defined: {sorted(used - ke)}"
+
+
+def test_example_documents_are_bundled_as_one_module():
+    src = (WEB / "samples" / "samples.js").read_text(encoding="utf-8")
+    for name in ("hidden.docx", "mail.eml", "page.html", "smuggle.txt"):
+        assert f'"{name}":' in src
+    assert sorted(p.name for p in (WEB / "samples").iterdir()) == ["samples.js"]
