@@ -2,7 +2,7 @@
 import {aboutView, VERSION} from "./about.js";
 import {checkView} from "./check.js";
 import {computerView} from "./computer.js";
-import {h, icon, state, t} from "./dom.js";
+import {h, icon, state, store, t} from "./dom.js";
 import {learnView} from "./learn.js";
 
 // ------------------------------------------------------------------ connection (desktop only)
@@ -10,10 +10,10 @@ const LOCAL = ["127.0.0.1", "localhost", "[::1]"].includes(location.hostname);
 const TOKEN = (() => {
   const m = location.hash.match(/token=([A-Za-z0-9_-]+)/);
   if (m) {
-    sessionStorage.setItem("bawwab-token", m[1]);
+    store.set("sessionStorage", "bawwab-token", m[1]);
     history.replaceState(null, "", location.pathname + "#computer");
   }
-  return LOCAL ? sessionStorage.getItem("bawwab-token") || "" : "";
+  return LOCAL ? store.get("sessionStorage", "bawwab-token") || m?.[1] || "" : "";
 })();
 
 async function api(path, body) {
@@ -49,7 +49,7 @@ function applyLang() {
 }
 // Appearance follows the system setting only (HIG dark-mode: no app-specific appearance switch).
 function applyTheme() {
-  localStorage.removeItem("bawwab-theme");
+  store.del("localStorage", "bawwab-theme");
   const dark = matchMedia("(prefers-color-scheme: dark)").matches;
   document.documentElement.dataset.theme = dark ? "dark" : "light";
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -72,7 +72,7 @@ function shell() {
     h("span", {class: "grow"}),
     h("span", {class: "conn", title: t("connected")}, h("i"), h("span", {text: "127.0.0.1"})),
     h("button", {class: "langbtn", type: "button", lang: state.lang === "ar" ? "en" : "ar", onclick: () => {
-      state.lang = state.lang === "ar" ? "en" : "ar"; localStorage.setItem("bawwab-lang", state.lang); applyLang(); render(false);
+      state.lang = state.lang === "ar" ? "en" : "ar"; store.set("localStorage", "bawwab-lang", state.lang); applyLang(); render(false);
     }, text: t("lang_switch")}));
   const rail = h("nav", {class: "rail", "aria-label": t("name")}, navButtons("tab"), h("div", {class: "spacer"}),
     h("div", {class: "foot"}, `v${VERSION}`, h("br"), t("trust_local")));
@@ -91,7 +91,7 @@ function render(focus) {
 function nav(id) {
   if (id === route) { window.scrollTo({top: 0, behavior: "smooth"}); return; }
   route = id;
-  history.replaceState(null, "", "#" + id);
+  try { history.replaceState(null, "", "#" + id); } catch (e) { /* the view still changes */ }
   const go = () => { render(true); window.scrollTo({top: 0}); };
   if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(go);
   else go();
@@ -115,8 +115,10 @@ render(false);
 if (TOKEN) {
   api("/api/status").then((st) => {
     STATUS = st; ctx.connected = true; ctx.serverVersion = st.version; render(false);
-  }).catch(() => { sessionStorage.removeItem("bawwab-token"); });
+  }).catch(() => { store.del("sessionStorage", "bawwab-token"); });
 }
-if ("serviceWorker" in navigator && (location.protocol === "https:" || LOCAL)) {
-  navigator.serviceWorker.register("sw.js").catch(() => { /* offline mode unavailable */ });
-}
+try {                                  // refused in sandboxed frames: the app still works, only not offline
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || LOCAL)) {
+    navigator.serviceWorker.register("sw.js").catch(() => { /* offline mode unavailable */ });
+  }
+} catch (e) { /* offline mode unavailable */ }

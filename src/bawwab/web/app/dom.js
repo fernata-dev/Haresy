@@ -2,7 +2,13 @@
 // textContent / text nodes. Icons are constant SVG strings parsed with DOMParser (never data).
 import {EXPLAIN, STR} from "./i18n.js";
 
-export const state = {lang: localStorage.getItem("bawwab-lang") || "ar"};    // Arabic first
+// Storage can be missing or throw (private browsing, sandboxed frames): never let it break the app.
+export const store = {
+  get: (area, k) => { try { return window[area].getItem(k); } catch (e) { return null; } },
+  set: (area, k, v) => { try { window[area].setItem(k, v); } catch (e) { /* not kept */ } },
+  del: (area, k) => { try { window[area].removeItem(k); } catch (e) { /* nothing to do */ } },
+};
+export const state = {lang: store.get("localStorage", "bawwab-lang") || "ar"};    // Arabic first
 export const t = (k) => {
   const v = STR[state.lang][k];
   return v !== undefined ? v : STR.en[k] !== undefined ? STR.en[k] : k;
