@@ -19,6 +19,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"    # the browser engine (JS) is compared with the Python one
       - run: pip install -e ".[dev]"
       - if: matrix.numpy
         run: pip install numpy        # results must be identical with or without optional packages

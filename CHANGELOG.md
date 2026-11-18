@@ -28,6 +28,18 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- **Skill scanner severity bug (found while porting it to JavaScript, fixed):** for JSON manifests
+  the "is any D2 rule above low?" test took `max()` of the severity *names*, which compares them
+  alphabetically ("high" < "low" < "medium"). A tool description that D2 did not flag but that hit
+  `override` (high) together with `ai_addressed` (low) was therefore dropped instead of being
+  reported as medium. It now uses the severity order, like the rest of the scanner. The skill
+  scanner is not a frozen benchmark file and has no measured results (LIMITATIONS §7); no result
+  file changes.
+- **Browser engine:** the D2 scanner and the skill scanner were ported to JavaScript
+  (`src/bawwab/web/engine/`) so the app can check text on a phone, fully offline. Rules are not
+  copied by hand: `tools/export_engine_data.py` generates `engine/data.js` from the Python files,
+  and `tests/test_bawwab_engine_parity.py` checks that the JS engine returns byte-identical reports
+  on a shared corpus (all dev/test attack texts, benign texts, fixtures and edge cases).
 - **Windows bug found by CI (fixed):** configs with CRLF line endings made `protect --apply` refuse
   ("changed after the plan was made") because the plan compared raw text with newline-translated
   text. Protect/restore now compare exact bytes and keep the file's line endings. Regression test.

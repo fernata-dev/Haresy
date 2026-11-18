@@ -146,7 +146,8 @@ def scan_text(text: str, name: str = "<text>", allow: tuple[str, ...] = ()) -> d
             v = _D2.screen(value, "tool_desc")
             if v.flagged:
                 sev = "high"
-            elif v.reasons and max(R.D2_RULE_SEVERITY.get(r["rule"], "low") for r in v.reasons) != "low":
+            elif v.reasons and max((R.D2_RULE_SEVERITY.get(r["rule"], "low") for r in v.reasons),
+                                   key=_SEV_ORDER.get) != "low":
                 sev = "medium"
             else:
                 continue
