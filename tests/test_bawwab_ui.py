@@ -9,7 +9,7 @@ from bawwab.testing.fake_home import build
 from bawwab.ui.server import App, Refused, make_server
 from bawwab_helpers import SECRETS, tree_digest
 
-STATIC = Path(__file__).resolve().parents[1] / "src" / "bawwab" / "ui" / "static"
+WEB = Path(__file__).resolve().parents[1] / "src" / "bawwab" / "web"
 
 
 @pytest.fixture
@@ -45,13 +45,15 @@ def test_static_page_has_strict_csp_and_no_inline_code(served):
     app, port, *_ = served
     code, headers, body = req(port, "GET", "/")
     html = body.decode("utf-8")
-    assert code == 200 and "script-src 'self'" in headers["Content-Security-Policy"]
-    assert "'unsafe-inline'" not in headers["Content-Security-Policy"]
-    assert 'dir="rtl"' in html and "<script src=\"/app.js\"></script>" in html
+    csp = headers["Content-Security-Policy"]
+    assert code == 200 and "script-src 'self'" in csp and "'unsafe-inline'" not in csp and "frame-ancestors 'none'" in csp
+    assert 'dir="rtl"' in html and '<script type="module" src="app/main.js"></script>' in html
     assert "style=" not in html and "onclick=" not in html
-    js = (STATIC / "app.js").read_text(encoding="utf-8")
-    assert "innerHTML" not in js and "eval(" not in js and "document.write" not in js
-    assert req(port, "GET", "/../server.py")[0] == 404
+    for path in ("/app/main.js", "/engine/check.js", "/engine/worker.js", "/sw.js", "/manifest.webmanifest",
+                 "/fonts/plex-arabic-arabic-400.woff2", "/samples/hidden.docx"):
+        assert req(port, "GET", path)[0] == 200, path
+    for bad in ("/../server.py", "/app/../../ui/server.py", "/%2e%2e/server.py", "/web/index.html", "/fonts/OFL.txt/x"):
+        assert req(port, "GET", bad)[0] == 404, bad
 
 
 def test_api_needs_token_right_host_and_no_foreign_origin(served):

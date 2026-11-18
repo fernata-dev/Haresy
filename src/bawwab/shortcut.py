@@ -58,7 +58,7 @@ def run(home: Path, action: str, dry_run: bool) -> int:
         return 1
     icon.parent.mkdir(parents=True, exist_ok=True)
     desk.parent.mkdir(parents=True, exist_ok=True)
-    icon.write_bytes(resources.files("bawwab").joinpath("ui/static/logo.svg").read_bytes())
+    icon.write_bytes(resources.files("bawwab").joinpath("web/icon.svg").read_bytes())
     desk.write_text(entry, encoding="utf-8")
     print(f"Added 'Bawwab' to your app menu ({desk}). Remove with: bawwab shortcut --remove")
     return 0

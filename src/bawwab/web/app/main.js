@@ -1,0 +1,126 @@
+// App shell: top bar, tab bar / side rail, router, language, theme, connection to `bawwab ui`.
+import {aboutView, VERSION} from "./about.js";
+import {checkView} from "./check.js";
+import {computerView} from "./computer.js";
+import {h, icon, state, t} from "./dom.js";
+import {learnView} from "./learn.js";
+
+// ------------------------------------------------------------------ connection (desktop only)
+const LOCAL = ["127.0.0.1", "localhost", "[::1]"].includes(location.hostname);
+const TOKEN = (() => {
+  const m = location.hash.match(/token=([A-Za-z0-9_-]+)/);
+  if (m) {
+    sessionStorage.setItem("bawwab-token", m[1]);
+    history.replaceState(null, "", location.pathname + "#computer");
+  }
+  return LOCAL ? sessionStorage.getItem("bawwab-token") || "" : "";
+})();
+
+async function api(path, body) {
+  const r = await fetch(path, {
+    method: body === undefined ? "GET" : "POST", cache: "no-store",
+    headers: Object.assign({"X-Bawwab-Token": TOKEN}, body === undefined ? {} : {"Content-Type": "application/json"}),
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  let j = {};
+  try { j = await r.json(); } catch (e) { /* not JSON */ }
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+
+let STATUS = null;
+const ctx = {
+  connected: false, serverVersion: null, installPrompt: null, api,
+  status: async () => (STATUS ||= await api("/api/status")),
+  invalidate: () => { STATUS = null; },
+  rerender: () => render(false),
+  install: async () => { if (ctx.installPrompt) { ctx.installPrompt.prompt(); ctx.installPrompt = null; } },
+};
+
+// ------------------------------------------------------------------ shell
+const ROUTES = [["check", "scan", "nav_check"], ["learn", "book", "nav_learn"], ["computer", "laptop", "nav_computer"], ["about", "door", "nav_about"]];
+let route = (location.hash.match(/^#(\w+)/) || [])[1];
+if (!ROUTES.some(([r]) => r === route)) route = "check";
+
+function applyLang() {
+  document.documentElement.lang = state.lang;
+  document.documentElement.dir = state.lang === "ar" ? "rtl" : "ltr";
+  document.title = state.lang === "ar" ? "بوّاب — افحص قبل ما المساعد يقرا" : "Bawwab — check before your AI assistant reads it";
+}
+function applyTheme() {
+  const saved = localStorage.getItem("bawwab-theme");
+  const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", dark ? "#0e1311" : "#f6f1e7");
+}
+
+function navButtons(cls) {
+  return ROUTES.map(([id, ic, label]) => h("a", {class: cls, href: "#" + id, "aria-current": route === id ? "page" : null,
+    onclick: (e) => { e.preventDefault(); nav(id); }}, h("span", {class: "pill-bg"}), icon(ic), h("span", {text: t(label)})));
+}
+
+function shell() {
+  const app = document.getElementById("app");
+  app.textContent = "";
+  app.className = "app" + (ctx.connected ? " connected" : "");
+  const dark = document.documentElement.dataset.theme === "dark";
+  const top = h("header", {class: "top"},
+    h("a", {class: "mark", href: "#check", onclick: (e) => { e.preventDefault(); nav("check"); }},
+      h("img", {src: "icon.svg", alt: "", width: "34", height: "34"}),
+      h("span", {}, h("b", {text: t("name")}), h("small", {text: t("tagline")}))),
+    h("span", {class: "grow"}),
+    h("span", {class: "conn", title: t("connected")}, h("i"), h("span", {text: "127.0.0.1"})),
+    h("button", {class: "iconbtn", type: "button", "aria-label": t("theme"), "aria-pressed": dark ? "true" : "false", onclick: () => {
+      localStorage.setItem("bawwab-theme", document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+      applyTheme(); render(false);
+    }}, icon(dark ? "sun" : "moon")),
+    h("button", {class: "langbtn", type: "button", lang: state.lang === "ar" ? "en" : "ar", onclick: () => {
+      state.lang = state.lang === "ar" ? "en" : "ar"; localStorage.setItem("bawwab-lang", state.lang); applyLang(); render(false);
+    }, text: t("lang_switch")}));
+  const rail = h("nav", {class: "rail", "aria-label": "main"}, navButtons("tab"), h("div", {class: "spacer"}),
+    h("div", {class: "foot"}, `v${VERSION}`, h("br"), t("trust_local")));
+  const main = h("main", {class: "main", id: "main", tabindex: "-1"});
+  const tabbar = h("nav", {class: "tabbar", "aria-label": "main"}, navButtons("tab"));
+  app.append(top, rail, main, tabbar);
+  return main;
+}
+
+function render(focus) {
+  const main = shell();
+  ({check: checkView, learn: learnView, computer: computerView, about: aboutView}[route])(main, route === "learn" ? nav : ctx);
+  if (focus) main.focus({preventScroll: true});
+}
+
+function nav(id) {
+  if (id === route) { window.scrollTo({top: 0, behavior: "smooth"}); return; }
+  route = id;
+  history.replaceState(null, "", "#" + id);
+  const go = () => { render(true); window.scrollTo({top: 0}); };
+  if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(go);
+  else go();
+}
+
+window.addEventListener("scroll", () => {
+  const top = document.querySelector(".top");
+  if (top) top.classList.toggle("scrolled", window.scrollY > 4);
+}, {passive: true});
+window.addEventListener("hashchange", () => {
+  const r = (location.hash.match(/^#(\w+)/) || [])[1];
+  if (r && r !== route && ROUTES.some(([x]) => x === r)) { route = r; render(true); }
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!localStorage.getItem("bawwab-theme")) { applyTheme(); render(false); } });
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); ctx.installPrompt = e; });
+
+// ------------------------------------------------------------------ boot
+applyLang();
+applyTheme();
+render(false);
+if (TOKEN) {
+  api("/api/status").then((st) => {
+    STATUS = st; ctx.connected = true; ctx.serverVersion = st.version; render(false);
+  }).catch(() => { sessionStorage.removeItem("bawwab-token"); });
+}
+if ("serviceWorker" in navigator && (location.protocol === "https:" || LOCAL)) {
+  navigator.serviceWorker.register("sw.js").catch(() => { /* offline mode unavailable */ });
+}

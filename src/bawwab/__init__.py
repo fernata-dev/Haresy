@@ -14,4 +14,4 @@ Bawwab reduces the damage an injected instruction can cause; it does not stop a
 model from following it.
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"

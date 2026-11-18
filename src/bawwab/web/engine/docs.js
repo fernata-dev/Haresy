@@ -561,6 +561,15 @@ export async function readEmail(bytesOrText) {
   const raw = typeof bytesOrText === "string" ? latin1(new TextEncoder().encode(bytesOrText)) : latin1(bytesOrText);
   const out = {segments: [], headers: {}, attachments: [], notes: []};
   await readMime(raw, "body", 0, out);
+  // multipart/alternative carries the same visible text twice (plain + HTML): keep one copy
+  const seenText = new Set();
+  out.segments = out.segments.filter((s) => {
+    if (s.seen !== "visible") return true;
+    const key = `${s.where}\u0000${s.text.replace(/\s+/g, " ")}`;
+    if (seenText.has(key)) return false;
+    seenText.add(key);
+    return true;
+  });
   const from = out.headers["from"] || "", reply = out.headers["reply-to"] || "";
   const dom = (v) => ((v.match(/@([A-Za-z0-9.-]+)/) || [])[1] || "").toLowerCase();
   if (reply && dom(reply) && dom(from) && dom(reply) !== dom(from)) out.notes.push("reply_to_differs");

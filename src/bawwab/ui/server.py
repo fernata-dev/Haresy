@@ -25,13 +25,28 @@ from pathlib import Path
 
 from bawwab import __version__
 
-STATIC = Path(__file__).parent / "static"
-FILES = {"/": ("index.html", "text/html; charset=utf-8"), "/index.html": ("index.html", "text/html; charset=utf-8"),
-         "/app.js": ("app.js", "text/javascript; charset=utf-8"), "/app.css": ("app.css", "text/css; charset=utf-8"),
-         "/logo.svg": ("logo.svg", "image/svg+xml")}
+WEB = Path(__file__).resolve().parent.parent / "web"      # the same app that runs on phones
+_TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+          ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2", ".webmanifest": "application/manifest+json",
+          ".json": "application/json", ".txt": "text/plain; charset=utf-8", ".eml": "message/rfc822",
+          ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
+
+
+def _static_files() -> dict[str, tuple[Path, str]]:
+    """Fixed whitelist built once from the shipped web folder (a request path is only a dict key)."""
+    files = {}
+    for f in sorted(WEB.rglob("*")):
+        if f.is_file() and f.suffix in _TYPES:
+            files["/" + f.relative_to(WEB).as_posix()] = (f, _TYPES[f.suffix])
+    if "/index.html" in files:
+        files["/"] = files["/index.html"]
+    return files
+
+
+FILES = _static_files()
 MAX_BODY = 2_000_000
-CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; "
-       "base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
+CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; "
+       "worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
 
 
 class Refused(Exception):
@@ -236,8 +251,8 @@ def make_handler(app: App, port_ref: dict):
             try:
                 if path in FILES and method == "GET":
                     self._guard(api=False)
-                    name, ctype = FILES[path]
-                    return self._send(200, (STATIC / name).read_bytes(), ctype)
+                    f, ctype = FILES[path]
+                    return self._send(200, f.read_bytes(), ctype)
                 routes = ROUTES_GET if method == "GET" else ROUTES_POST
                 if path not in routes:
                     return self._json(404, {"error": "not found"})

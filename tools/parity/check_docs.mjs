@@ -43,5 +43,20 @@ for (const c of cases) {
   for (const rule of c.rules || []) if (!(r.findings || []).some((f) => f.rule === rule)) fail(c, `missing finding ${rule}`);
   console.log(`${c.file}: ${r.verdict}  segments=${segs.length} hidden=${r.counts?.hidden ?? 0} unseen=${r.counts?.unseen ?? 0} (${ms} ms)`);
 }
+// pasted text: raw e-mail source, page HTML and an ordinary message take the right path
+const {checkText} = await import("../../src/bawwab/web/engine/check.js");
+const pasted = [
+  [readFileSync(join(dir, "mail.eml"), "utf-8"), "email", "danger"],
+  [readFileSync(join(dir, "page.html"), "utf-8"), "html", "danger"],
+  ["Hi Sara, the meeting moved to Thursday at 10. Bring the agenda.", "text", "clear"],
+  ["مساء الخير، الاجتماع اتأجل للخميس الساعة ١٠. هات الأجندة معاك.", "text", "clear"],
+];
+for (const [text, kind, verdict] of pasted) {
+  const r = await checkText(text);
+  if (r.kind !== kind || r.verdict !== verdict) { bad++; console.log(`FAIL pasted ${kind}: got ${r.kind}/${r.verdict}`); }
+}
+const mail = await checkFile("mail.eml", new Uint8Array(readFileSync(join(dir, "mail.eml"))));
+const dup = mail.segments.filter((s) => s.seen === "visible" && s.text.includes("Hi, the monthly report is attached.")).length;
+if (dup !== 1) { bad++; console.log(`FAIL mail.eml: visible body appears ${dup} times`); }
 console.log(bad ? `${bad} problem(s)` : `all ${cases.length} documents OK`);
 process.exit(bad ? 1 : 0);
