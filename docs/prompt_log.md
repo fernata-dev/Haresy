@@ -162,3 +162,23 @@ a bilingual product website (`site/`). Its demo decisions are computed at build 
 policy code and the frozen D2 scanner (`tools/site/build_site.py`). Sources (OWASP LLM01, Simon
 Willison's "lethal trifecta") were found by web search; their primary pages could not be fetched
 from the build session, so the site states only what several sources agree on and links to them.
+
+## Prompt 11 — 2026-11-19 — reaction to the website
+
+```text
+ده ازبل واعفن وانيل واخرى ما راته عيناي
+```
+
+Response summary: instead of a third blind redesign, the assistant checked how the pages render in
+a sandboxed frame (how the published link is shown inside the Claude app) and found a real defect:
+module scripts and fonts are refused there, so the phone app was a blank page and the site's demo
+was empty. Fixed (classic bundles), republished, and asked which of three causes the user meant.
+
+## Prompt 12 — 2026-11-19 — finish
+
+```text
+كمل يعم وخلصه كامل
+```
+
+Response summary (m20): fonts embedded as data URIs (they also failed in sandboxed frames), a
+layout check at 7 widths for the site (AR/EN) and the app, docs, tag, CI.

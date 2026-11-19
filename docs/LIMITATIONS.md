@@ -190,6 +190,11 @@ sits outside the page (comments, file properties, `alt` text, page metadata).
   English, light and dark, no console errors (`tools/web/shoot.mjs`); the desktop mode against
   `bawwab ui` on a fake HOME (`tools/web/shoot_connected.mjs`).
 
+**Where the pages load.** They use classic script bundles and embedded fonts, so they also work in
+sandboxed previews (opaque origin) and from file://; checked in Chromium, with a layout check at
+320–1920 px for the site (AR/EN) and the app. Offline use (service worker) needs https or
+127.0.0.1; a sandboxed preview cannot install it.
+
 **Not verified.** No real phone, no Safari/WebKit and no Firefox were used (Chromium only; module
 workers and `DecompressionStream("deflate-raw")` need recent browsers: Chrome/Edge 103+, Safari
 16.4+, Firefox 113+). No real user documents, newsletters or web pages were tested: the

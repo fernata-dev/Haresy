@@ -45,7 +45,7 @@ def _static_files() -> dict[str, tuple[Path, str]]:
 
 FILES = _static_files()
 MAX_BODY = 2_000_000
-CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; "
+CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; "
        "worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
 
 

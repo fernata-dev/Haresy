@@ -35,8 +35,8 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
   normal local server. Now the pages load generated classic bundles (`tools/web/bundle.py`; the
   modules stay the source of truth), the worker falls back to the page when it cannot start, and
   tests check bundle freshness and that the bundled engine returns the same reports as the modules.
-  Verified in a sandboxed iframe and from file:// (Chromium). Fonts still fall back to system
-  fonts in such frames (cross-origin font loads are refused).
+  Verified in a sandboxed iframe and from file:// (Chromium). The font is now embedded as data URIs
+  (`src/bawwab/web/fonts.css`, 400 and 700), so it also loads in such frames.
 - **m19 — website.** `site/` (Arabic + English): hero with the doorway and a live decision log, the
   problem (OWASP LLM01, "lethal trifecta"), how it works, an interactive "Try the door" demo whose
   decisions are computed by `bawwab.policy` and D2 at build time, a real terminal recording,
