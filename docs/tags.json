@@ -100,6 +100,11 @@
    "commit": "7dc9dc6317af9baa4ba2f4b5668b6d9b5342bcf8",
    "annotated": true,
    "message": "m18: web app for phones + desktop (PWA), JS engine with Python parity, document readers, redesign"
+  },
+  "m19": {
+   "commit": "67e17bf2c85873707a42352e7d7d98b0b32e5279",
+   "annotated": true,
+   "message": "m19: product website with real-policy demo"
   }
  }
 }
