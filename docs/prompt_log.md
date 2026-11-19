@@ -182,3 +182,14 @@ was empty. Fixed (classic bundles), republished, and asked which of three causes
 
 Response summary (m20): fonts embedded as data URIs (they also failed in sandboxed frames), a
 layout check at 7 widths for the site (AR/EN) and the app, docs, tag, CI.
+
+## Prompt 13 — 2026-11-19 — try it with an agent
+
+```text
+هات بقا اجربه عشان احطه في antigravty cli واجرب جيليبريك قوي عليه
+```
+
+Response summary: `docs/TRY_WITH_AN_AGENT.md`. Every command was run on a throwaway HOME first.
+Antigravity is not supported (manual MCP wiring only; its built-in terminal/browser bypass Bawwab);
+Claude Code is the supported target whose hook also covers built-in tools. The assistant gave
+attack goals and mock destinations, not ready-made jailbreak texts (the student writes those).

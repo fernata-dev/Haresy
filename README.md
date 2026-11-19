@@ -131,6 +131,9 @@ Nothing runs automatically: installing Bawwab changes nothing, and `discover` ne
 Read [`docs/LIMITATIONS.md` §9](docs/LIMITATIONS.md) before `--apply`: MCP wrapping was checked with the
 real CLIs, but the hook was never exercised in a real Claude Code session and no model was run.
 
+**Try it against a real agent and your own jailbreak:** [`docs/TRY_WITH_AN_AGENT.md`](docs/TRY_WITH_AN_AGENT.md)
+(Claude Code: supported; Google Antigravity: manual MCP wiring only, unsupported).
+
 ## Website
 
 `site/` is the product website (Arabic first, English at `site/en/`). Its "Try the door" demo shows
