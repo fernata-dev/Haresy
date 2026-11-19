@@ -105,6 +105,11 @@
    "commit": "67e17bf2c85873707a42352e7d7d98b0b32e5279",
    "annotated": true,
    "message": "m19: product website with real-policy demo"
+  },
+  "m20": {
+   "commit": "e8810c49bf7cbef65e184062633c503b0a429063",
+   "annotated": true,
+   "message": "m20: pages work in sandboxed previews and from file://; embedded fonts; width QA"
   }
  }
 }
