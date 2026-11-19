@@ -131,6 +131,20 @@ Nothing runs automatically: installing Bawwab changes nothing, and `discover` ne
 Read [`docs/LIMITATIONS.md` §9](docs/LIMITATIONS.md) before `--apply`: MCP wrapping was checked with the
 real CLIs, but the hook was never exercised in a real Claude Code session and no model was run.
 
+## Website
+
+`site/` is the product website (Arabic first, English at `site/en/`). Its "Try the door" demo shows
+decisions computed at build time by Bawwab's own policy code and the frozen D2 scanner
+(`tools/site/build_site.py`; `tests/test_site.py` fails if a page is stale). Preview it with the app:
+
+```bash
+python tools/site/build_site.py --out _site && cd _site && python3 -m http.server 8000   # http://127.0.0.1:8000
+```
+
+It is published together with the app (at `/app/`) by the manual `pages` workflow.
+
+<img src="docs/media/site/site-desktop-hero-ar.png" width="720" alt="Bawwab website, Arabic hero">
+
 ## The app on a phone or in a browser
 
 The app is a folder of static files (`src/bawwab/web/`): no server code, no tracking, no

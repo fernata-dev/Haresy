@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" dir="{{dir}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#0b1714">
+<title>{{title}}</title>
+<meta name="description" content="{{meta_desc}}">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{meta_desc}}">
+<meta property="og:image" content="{{root}}assets/og.png">
+<link rel="icon" href="{{root}}app/icon.svg" type="image/svg+xml">
+<link rel="alternate" hreflang="{{alt_lang}}" href="{{lang_href}}">
+<link rel="preload" href="{{root}}app/fonts/plex-arabic-arabic-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{root}}assets/site.css">
+<script type="module" src="{{root}}assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">{{skip}}</a>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top"><img src="{{root}}app/icon.svg" alt="" width="34" height="34"><b>{{brand}}</b></a>
+    <nav class="nav-links" aria-label="{{brand}}">
+      <a href="#how">{{nav_how}}</a><a href="#demo">{{nav_demo}}</a><a href="#install">{{nav_install}}</a><a href="#limits">{{nav_limits}}</a>
+    </nav>
+    <a class="lang" href="{{lang_href}}" lang="{{alt_lang}}" hreflang="{{alt_lang}}">{{lang_name}}</a>
+    <a class="btn btn-brass sm" href="#install">{{nav_cta}}</a>
+  </div>
+</header>
+
+<main id="main">
+<!-- ============================================================ hero -->
+<section class="hero" id="top">
+  <div class="night" aria-hidden="true"></div>
+  <div class="wrap hero-in">
+    <div class="hero-copy">
+      <p class="eyebrow on-dark">{{hero_eyebrow}}</p>
+      <h1><span>{{hero_h1a}}</span> <em>{{hero_h1b}}</em></h1>
+      <p class="hero-sub">{{hero_sub}}</p>
+      <div class="cmd-line" data-copy="{{pipx}}">
+        <code class="ltr"><span class="dollar">$</span> {{pipx_short}}</code>
+        <button class="copy" type="button" data-copy-target data-label="{{copy}}" data-done="{{copied}}">{{copy}}</button>
+      </div>
+      <div class="hero-links">
+        <a class="btn btn-brass" href="#demo">{{hero_try}}</a>
+        <a class="link-light" href="{{root}}app/index.html">{{hero_app}} →</a>
+      </div>
+    </div>
+    <figure class="arch" aria-hidden="true">
+      <div class="arch-frame">
+        <span class="lamp"></span>
+        <div class="ledger ltr" id="ledger">{{ledger_static}}</div>
+      </div>
+      <div class="threshold"><span>{{door_agent}}</span><b>{{door_label}}</b><span>{{door_tools}}</span></div>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================================================ mechanisms strip -->
+<section class="strip" aria-labelledby="strip-t">
+  <div class="wrap">
+    <h2 class="strip-t" id="strip-t">{{strip_t}}</h2>
+    <ul class="strip-list">
+      <li>{{strip_1}}</li><li>{{strip_2}}</li><li>{{strip_3}}</li><li>{{strip_4}}</li>
+    </ul>
+    <p class="strip-note">{{strip_note}}</p>
+  </div>
+</section>
+
+<!-- ============================================================ problem -->
+<section class="sec" id="problem" aria-labelledby="prob-h">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">{{prob_eyebrow}}</p>
+      <h2 id="prob-h">{{prob_h2}}</h2>
+      <p class="lead">{{prob_p}} <a class="src" href="{{src_owasp}}" rel="noopener noreferrer">OWASP LLM01 ↗</a></p>
+      <p class="cut">{{tri_cut}}</p>
+      <p class="small muted">{{tri_src}} <a class="src" href="{{src_willison}}" rel="noopener noreferrer">simonwillison.net ↗</a></p>
+    </div>
+    <figure class="tri">
+      <figcaption class="tri-t">{{tri_t}}</figcaption>
+      <div class="tri-map">
+        <div class="ring r1 shut"><b>{{tri_1}}</b><span>{{tri_1d}}</span></div>
+        <div class="ring r2"><b>{{tri_2}}</b><span>{{tri_2d}}</span></div>
+        <div class="ring r3 shut"><b>{{tri_3}}</b><span>{{tri_3d}}</span></div>
+        <div class="tri-core">{{door_label}}</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================================================ how -->
+<section class="sec sec-soft" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <p class="eyebrow">{{how_eyebrow}}</p>
+    <h2 id="how-h" class="narrow">{{how_h2}}</h2>
+    <p class="lead narrow">{{how_p}}</p>
+    <div class="flow" aria-hidden="true">
+      <div class="flow-node">{{door_agent}}<small>Claude Code · Gemini CLI</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node gate">{{door_label}}<small>proxy · hook · policy</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node">{{door_tools}}<small>MCP · Bash · fetch · Read</small></div>
+    </div>
+    <div class="how-grid">
+      <article class="how-card"><code class="mech ltr">bawwab mcp-proxy</code><h3>{{how_1t}}</h3><p>{{how_1p}}</p></article>
+      <article class="how-card"><code class="mech ltr">bawwab hook claude-code</code><h3>{{how_2t}}</h3><p>{{how_2p}}</p></article>
+      <article class="how-card"><code class="mech ltr">~/.bawwab/policy.json</code><h3>{{how_3t}}</h3><p>{{how_3p}}</p></article>
+      <article class="how-card"><code class="mech ltr">bawwab discover</code><h3>{{how_4t}}</h3><p>{{how_4p}}</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ demo -->
+<section class="sec" id="demo" aria-labelledby="demo-h">
+  <div class="wrap">
+    <p class="eyebrow">{{demo_eyebrow}}</p>
+    <h2 id="demo-h" class="narrow">{{demo_h2}}</h2>
+    <p class="lead narrow">{{demo_p}}</p>
+    <div class="demo" id="demo-app" data-lang="{{lang}}">
+      <div class="demo-pick">
+        <p class="label" id="scn-label">{{demo_scn}}</p>
+        <div class="scn-list" role="tablist" aria-labelledby="scn-label" id="scn-list"></div>
+      </div>
+      <div class="demo-stage" role="tabpanel" id="demo-stage" aria-live="polite">
+        <noscript><p>JavaScript is needed for the interactive demo.</p></noscript>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ proof -->
+<section class="sec sec-dark" aria-labelledby="proof-h">
+  <div class="wrap">
+    <p class="eyebrow on-dark">{{proof_eyebrow}}</p>
+    <h2 id="proof-h">{{proof_h2}}</h2>
+    <p class="lead on-dark narrow">{{proof_p}}</p>
+    <figure class="shot"><img src="{{root}}assets/img/proxy-taint.png" alt="{{proof_alt}}" width="2056" height="844" loading="lazy" decoding="async"></figure>
+  </div>
+</section>
+
+<!-- ============================================================ install -->
+<section class="sec" id="install" aria-labelledby="inst-h">
+  <div class="wrap">
+    <p class="eyebrow">{{inst_eyebrow}}</p>
+    <h2 id="inst-h" class="narrow">{{inst_h2}}</h2>
+    <div class="install">
+      <div class="os-tabs" role="tablist" aria-label="OS">{{os_tabs}}</div>
+      {{os_panels}}
+      <ol class="steps">
+        <li><b>{{st1_t}}</b><code class="ltr">bawwab</code><span>{{st1_p}}</span></li>
+        <li><b>{{st2_t}}</b><code class="ltr">bawwab protect --dry-run</code><span>{{st2_p}}</span></li>
+        <li><b>{{st3_t}}</b><code class="ltr">bawwab protect --apply</code><span>{{st3_p}}</span></li>
+        <li><b>{{st4_t}}</b><code class="ltr">bawwab unprotect</code><span>{{st4_p}}</span></li>
+      </ol>
+      <p class="small muted">{{inst_quit}}</p>
+      <p class="small">{{inst_ui}} <code class="ltr">bawwab ui</code></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ apps -->
+<section class="sec sec-soft" aria-labelledby="apps-h">
+  <div class="wrap">
+    <p class="eyebrow">{{apps_eyebrow}}</p>
+    <h2 id="apps-h" class="narrow">{{apps_h2}}</h2>
+    <div class="apps">
+      <article class="app app-desktop">
+        <div class="app-txt"><h3>{{app1_t}}</h3><p>{{app1_p}}</p></div>
+        <img src="{{root}}assets/img/desktop-result.png" alt="{{app_alt_desktop}}" width="1440" height="900" loading="lazy" decoding="async">
+      </article>
+      <article class="app app-phone">
+        <div class="app-txt"><h3>{{app2_t}}</h3><p>{{app2_p}}</p><a class="btn btn-ink sm" href="{{root}}app/index.html">{{app2_cta}}</a></div>
+        <img src="{{root}}assets/img/phone-result.png" alt="{{app_alt_phone}}" width="585" height="996" loading="lazy" decoding="async">
+      </article>
+      <article class="app app-cli">
+        <div class="app-txt"><h3>{{app3_t}}</h3><p>{{app3_p}}</p></div>
+        <pre class="term ltr"><span class="c">$</span> bawwab scan ~/.claude/skills --sarif
+<span class="c">$</span> bawwab policy show
+<span class="c">$</span> bawwab agents</pre>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ support -->
+<section class="sec" aria-labelledby="sup-h">
+  <div class="wrap">
+    <p class="eyebrow">{{sup_eyebrow}}</p>
+    <h2 id="sup-h" class="narrow">{{sup_h2}}</h2>
+    <div class="tablewrap">
+      <table class="sup">
+        <thead><tr><th scope="col">{{sup_agent}}</th><th scope="col">{{sup_mech}}</th><th scope="col">{{sup_check}}</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Claude Code</th><td>{{sup_cc_m}}</td><td>{{sup_cc_c}}</td></tr>
+          <tr><th scope="row">Gemini CLI</th><td>{{sup_gc_m}}</td><td>{{sup_gc_c}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nosup"><b>{{sup_no_t}}:</b> {{sup_no}}</p>
+  </div>
+</section>
+
+<!-- ============================================================ limits -->
+<section class="sec sec-stone" id="limits" aria-labelledby="lim-h">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">{{lim_eyebrow}}</p>
+      <h2 id="lim-h">{{lim_h2}}</h2>
+      <blockquote class="quote"><p>{{lim_quote}}</p></blockquote>
+    </div>
+    <div>
+      <ul class="lims"><li>{{lim_1}}</li><li>{{lim_2}}</li><li>{{lim_3}}</li><li>{{lim_4}}</li><li>{{lim_5}}</li></ul>
+      <a class="more" href="{{doc_limits}}" rel="noopener noreferrer">{{lim_more}} ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ research -->
+<section class="sec" aria-labelledby="res-h">
+  <div class="wrap research">
+    <div>
+      <p class="eyebrow">{{res_eyebrow}}</p>
+      <h2 id="res-h">{{res_h2}}</h2>
+    </div>
+    <div>
+      <p class="lead">{{res_p}}</p>
+      <p class="small muted">{{res_note}}</p>
+      <a class="more" href="{{doc_readme}}" rel="noopener noreferrer">{{res_link}} ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ faq -->
+<section class="sec sec-soft" aria-labelledby="faq-h">
+  <div class="wrap faq-wrap">
+    <div><p class="eyebrow">{{faq_eyebrow}}</p><h2 id="faq-h">{{faq_h2}}</h2></div>
+    <div class="faq">
+      <details><summary>{{q1}}</summary><p>{{a1}}</p></details>
+      <details><summary>{{q2}}</summary><p>{{a2}}</p></details>
+      <details><summary>{{q3}}</summary><p>{{a3}}</p></details>
+      <details><summary>{{q4}}</summary><p>{{a4}}</p></details>
+      <details><summary>{{q5}}</summary><p>{{a5}}</p></details>
+      <details><summary>{{q6}}</summary><p>{{a6}}</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ final cta -->
+<section class="final" aria-labelledby="cta-h">
+  <div class="wrap final-in">
+    <h2 id="cta-h">{{cta_h2}}</h2>
+    <p>{{cta_p}}</p>
+    <div class="cmd-line" data-copy="{{pipx}}">
+      <code class="ltr"><span class="dollar">$</span> {{pipx_short}}</code>
+      <button class="copy" type="button" data-copy-target data-label="{{copy}}" data-done="{{copied}}">{{copy}}</button>
+    </div>
+    <a class="link-light" href="{{repo}}" rel="noopener noreferrer">{{cta_gh}} ↗</a>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand"><img src="{{root}}app/icon.svg" alt="" width="28" height="28"><b>{{brand}}</b><span class="muted">MIT</span></div>
+    <nav class="foot-links" aria-label="{{foot_docs}}">
+      <a href="{{doc_install}}" rel="noopener noreferrer">{{foot_install}}</a>
+      <a href="{{doc_limits}}" rel="noopener noreferrer">{{foot_limits}}</a>
+      <a href="{{doc_integrations}}" rel="noopener noreferrer">{{foot_integrations}}</a>
+      <a href="{{doc_ai}}" rel="noopener noreferrer">{{foot_ai}}</a>
+      <a href="{{root}}app/index.html">{{app2_t}}</a>
+    </nav>
+    <p class="foot-note">{{foot_note}}</p>
+    <p class="foot-note">{{foot_sources}} <a href="{{src_owasp}}" rel="noopener noreferrer">OWASP LLM01</a> · <a href="{{src_willison}}" rel="noopener noreferrer">Simon Willison — The lethal trifecta</a> · {{foot_font}}</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -28,6 +28,12 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- **m19 — website.** `site/` (Arabic + English): hero with the doorway and a live decision log, the
+  problem (OWASP LLM01, "lethal trifecta"), how it works, an interactive "Try the door" demo whose
+  decisions are computed by `bawwab.policy` and D2 at build time, a real terminal recording,
+  install per OS, the three faces, supported agents, honest limits, the research question, FAQ.
+  Static, strict CSP, no dependencies; `tests/test_site.py`; the `pages` workflow publishes site +
+  app. Screenshots in `docs/media/site/`.
 - **m18 — web app for phones + desktop, one product with three faces.** New static app
   (`src/bawwab/web/`): Check (file / paste / examples → X-ray of hidden and unseen text, plain-language
   findings, what to do), Learn (indirect injection through cloud assistants, habits, honest limits),

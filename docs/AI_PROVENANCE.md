@@ -4,7 +4,7 @@ ISEF requires disclosure of AI assistance. This file lists what was produced by 
 (Claude, by Anthropic, used through Claude Code) in response to the prompts in
 [`prompt_log.md`](prompt_log.md).
 
-## Everything in this repository (tags `m1`–`m18`) was AI-generated
+## Everything in this repository (tags `m1`–`m19`) was AI-generated
 
 | path | what | AI-generated |
 |---|---|---|
@@ -22,6 +22,7 @@ ISEF requires disclosure of AI assistance. This file lists what was produced by 
 | `docs/media/*`, `tools/record/*` | real terminal recording (fake HOME) + the scripts that made it | recording made by AI-written scripts |
 | `src/bawwab/ui/**`, `src/bawwab/web/**` (app, engine, styles, icons, samples) | the app (m15; redesigned in m18) and the JavaScript port of the scanners | yes, all of it (except the font) |
 | `src/bawwab/web/fonts/*` | IBM Plex Sans Arabic, © IBM, SIL Open Font License 1.1 (`fonts/OFL.txt`), from the `@fontsource/ibm-plex-sans-arabic` package | **no** (third-party font) |
+| `site/**`, `tools/site/*`, `docs/media/site/*` | product website, its build script and screenshots | yes |
 | `tools/export_engine_data.py`, `tools/parity/*`, `tools/web/*` | rule export, parity corpus and checks, screenshots / video scripts | yes |
 | `docs/media/app/*`, `docs/media/bawwab-phone-tour.mp4` | screenshots and video of the app in a headless browser (fake HOME for the desktop part) | made by AI-written scripts |
 

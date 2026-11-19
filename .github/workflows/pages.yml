@@ -1,5 +1,5 @@
 name: pages
-# Publishes the static web app (src/bawwab/web) to GitHub Pages. Manual only: run it from the
+# Publishes the website (site/) with the phone/desktop app at /app/ to GitHub Pages. Manual only: run it from the
 # Actions tab after enabling Settings -> Pages -> Source: GitHub Actions. It uploads static files;
 # the app itself never sends anything anywhere (see docs/LIMITATIONS.md section 11).
 on:
@@ -23,9 +23,11 @@ jobs:
         with:
           python-version: "3.12"
       - run: python tools/export_engine_data.py --check      # rules in the app = rules in Python
+      - run: python tools/site/build_site.py --check           # site decisions = Bawwab's policy code
+      - run: python tools/site/build_site.py --no-images --out _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: src/bawwab/web
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4

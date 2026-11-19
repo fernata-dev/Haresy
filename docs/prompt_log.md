@@ -140,3 +140,25 @@ the same app on the desktop (`bawwab ui`, plus agent protection), and the CLI. T
 ported to JavaScript with a byte-exact parity test against Python; Word / e-mail / HTML readers
 reveal hidden text; full redesign. The assistant stated that no app on a phone can sit between a
 user and a cloud assistant such as Gemini in Drive: Bawwab checks content before it is handed over.
+
+## Prompt 9 — 2026-11-18 — use the design skills
+
+```text
+يعم استخدم كل skills بتاعت الديساين عندك وخلي الشكل احسن من ده
+```
+
+Response summary: design critique, WCAG 2.1 AA audit, Apple HIG review and UX-copy review of the
+app, then one pass of fixes (CHANGELOG m18 "Design pass").
+
+## Prompt 10 — 2026-11-19 — the tool's website
+
+```text
+يحبيبي الاداة افهم الاداة ااي بتعمله انها بتتركب في ai بص طور الموقع بتاعه بقوة وخليه اجمل واقوى ومتطور وكمان احسن وكمان استخدم الskills بتاعت الديزاين ويبقا قوي واحترافي ويبقا جميييل واحترافي اكتر  وابحث عندك ويبقا قوي
+```
+
+Response summary (m19): the assistant clarified that Bawwab installs into the agent's settings on
+the computer (between the agent and its tools), not into the model or into cloud chat apps, and built
+a bilingual product website (`site/`). Its demo decisions are computed at build time by Bawwab's own
+policy code and the frozen D2 scanner (`tools/site/build_site.py`). Sources (OWASP LLM01, Simon
+Willison's "lethal trifecta") were found by web search; their primary pages could not be fetched
+from the build session, so the site states only what several sources agree on and links to them.
