@@ -47,9 +47,9 @@ def test_static_page_has_strict_csp_and_no_inline_code(served):
     html = body.decode("utf-8")
     csp = headers["Content-Security-Policy"]
     assert code == 200 and "script-src 'self'" in csp and "'unsafe-inline'" not in csp and "frame-ancestors 'none'" in csp
-    assert 'dir="rtl"' in html and '<script type="module" src="app/main.js"></script>' in html
+    assert 'dir="rtl"' in html and '<script src="bundle.js" defer></script>' in html
     assert "style=" not in html and "onclick=" not in html
-    for path in ("/app/main.js", "/engine/check.js", "/engine/worker.js", "/sw.js", "/manifest.webmanifest",
+    for path in ("/bundle.js", "/engine/worker-bundle.js", "/app/main.js", "/engine/check.js", "/engine/worker.js", "/sw.js", "/manifest.webmanifest",
                  "/fonts/plex-arabic-arabic-400.woff2", "/samples/samples.js"):
         assert req(port, "GET", path)[0] == 200, path
     for bad in ("/../server.py", "/app/../../ui/server.py", "/%2e%2e/server.py", "/web/index.html", "/fonts/OFL.txt/x"):

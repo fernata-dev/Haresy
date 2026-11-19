@@ -1,6 +1,8 @@
-// Bawwab website behaviour. Text from data is inserted with textContent only; icons are constant
+// Bawwab website behaviour (classic script: works in sandboxed previews and from file://). Text from data is inserted with textContent only; icons are constant
 // SVG strings parsed with DOMParser. No network calls, no tracking.
-import DEMO from "./demo-data.js";
+(function () {
+"use strict";
+const DEMO = self.BAWWAB_DEMO;
 
 const lang = document.documentElement.lang === "ar" ? "ar" : "en";
 const T = DEMO.text[lang];
@@ -153,3 +155,4 @@ if (!reduce && "IntersectionObserver" in window) {
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), {rootMargin: "0px 0px -8% 0px"});
   for (const el of document.querySelectorAll(".sec .wrap > *, .strip .wrap > *, .final-in > *")) { el.classList.add("rv"); io.observe(el); }
 }
+})();

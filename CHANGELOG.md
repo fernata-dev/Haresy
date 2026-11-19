@@ -28,6 +28,15 @@ ONLY if its exact sha256 is recorded there, and every results file and the repor
 
 ## History
 
+- **Blank page in sandboxed previews (found after user feedback, fixed).** The app and the site
+  loaded ES modules; browsers refuse module scripts, module workers and cross-origin fonts in a
+  sandboxed frame with an opaque origin (how embedded previews show pages) and on file:// pages, so
+  the app was an empty beige page there and the site's demo was empty. Earlier checks only used a
+  normal local server. Now the pages load generated classic bundles (`tools/web/bundle.py`; the
+  modules stay the source of truth), the worker falls back to the page when it cannot start, and
+  tests check bundle freshness and that the bundled engine returns the same reports as the modules.
+  Verified in a sandboxed iframe and from file:// (Chromium). Fonts still fall back to system
+  fonts in such frames (cross-origin font loads are refused).
 - **m19 — website.** `site/` (Arabic + English): hero with the doorway and a live decision log, the
   problem (OWASP LLM01, "lethal trifecta"), how it works, an interactive "Try the door" demo whose
   decisions are computed by `bawwab.policy` and D2 at build time, a real terminal recording,

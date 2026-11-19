@@ -23,6 +23,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python tools/export_engine_data.py --check      # rules in the app = rules in Python
+      - run: python tools/web/bundle.py --check                # page scripts = the ES modules
       - run: python tools/site/build_site.py --check           # site decisions = Bawwab's policy code
       - run: python tools/site/build_site.py --no-images --out _site
       - uses: actions/configure-pages@v5

@@ -3,7 +3,7 @@
 // The list is checked by tests/test_bawwab_web.py: every shipped file must be here.
 const CACHE = "bawwab-0.4.0";
 const FILES = [
-  "./", "index.html", "app.css", "icon.svg", "manifest.webmanifest",
+  "./", "index.html", "app.css", "icon.svg", "manifest.webmanifest", "bundle.js", "engine/worker-bundle.js",
   "app/main.js", "app/dom.js", "app/i18n.js", "app/check.js", "app/learn.js", "app/computer.js", "app/about.js",
   "engine/data.js", "engine/pyutil.js", "engine/normalizer.js", "engine/scanner.js", "engine/skillscan.js",
   "engine/docs.js", "engine/check.js", "engine/worker.js",

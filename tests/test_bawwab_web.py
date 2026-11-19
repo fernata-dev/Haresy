@@ -9,6 +9,7 @@ import json
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -91,3 +92,26 @@ def test_example_documents_are_bundled_as_one_module():
     for name in ("hidden.docx", "mail.eml", "page.html", "smuggle.txt"):
         assert f'"{name}":' in src
     assert sorted(p.name for p in (WEB / "samples").iterdir()) == ["samples.js"]
+
+
+def test_page_loads_classic_bundles_not_modules():
+    """Module scripts are refused in sandboxed previews (opaque origin) and on file:// pages, where
+    a module-only page is blank. The page loads generated classic bundles; they must be fresh."""
+    html = (WEB / "index.html").read_text(encoding="utf-8")
+    assert '<script src="bundle.js" defer></script>' in html and 'type="module"' not in html
+    root = WEB.parents[2]
+    r = subprocess.run([sys.executable, str(root / "tools" / "web" / "bundle.py"), "--check"], capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+    for f in ("bundle.js", "engine/worker-bundle.js"):
+        src = (WEB / f).read_text(encoding="utf-8")
+        assert "import.meta" not in src and not re.search(r"^\s*(import|export)\b", src, re.M), f
+
+
+def test_worker_bundle_gives_the_same_reports_as_the_modules(tmp_path):
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("node not installed")
+    root = WEB.parents[2]
+    subprocess.run([sys.executable, str(root / "tools" / "parity" / "make_doc_fixtures.py"), str(tmp_path)], check=True, capture_output=True)
+    r = subprocess.run([node, str(root / "tools" / "web" / "check_bundle.mjs"), str(tmp_path)], capture_output=True, text=True, encoding="utf-8")
+    assert r.returncode == 0, r.stdout[-2000:] + r.stderr[-2000:]
