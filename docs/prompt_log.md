@@ -193,3 +193,15 @@ Response summary: `docs/TRY_WITH_AN_AGENT.md`. Every command was run on a throwa
 Antigravity is not supported (manual MCP wiring only; its built-in terminal/browser bypass Bawwab);
 Claude Code is the supported target whose hook also covers built-in tools. The assistant gave
 attack goals and mock destinations, not ready-made jailbreak texts (the student writes those).
+
+## Prompt 14 — 2026-11-20 — meeting tomorrow, "stop any jailbreak", run on my laptop
+
+```text
+يبني المفروض بكرة هروح يشوفن الدكتور ويشوف مشروعي ف اعمل ايه كيف فهمني اشغله كياو اقصد اشرحه كيف وكمان لا احنا عايزينه يمنع اي جيلبريك زي ما قولتلك ودي مجموعه جيلبريكات قوية جدا جدا جدا بس المشكلة واحده انك مش على جهازي هل اقدر اخليك ع جهازي اللاب توب؟
+```
+
+Response summary: `tools/demo/meeting_demo.py` (one-command offline demo on a fake home, tested) and
+`docs/MEETING_AR.md` (laptop setup, order, honest answers). The assistant did not change the claim:
+no tool can guarantee stopping every jailbreak; Bawwab limits what a jailbroken agent can do. No
+jailbreak texts were attached to the message. The assistant could not reach the laptop from the
+cloud session and explained how to run Claude on it.
