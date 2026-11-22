@@ -5,18 +5,28 @@
 
 ## ١) الليلة: جهّز اللاب توب (CachyOS) — ٢٠ دقيقة
 
-```bash
-sudo pacman -S --needed git python nodejs
-git clone -b ccr-bf26486f-ag5cn6 https://github.com/fernata-dev/Haresy.git
-cd Haresy
-python -m venv .venv && source .venv/bin/activate
+> إنت شغّال على **fish shell** (باين من الـ prompt). عشان كده `source .venv/bin/activate` بايظ عندك:
+> الملف ده مكتوب لـ bash. استخدم `activate.fish`. ودي الأوامر الكاملة للـ fish:
+
+```fish
+# لو فولدر Haresy موجود من قبل، ادخله على طول (متعملش clone تاني):
+cd ~/Haresy ; or git clone -b ccr-bf26486f-ag5cn6 https://github.com/fernata-dev/Haresy.git ~/Haresy ; and cd ~/Haresy
+python -m venv .venv
+source .venv/bin/activate.fish        # ← مهم: .fish مش activate لوحده
 pip install -e ".[dev]"
 python -m hares restore-tags          # يرجّع علامات المراحل (m1 … m20)
 python -m pytest                      # كل الاختبارات لازم تعدّي
 python tools/demo/meeting_demo.py     # الديمو كله، خطوة خطوة (Enter بين كل خطوة)
-python -m hares report && xdg-open report/index.html
-bawwab ui                             # التطبيق في المتصفح
+python -m hares report ; and xdg-open report/index.html
+python -m bawwab ui                   # التطبيق في المتصفح
 ```
+
+**ملاحظات على الأخطاء اللي ظهرتلك في الـ terminal:**
+- `'bawwab' (0.3.0) already seems to be installed` — عندك نسخة قديمة متثبّتة بـ pipx. مش محتاجها
+  خالص للديمو (الديمو بيشتغل من الـ venv جوه فولدر Haresy). لو عايز تحدّثها: `pipx upgrade bawwab`
+  أو `pipx install --force "git+https://github.com/fernata-dev/Haresy.git@ccr-bf26486f-ag5cn6"`.
+- `No module named hares` و `can't open file '.../tools/demo/meeting_demo.py'` — سببهم إن الـ venv
+  ماكانش متفعّل (مشكلة fish فوق) وإنك ماكنتش جوه فولدر Haresy. الأوامر اللي فوق بتحل الاتنين.
 
 لو الريبو خاص وطلب منك باسورد: `gh auth login` الأول، أو حمّله ZIP من GitHub.
 
